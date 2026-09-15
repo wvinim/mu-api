@@ -43,18 +43,29 @@ describe('GET /api/v1/support/tickets', () => {
     const res = await request(app).get('/api/v1/support/tickets').set('Authorization', authHeader('player1'));
 
     expect(res.status).toBe(200);
-    expect(supportTicketsRepository.findByAccount).toHaveBeenCalledWith('player1', { page: 1, limit: 20 });
+    expect(supportTicketsRepository.findByAccount).toHaveBeenCalledWith('player1', { page: 1, limit: 20, status: undefined });
     expect(supportTicketsRepository.findAll).not.toHaveBeenCalled();
   });
 
-  it('staff vê todos os tickets', async () => {
+  it('staff vê os tickets abertos por padrão (sem os encerrados)', async () => {
     supportTicketsRepository.findAll.mockResolvedValue({ items: [], total: 0 });
 
     const res = await request(app).get('/api/v1/support/tickets').set('Authorization', authHeader('staffuser'));
 
     expect(res.status).toBe(200);
-    expect(supportTicketsRepository.findAll).toHaveBeenCalledWith({ page: 1, limit: 20 });
+    expect(supportTicketsRepository.findAll).toHaveBeenCalledWith({ page: 1, limit: 20, status: undefined });
     expect(supportTicketsRepository.findByAccount).not.toHaveBeenCalled();
+  });
+
+  it('staff consegue pedir explicitamente os tickets encerrados', async () => {
+    supportTicketsRepository.findAll.mockResolvedValue({ items: [], total: 0 });
+
+    const res = await request(app)
+      .get('/api/v1/support/tickets?status=closed')
+      .set('Authorization', authHeader('staffuser'));
+
+    expect(res.status).toBe(200);
+    expect(supportTicketsRepository.findAll).toHaveBeenCalledWith({ page: 1, limit: 20, status: 'closed' });
   });
 });
 
@@ -125,5 +136,44 @@ describe('POST /api/v1/support/tickets/:id/reply', () => {
       .send({ message: 'resposta do suporte' });
 
     expect(res.status).toBe(201);
+  });
+});
+
+describe('POST /api/v1/support/tickets/:id/close', () => {
+  it('dono do ticket pode encerrar', async () => {
+    supportTicketsRepository.findById.mockResolvedValue({ id: 1, accountId: 'player1', subject: 'x', status: 'open' });
+    supportTicketsRepository.closeTicket.mockResolvedValue(true);
+
+    const res = await request(app).post('/api/v1/support/tickets/1/close').set('Authorization', authHeader('player1'));
+
+    expect(res.status).toBe(200);
+    expect(supportTicketsRepository.closeTicket).toHaveBeenCalledWith(1);
+  });
+
+  it('staff pode encerrar ticket de qualquer jogador', async () => {
+    supportTicketsRepository.findById.mockResolvedValue({ id: 1, accountId: 'player1', subject: 'x', status: 'open' });
+    supportTicketsRepository.closeTicket.mockResolvedValue(true);
+
+    const res = await request(app).post('/api/v1/support/tickets/1/close').set('Authorization', authHeader('staffuser'));
+
+    expect(res.status).toBe(200);
+  });
+
+  it('outro jogador não pode encerrar um ticket alheio', async () => {
+    supportTicketsRepository.findById.mockResolvedValue({ id: 1, accountId: 'player1', subject: 'x', status: 'open' });
+
+    const res = await request(app).post('/api/v1/support/tickets/1/close').set('Authorization', authHeader('player2'));
+
+    expect(res.status).toBe(404);
+    expect(supportTicketsRepository.closeTicket).not.toHaveBeenCalled();
+  });
+
+  it('retorna 409 ao tentar encerrar um ticket já encerrado', async () => {
+    supportTicketsRepository.findById.mockResolvedValue({ id: 1, accountId: 'player1', subject: 'x', status: 'closed' });
+
+    const res = await request(app).post('/api/v1/support/tickets/1/close').set('Authorization', authHeader('player1'));
+
+    expect(res.status).toBe(409);
+    expect(supportTicketsRepository.closeTicket).not.toHaveBeenCalled();
   });
 });

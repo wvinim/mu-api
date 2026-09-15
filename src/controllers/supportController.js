@@ -35,10 +35,10 @@ async function createTicket(req, res, next) {
 
 async function listTickets(req, res, next) {
   try {
-    const { page, limit } = req.query;
+    const { page, limit, status } = req.query;
     const result = isStaffOrAdmin(req)
-      ? await supportTicketsRepository.findAll({ page, limit })
-      : await supportTicketsRepository.findByAccount(req.user.username, { page, limit });
+      ? await supportTicketsRepository.findAll({ page, limit, status })
+      : await supportTicketsRepository.findByAccount(req.user.username, { page, limit, status });
 
     res.json({ page, limit, total: result.total, items: result.items });
   } catch (err) {
@@ -95,4 +95,30 @@ async function replyTicket(req, res, next) {
   }
 }
 
-module.exports = { createTicket, listTickets, getTicket, replyTicket };
+async function closeTicket(req, res, next) {
+  try {
+    const ticket = await supportTicketsRepository.findById(req.params.id);
+    await assertCanAccessTicket(req, ticket);
+
+    if (ticket.status === 'closed') {
+      throw new AppError(409, 'TICKET_ALREADY_CLOSED', 'Ticket já está encerrado.');
+    }
+
+    await supportTicketsRepository.closeTicket(ticket.id);
+
+    await auditLog.record({
+      accountId: req.user.username,
+      username: req.user.username,
+      eventType: 'support.ticket_closed',
+      success: true,
+      ...requestMeta(req),
+      details: { ticketId: ticket.id },
+    });
+
+    res.json({ message: 'Ticket encerrado.' });
+  } catch (err) {
+    next(err);
+  }
+}
+
+module.exports = { createTicket, listTickets, getTicket, replyTicket, closeTicket };

@@ -19,5 +19,6 @@ router.post(
   validate(schemas.reply),
   controller.replyTicket,
 );
+router.post('/support/tickets/:id/close', validate(schemas.idParam, 'params'), controller.closeTicket);
 
 module.exports = router;

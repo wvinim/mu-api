@@ -56,48 +56,69 @@ async function findRepliesByTicket(ticketId) {
   return result.recordset;
 }
 
-async function findByAccount(accountId, { page = 1, limit = 20 } = {}) {
+async function findByAccount(accountId, { page = 1, limit = 20, status } = {}) {
   const pool = getPool();
   const firstRow = (page - 1) * limit + 1;
   const lastRow = page * limit;
-  const result = await pool
+  const request = pool
     .request()
     .input('accountId', sql.VarChar(10), accountId)
     .input('firstRow', sql.Int, firstRow)
-    .input('lastRow', sql.Int, lastRow)
-    .query(`
+    .input('lastRow', sql.Int, lastRow);
+  if (status) request.input('status', sql.VarChar(20), status);
+
+  const result = await request.query(`
       WITH Ranked AS (
         SELECT Id AS id, Subject AS subject, Status AS status, CreatedAt AS createdAt, UpdatedAt AS updatedAt,
                ROW_NUMBER() OVER (ORDER BY UpdatedAt DESC) AS rank
-        FROM WebSupportTickets WHERE AccountId = @accountId
+        FROM WebSupportTickets
+        WHERE AccountId = @accountId ${status ? 'AND Status = @status' : ''}
       )
       SELECT id, subject, status, createdAt, updatedAt FROM Ranked WHERE rank BETWEEN @firstRow AND @lastRow ORDER BY rank;
 
-      SELECT COUNT(*) AS total FROM WebSupportTickets WHERE AccountId = @accountId;
+      SELECT COUNT(*) AS total FROM WebSupportTickets WHERE AccountId = @accountId ${status ? 'AND Status = @status' : ''};
     `);
   return { items: result.recordsets[0], total: result.recordsets[1][0].total };
 }
 
-async function findAll({ page = 1, limit = 20 } = {}) {
+// Sem filtro explícito de status, a listagem (usada pelo admin/staff) esconde
+// tickets encerrados por padrão — só aparecem passando ?status=closed.
+async function findAll({ page = 1, limit = 20, status } = {}) {
   const pool = getPool();
   const firstRow = (page - 1) * limit + 1;
   const lastRow = page * limit;
-  const result = await pool
+  const effectiveStatus = status || 'open';
+  const request = pool
     .request()
     .input('firstRow', sql.Int, firstRow)
     .input('lastRow', sql.Int, lastRow)
-    .query(`
+    .input('status', sql.VarChar(20), effectiveStatus);
+
+  const result = await request.query(`
       WITH Ranked AS (
         SELECT Id AS id, AccountId AS accountId, Subject AS subject, Status AS status,
                CreatedAt AS createdAt, UpdatedAt AS updatedAt,
                ROW_NUMBER() OVER (ORDER BY UpdatedAt DESC) AS rank
-        FROM WebSupportTickets
+        FROM WebSupportTickets WHERE Status = @status
       )
       SELECT id, accountId, subject, status, createdAt, updatedAt FROM Ranked WHERE rank BETWEEN @firstRow AND @lastRow ORDER BY rank;
 
-      SELECT COUNT(*) AS total FROM WebSupportTickets;
+      SELECT COUNT(*) AS total FROM WebSupportTickets WHERE Status = @status;
     `);
   return { items: result.recordsets[0], total: result.recordsets[1][0].total };
 }
 
-module.exports = { createTicket, addReply, findById, findRepliesByTicket, findByAccount, findAll };
+async function closeTicket(id) {
+  const pool = getPool();
+  const result = await pool
+    .request()
+    .input('id', sql.Int, id)
+    .query(`
+      UPDATE WebSupportTickets
+      SET Status = 'closed', UpdatedAt = SYSUTCDATETIME()
+      WHERE Id = @id AND Status = 'open';
+    `);
+  return result.rowsAffected[0] > 0;
+}
+
+module.exports = { createTicket, addReply, findById, findRepliesByTicket, findByAccount, findAll, closeTicket };

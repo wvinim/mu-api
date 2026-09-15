@@ -12,6 +12,7 @@ const reply = Joi.object({
 const listQuery = Joi.object({
   page: Joi.number().integer().min(1).default(1),
   limit: Joi.number().integer().min(1).max(100).default(20),
+  status: Joi.string().valid('open', 'closed'),
 });
 
 const idParam = Joi.object({

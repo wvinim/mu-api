@@ -108,9 +108,10 @@ chamado pela Efí diretamente.
 | Método | Rota | Body/Query | Resposta |
 |---|---|---|---|
 | POST | `/support/tickets` | `{ subject(máx 200), message(máx 4000) }` | 201 `{ id, subject, status: "open" }`. Rate limit 5/hora |
-| GET | `/support/tickets` | `?page&limit` | `{ page, limit, total, items }` — player vê só os próprios, staff/admin veem todos |
+| GET | `/support/tickets` | `?page&limit&status(open\|closed)` | `{ page, limit, total, items }` — player vê só os próprios (todos os status por padrão); staff/admin veem todos, mas **sem `status`, encerrados ficam escondidos** — usar `?status=closed` pra ver |
 | GET | `/support/tickets/:id` | — | ticket + `{ replies: [{ ..., authorRole }] }`. **404 (não 403)** se não for o dono e não for staff/admin |
 | POST | `/support/tickets/:id/reply` | `{ message(máx 4000) }` | 201 `{ message }`. Mesma regra de acesso do GET |
+| POST | `/support/tickets/:id/close` | — | 200 `{ message }`. Mesma regra de acesso do GET. **409** se já estiver encerrado |
 
 ---
 

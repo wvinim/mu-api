@@ -13,8 +13,18 @@
   recebe **404** (não 403), pra não confirmar que aquele ID existe.
 - `POST /api/v1/support/tickets/:id/reply` — adiciona uma resposta.
   Mesma regra de acesso do detalhe.
-- Log de auditoria em `WebAuditLog` na criação de ticket e em cada
-  resposta.
+- `POST /api/v1/support/tickets/:id/close` — encerra o ticket (`Status`
+  vira `'closed'`). Mesma regra de acesso do detalhe (dono ou
+  staff/admin). Retorna **409** se o ticket já estiver encerrado.
+- `GET /api/v1/support/tickets` agora aceita `?status=open|closed`.
+  **Sem esse filtro, tickets encerrados não aparecem na listagem de
+  staff/admin** (default passa a ser `status=open` só para essa
+  listagem) — pra ver os encerrados é preciso pedir
+  `?status=closed` explicitamente. A listagem do jogador comum
+  (`findByAccount`) continua mostrando todos os status por padrão,
+  e aceita o mesmo filtro se quiser restringir.
+- Log de auditoria em `WebAuditLog` na criação de ticket, em cada
+  resposta e no encerramento (`support.ticket_closed`).
 - Migration `migrations/0003_support_tickets.sql` (`WebSupportTickets`,
   `WebSupportReplies`) — não aplicada.
 - Testes em `tests/support.test.js`, cobrindo as regras de
@@ -22,11 +32,13 @@
 
 ## Decisões tomadas (não pedidas explicitamente)
 
-- **Sem endpoint de fechar/reabrir ticket nesta seção.** A coluna
-  `Status` existe (`'open'`/`'closed'`, default `'open'`), mas nada nesta
-  seção altera esse valor — o brief não pediu isso aqui. Fica pronto pra
-  quando a Seção 7 (Administração) quiser adicionar
-  `PATCH /admin/support/tickets/:id` para staff fechar/reabrir.
+- **Sem endpoint de reabrir ticket.** Só fechar. Se precisar reabrir,
+  fica pra quando você pedir — provavelmente `POST .../reopen` restrito
+  a staff/admin, seguindo o mesmo padrão do close.
+- **Reply em ticket encerrado continua permitido.** Não bloqueei resposta
+  em ticket com `status='closed'` porque não foi pedido; se quiser esse
+  bloqueio (e nesse caso, quem pode ainda responder — só staff pra
+  reabrir implicitamente?), me avise antes de eu mudar esse comportamento.
 - **Papel do autor de cada resposta** (`authorRole`) é calculado na
   leitura (via a mesma lista fixa `ADMIN_USERNAMES`/`STAFF_USERNAMES`),
   não guardado na tabela — evita duas fontes de verdade sobre quem é
