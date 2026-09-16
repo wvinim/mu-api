@@ -57,6 +57,8 @@ projeto e o escopo funcional.
 | `npm start`         | Sobe a API em modo normal                   |
 | `npm test`          | Roda a suíte Jest                           |
 | `npm run test:watch`| Roda o Jest em modo watch                   |
+| `npm run dump-inventory -- <Nome>` | Diagnóstico só-leitura do `Inventory` de um personagem (bytes + grade 2D real) |
+| `npm run generate-item-dimensions` | Regenera `src/data/itemDimensions.json` a partir de `docs/inv/Item.txt` |
 
 ## Estrutura
 
@@ -69,9 +71,14 @@ src/
   middlewares/        # error handler central, 404 padronizado
   routes/             # rotas da API, montadas em /api/v1
   utils/              # logger (pino), AppError (erro padronizado)
+  data/itemDimensions.json  # grupo:índice -> largura/altura real (gerado, ver scripts/)
 tests/                # testes Jest + Supertest
+scripts/
+  dumpInventorySlots.js       # diagnóstico só-leitura do Inventory de um personagem
+  generateItemDimensions.js   # gera src/data/itemDimensions.json a partir de docs/inv/Item.txt
 docs/
   INVENTORY_BYTE_FORMAT.md   # formato binário da coluna Inventory (Loja)
+  inv/Item.txt, item.bmd      # tabela de itens do client (fonte de largura/altura)
   SECTION_*_*.md              # resumo de decisões/pendências por seção
 migrations/
   *.sql                        # migrations revisáveis — NUNCA aplicadas automaticamente
@@ -102,8 +109,26 @@ detalhes da estratégia híbrida de senha (client do jogo vs. login do site).
 - [x] Seção 4 — Personagens — ver `docs/SECTION_4_CHARACTERS.md`.
       Ranking por guild removido do escopo por decisão sua.
 - [x] Seção 5 — Loja/Créditos (Efí) — ver `docs/SECTION_5_SHOP.md`.
-      **Não testada** (sem credenciais de sandbox ainda). Requer aplicar
-      `migrations/0002_shop_tables.sql`.
+      **Pagamento Pix não testado** (sem credenciais de sandbox ainda).
+      Requer aplicar `migrations/0002_shop_tables.sql`.
+      **Resgate de item/bundle validado empiricamente em conta de teste**
+      (inserção no `Inventory`, bloqueio por mochila cheia, bloqueio por
+      personagem online) — ver os dois bugs de produção abaixo, já
+      corrigidos e com teste de regressão.
+      Bug 1: FK de `WebItemRedemptions`/`WebBundleRedemptions` para
+      `Character(Name)` travava o DELETE do personagem (e derrubava o
+      gameserver) depois de um resgate — corrigido com
+      `migrations/0005_fix_redemption_character_fk.sql`, **aplicada e
+      validada em produção** (schema confirmado + delete testado pelo
+      client do jogo).
+      Bug 2: itens maiores que 1x1 (ex: armadura 2x2) já presentes na
+      mochila "escondiam" células que o scanner via como livres — itens
+      da loja eram gravados no banco mas nunca apareciam no jogo. Corrigido
+      com uma grade 2D real baseada em `docs/inv/Item.txt` (ver
+      `docs/SECTION_5_SHOP.md`).
+      Resgate agora também bloqueia se o personagem estiver online
+      (`MEMB_STAT.ConnectStat`) ou sem espaço na mochila, checado **antes**
+      de debitar o Cash.
 - [x] Seção 6 — Suporte/Tickets — ver `docs/SECTION_6_SUPPORT.md`.
       Requer aplicar `migrations/0003_support_tickets.sql`.
 - [x] Seção 7 — Administração — ver `docs/SECTION_7_ADMIN.md`. CRUD de

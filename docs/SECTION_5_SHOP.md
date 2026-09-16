@@ -152,6 +152,115 @@ PK de cada tabela envolvida com um alias próprio (`ComponentId`/
 inspeciona o texto da query pra travar essa regra (confirmado que ele
 falha se alguém reintroduzir `ORDER BY b.Id, bi.Id`).
 
+### Bug corrigido em produção (relatado por você): DELETE de personagem crashava o gameserver
+
+Depois de um resgate (item ou bundle), o personagem passava a **travar o
+`DELETE`** no client do jogo, e o gameserver em C++ crashava nessa hora.
+Personagens sem nenhum resgate deletavam normalmente.
+
+**Causa**: as FKs `FK_WebItemRedemptions_Character` e
+`FK_WebBundleRedemptions_Character` (migrations 0002/0004) apontam para
+`Character(Name)` sem `ON DELETE` — o padrão do SQL Server é `NO ACTION`,
+que **rejeita o DELETE com erro 547** quando existe qualquer linha de
+resgate referenciando aquele personagem. O gameserver não trata esse erro
+de SQL e crasha em vez de simplesmente falhar a exclusão.
+
+**Correção**: `migrations/0005_fix_redemption_character_fk.sql` muda as
+duas FKs para `ON DELETE SET NULL` — o personagem pode ser deletado
+normalmente, e a linha de resgate continua existindo (conta, item/pacote,
+preço, data) só com `CharacterName = NULL`, mantendo o histórico
+financeiro/auditoria intacto. Isso exigiu tornar `CharacterName` nullable
+nas duas tabelas (a migration já faz isso).
+
+**✅ Aplicada e validada em produção (2026-09-16)**: confirmado via
+`sys.foreign_keys`/`sys.columns` que as duas FKs estão com
+`delete_referential_action_desc = 'SET_NULL'` e `CharacterName` nullable.
+Testado também pelo caminho que originalmente reproduzia o crash: deletar
+pelo client do jogo um personagem com histórico de resgate — funcionou
+sem travar/crashar.
+
+### Novas validações no resgate (item e bundle), pedidas por você
+
+Duas checagens novas, feitas **antes** de debitar o Cash (nenhuma delas
+debita e depois estorna — se falhar, nada muda no saldo):
+
+1. **Personagem não pode estar online.** Não existe uma coluna de
+   "personagem ativo" na tabela `Character` — a checagem usa
+   `MEMB_STAT.ConnectStat = 1` pela conta (`accountsRepository.isAccountOnline`),
+   assumindo que só um personagem por conta fica logado por vez (decisão
+   sua). Erro: **409 `CHARACTER_ONLINE`**.
+   ⚠️ `docs/SECTION_8_SERVER.md` já registrava que a confiabilidade de
+   `MEMB_STAT.ConnectStat` nunca foi validada contra o banco real — vale
+   confirmar isso também ao testar esta checagem.
+2. **Mochila precisa ter espaço para TODOS os itens da compra** (1 para
+   item avulso, N para bundle) antes de debitar — `inventoryService.findEmptyBagSlot`/
+   `countEmptyBagSlots` chamado antes do débito, não só depois como
+   fallback. Erro: **409 `INVENTORY_FULL`**.
+
+### Bug corrigido em produção (achado testando a checagem acima): item da loja "sumia" sem aparecer na mochila
+
+Ao testar a validação de espaço #2 acima, você reportou: deixou a mochila
+de um personagem de teste com só 1 espaço visível livre, resgatou um
+bundle de 2 itens, a API respondeu sucesso, mas a mochila continuava com
+1 espaço livre no jogo — os itens "sumiram".
+
+**Causa**: `findEmptyBagSlot`/`countEmptyBagSlots` liam a coluna
+`Inventory` byte a byte, tratando **1 slot do array = 1 célula visual da
+mochila**. Isso é verdade só para itens 1x1. Um item maior (ex: uma
+armadura 2x2) ocupa várias células na grade 8x8 real, mas só grava dados
+em **um** slot do array (a célula "âncora", canto superior esquerdo) — as
+outras 3 células que ele cobre visualmente continuam com os 16 bytes de
+"vazio" (`0xFF`) no banco, porque é o **client**, não o servidor, quem
+impede o jogador de soltar outro item ali (usando a largura/altura real
+do item, que o client conhece e o banco não guarda por instância). Nosso
+scanner via essas células cobertas como livres e inseria o item da loja
+bem ali — a escrita no banco funcionava, mas o client nunca desenhava um
+ícone novo numa célula que já estava visualmente ocupada por outro item.
+
+Diagnosticado com o script `scripts/dumpInventorySlots.js` (dump de bytes
++ status `MEMB_STAT`) comparando o array contra o que o jogo mostrava:
+o array tinha só ~20 slots ocupados onde o jogo mostrava a mochila quase
+cheia — a diferença batia exatamente com itens 2x2 no meio dos itens 1x1.
+
+**Correção**: você forneceu `docs/inv/Item.txt` (tabela de itens do
+client — colunas `X`/`Y` = largura/altura real de cada item). Isso virou
+`src/data/itemDimensions.json`, gerado por
+`node scripts/generateItemDimensions.js` (rode de novo sempre que o
+`Item.txt` for atualizado). `inventoryService.js` ganhou:
+- `decodeItemType`/`getItemDimensions` — descobre grupo/índice/tamanho de
+  um item já salvo no array.
+- `buildBagGrid` — reconstrói a ocupação real da grade 8x8 (não só do
+  array), marcando toda célula coberta pelo footprint de cada item já
+  presente, não só a âncora.
+- `findEmptyBagSlot`/`countEmptyBagSlots` agora usam essa grade — nunca
+  mais escolhem uma célula "vazia no array" que na verdade está coberta
+  por um item maior vizinho. Se algum item da mochila não estiver na
+  tabela de dimensões (footprint desconhecido), lançam
+  **409 `INVENTORY_UNKNOWN_ITEM`** em vez de arriscar sobrescrever algo.
+- `assertRedeemableAsSimpleItem` — chamado antes de debitar Cash pra
+  qualquer item/componente de bundle: se o item cadastrado na loja não
+  for 1x1 de verdade (conferido contra `Item.txt`), a compra é rejeitada
+  com **500 `UNSUPPORTED_ITEM_FOOTPRINT`** em vez de repetir o mesmo bug
+  na escrita (nossa lógica de inserção só sabe reservar 1 célula).
+
+**Validado empiricamente** (mesmo método do bug original): reproduzido o
+cenário exato (mochila com armaduras 2x2 misturadas + 1 espaço visível
+livre) — o dump confirmou que a nova lógica calcula **exatamente 1
+célula livre** e aponta o slot certo (não um fantasma coberto). Depois,
+testado ponta a ponta pela rota real: com 2 slots livres de verdade, um
+resgate de bundle (2 itens) caiu certinho nos dois espaços; com só 1
+livre, a API bloqueou com `INVENTORY_FULL` **antes de debitar**, sem
+inserir nada. Teste de regressão em `tests/inventoryService.test.js`
+reproduz esse cenário (armadura 2x2 escondendo células) para não voltar
+a quebrar silenciosamente.
+
+⚠️ **Ainda em aberto**: a tabela de dimensões cobre os itens que estavam
+em `docs/inv/Item.txt` no momento em que foi gerada. Se o servidor
+adicionar itens novos (evento, season update) sem atualizar esse arquivo
+e regenerar `itemDimensions.json`, um personagem com um desses itens novos
+na mochila vai fazer o resgate falhar com `INVENTORY_UNKNOWN_ITEM` (seguro,
+mas incômodo) até o arquivo ser atualizado.
+
 ### Schema novo
 
 `migrations/0004_shop_bundles.sql` — **não aplicada**, mesma mecânica das
@@ -210,6 +319,8 @@ alteração em tabela existente:
 7. **Aplicar `migrations/0004_shop_bundles.sql`** (revisar antes) — cria
    `WebShopBundles`, `WebShopBundleItems`, `WebBundleRedemptions` pro
    recurso de pacotes/bundles (ver adendo acima).
+8. ~~Aplicar `migrations/0005_fix_redemption_character_fk.sql`~~ —
+   **feito e validado em 2026-09-16** (ver seção acima).
 
 ## Próxima seção
 

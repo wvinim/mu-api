@@ -139,9 +139,20 @@ async function purchaseItem(req, res, id, username, meta) {
 
   const item = await shopItemsRepository.findById(id);
   if (!item || !item.Active) throw new AppError(404, 'NOT_FOUND', 'Item não encontrado.');
+  inventoryService.assertRedeemableAsSimpleItem(item.ItemGroup, item.ItemIndex);
 
   const character = await charactersRepository.findOwnedCharacter(username, characterName);
   if (!character) throw new AppError(404, 'NOT_FOUND', 'Personagem não encontrado nesta conta.');
+
+  const online = await accountsRepository.isAccountOnline(username);
+  if (online) {
+    throw new AppError(409, 'CHARACTER_ONLINE', 'Saia do jogo antes de resgatar itens da loja.');
+  }
+
+  const inventoryBuffer = await charactersRepository.getInventoryBuffer(characterName);
+  if (inventoryService.findEmptyBagSlot(inventoryBuffer) === -1) {
+    throw new AppError(409, 'INVENTORY_FULL', 'Mochila cheia. Libere espaço antes de resgatar este item.');
+  }
 
   const debited = await accountsRepository.debitCash(username, item.PriceCredits);
   if (!debited) {
@@ -150,7 +161,6 @@ async function purchaseItem(req, res, id, username, meta) {
 
   let inventoryResult;
   try {
-    const inventoryBuffer = await charactersRepository.getInventoryBuffer(characterName);
     inventoryResult = inventoryService.insertItemIntoInventory(inventoryBuffer, {
       itemGroup: item.ItemGroup,
       itemIndex: item.ItemIndex,
@@ -216,9 +226,27 @@ async function purchaseBundle(req, res, id, username, meta) {
 
   const bundle = await shopBundlesRepository.findById(id);
   if (!bundle || !bundle.Active) throw new AppError(404, 'NOT_FOUND', 'Pacote não encontrado.');
+  for (const component of bundle.Items) {
+    inventoryService.assertRedeemableAsSimpleItem(component.ItemGroup, component.ItemIndex);
+  }
 
   const character = await charactersRepository.findOwnedCharacter(username, characterName);
   if (!character) throw new AppError(404, 'NOT_FOUND', 'Personagem não encontrado nesta conta.');
+
+  const online = await accountsRepository.isAccountOnline(username);
+  if (online) {
+    throw new AppError(409, 'CHARACTER_ONLINE', 'Saia do jogo antes de resgatar itens da loja.');
+  }
+
+  const componentSpecs = expandBundleComponents(bundle);
+  const inventoryBuffer = await charactersRepository.getInventoryBuffer(characterName);
+  if (inventoryService.countEmptyBagSlots(inventoryBuffer) < componentSpecs.length) {
+    throw new AppError(
+      409,
+      'INVENTORY_FULL',
+      'Mochila cheia. Espaço insuficiente para todos os itens do pacote — nada foi alterado.',
+    );
+  }
 
   const debited = await accountsRepository.debitCash(username, bundle.PriceCredits);
   if (!debited) {
@@ -227,8 +255,7 @@ async function purchaseBundle(req, res, id, username, meta) {
 
   let insertResult;
   try {
-    const inventoryBuffer = await charactersRepository.getInventoryBuffer(characterName);
-    insertResult = inventoryService.insertItemsIntoInventory(inventoryBuffer, expandBundleComponents(bundle));
+    insertResult = inventoryService.insertItemsIntoInventory(inventoryBuffer, componentSpecs);
     await charactersRepository.updateInventory(characterName, insertResult.buffer);
   } catch (err) {
     // Tudo ou nada: se faltou espaço pra qualquer item do pacote, nada foi

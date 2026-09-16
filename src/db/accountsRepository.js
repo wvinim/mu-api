@@ -129,6 +129,21 @@ async function updateProfile(username, { displayName }) {
     .query("UPDATE MEMB_INFO SET memb_name = @displayName, modi_days = GETDATE() WHERE memb___id = @username");
 }
 
+/**
+ * Usado para bloquear resgates da loja enquanto o jogador está logado no
+ * jogo (só existe um personagem ativo por conta por vez, então "conta
+ * online" já identifica o personagem online). Ver docs/SECTION_8_SERVER.md
+ * sobre a confiabilidade de MEMB_STAT.ConnectStat.
+ */
+async function isAccountOnline(username) {
+  const pool = getPool();
+  const result = await pool
+    .request()
+    .input('username', sql.VarChar(10), username)
+    .query('SELECT 1 AS online FROM MEMB_STAT WHERE memb___id = @username AND ConnectStat = 1');
+  return result.recordset.length > 0;
+}
+
 /** Crédito incondicional (ex: confirmação de pagamento Pix). */
 async function creditCash(username, amount) {
   const pool = getPool();
@@ -216,6 +231,7 @@ module.exports = {
   setEmailConfirmed,
   updatePasswordBoth,
   updateProfile,
+  isAccountOnline,
   creditCash,
   debitCash,
   findAllPaginated,

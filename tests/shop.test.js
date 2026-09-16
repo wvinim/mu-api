@@ -59,7 +59,7 @@ function makeBundleFixture() {
     Active: true,
     Items: [
       { ItemId: 2, ItemName: 'Jewel Pack', ItemGroup: 14, ItemIndex: 5, ItemLevel: 1, ItemQuantity: 1, ComponentQuantity: 2 },
-      { ItemId: 3, ItemName: 'Kundun Box', ItemGroup: 14, ItemIndex: 30, ItemLevel: 0, ItemQuantity: 1, ComponentQuantity: 3 },
+      { ItemId: 3, ItemName: 'Kundun Box', ItemGroup: 14, ItemIndex: 13, ItemLevel: 0, ItemQuantity: 1, ComponentQuantity: 3 },
     ],
   };
 }
@@ -182,6 +182,8 @@ describe('POST /api/v1/shop/purchase — resgate de item', () => {
   it('rejeita quando não há créditos suficientes', async () => {
     shopItemsRepository.findById.mockResolvedValue({ Id: 2, Name: 'Item', PriceCredits: 100, ItemGroup: 14, ItemIndex: 0, ItemLevel: 0, Quantity: 1, Active: true });
     charactersRepository.findOwnedCharacter.mockResolvedValue({ Name: 'Hero1' });
+    accountsRepository.isAccountOnline.mockResolvedValue(false);
+    charactersRepository.getInventoryBuffer.mockResolvedValue(Buffer.from(EMPTY_INVENTORY));
     accountsRepository.debitCash.mockResolvedValue(false);
 
     const res = await request(app)
@@ -194,9 +196,26 @@ describe('POST /api/v1/shop/purchase — resgate de item', () => {
     expect(charactersRepository.updateInventory).not.toHaveBeenCalled();
   });
 
+  it('rejeita resgate se o personagem (conta) estiver online', async () => {
+    shopItemsRepository.findById.mockResolvedValue({ Id: 2, Name: 'Item', PriceCredits: 100, ItemGroup: 14, ItemIndex: 0, ItemLevel: 0, Quantity: 1, Active: true });
+    charactersRepository.findOwnedCharacter.mockResolvedValue({ Name: 'Hero1' });
+    accountsRepository.isAccountOnline.mockResolvedValue(true);
+
+    const res = await request(app)
+      .post('/api/v1/shop/purchase')
+      .set('Authorization', authHeader())
+      .send({ catalogId: 'item:2', characterName: 'Hero1' });
+
+    expect(res.status).toBe(409);
+    expect(res.body.error.code).toBe('CHARACTER_ONLINE');
+    expect(accountsRepository.debitCash).not.toHaveBeenCalled();
+    expect(charactersRepository.getInventoryBuffer).not.toHaveBeenCalled();
+  });
+
   it('insere o item na mochila (slot 12-75) e nunca em slot de equipamento', async () => {
     shopItemsRepository.findById.mockResolvedValue({ Id: 2, Name: 'Bundle', PriceCredits: 100, ItemGroup: 14, ItemIndex: 5, ItemLevel: 1, Quantity: 10, Active: true });
     charactersRepository.findOwnedCharacter.mockResolvedValue({ Name: 'Hero1' });
+    accountsRepository.isAccountOnline.mockResolvedValue(false);
     accountsRepository.debitCash.mockResolvedValue(true);
     charactersRepository.getInventoryBuffer.mockResolvedValue(Buffer.from(EMPTY_INVENTORY));
     charactersRepository.updateInventory.mockResolvedValue();
@@ -220,10 +239,10 @@ describe('POST /api/v1/shop/purchase — resgate de item', () => {
     }
   });
 
-  it('estorna os créditos se a mochila estiver cheia', async () => {
+  it('rejeita com mochila cheia SEM debitar créditos (checagem é antes do débito)', async () => {
     shopItemsRepository.findById.mockResolvedValue({ Id: 2, Name: 'Item', PriceCredits: 100, ItemGroup: 14, ItemIndex: 0, ItemLevel: 0, Quantity: 1, Active: true });
     charactersRepository.findOwnedCharacter.mockResolvedValue({ Name: 'Hero1' });
-    accountsRepository.debitCash.mockResolvedValue(true);
+    accountsRepository.isAccountOnline.mockResolvedValue(false);
     charactersRepository.getInventoryBuffer.mockResolvedValue(Buffer.from(FULL_INVENTORY));
 
     const res = await request(app)
@@ -233,7 +252,8 @@ describe('POST /api/v1/shop/purchase — resgate de item', () => {
 
     expect(res.status).toBe(409);
     expect(res.body.error.code).toBe('INVENTORY_FULL');
-    expect(accountsRepository.creditCash).toHaveBeenCalledWith('player1', 100);
+    expect(accountsRepository.debitCash).not.toHaveBeenCalled();
+    expect(accountsRepository.creditCash).not.toHaveBeenCalled();
     expect(itemRedemptionsRepository.create).not.toHaveBeenCalled();
   });
 });
@@ -276,6 +296,8 @@ describe('POST /api/v1/shop/purchase — resgate de pacote (bundle)', () => {
   it('rejeita quando não há créditos suficientes', async () => {
     shopBundlesRepository.findById.mockResolvedValue(makeBundleFixture());
     charactersRepository.findOwnedCharacter.mockResolvedValue({ Name: 'Hero1' });
+    accountsRepository.isAccountOnline.mockResolvedValue(false);
+    charactersRepository.getInventoryBuffer.mockResolvedValue(Buffer.from(EMPTY_INVENTORY));
     accountsRepository.debitCash.mockResolvedValue(false);
 
     const res = await request(app)
@@ -288,9 +310,25 @@ describe('POST /api/v1/shop/purchase — resgate de pacote (bundle)', () => {
     expect(charactersRepository.updateInventory).not.toHaveBeenCalled();
   });
 
+  it('rejeita resgate de pacote se o personagem (conta) estiver online', async () => {
+    shopBundlesRepository.findById.mockResolvedValue(makeBundleFixture());
+    charactersRepository.findOwnedCharacter.mockResolvedValue({ Name: 'Hero1' });
+    accountsRepository.isAccountOnline.mockResolvedValue(true);
+
+    const res = await request(app)
+      .post('/api/v1/shop/purchase')
+      .set('Authorization', authHeader())
+      .send({ catalogId: 'bundle:5', characterName: 'Hero1' });
+
+    expect(res.status).toBe(409);
+    expect(res.body.error.code).toBe('CHARACTER_ONLINE');
+    expect(accountsRepository.debitCash).not.toHaveBeenCalled();
+  });
+
   it('insere todos os itens do pacote (2 Jewel Pack + 3 Kundun Box) em slots distintos da mochila', async () => {
     shopBundlesRepository.findById.mockResolvedValue(makeBundleFixture());
     charactersRepository.findOwnedCharacter.mockResolvedValue({ Name: 'Hero1' });
+    accountsRepository.isAccountOnline.mockResolvedValue(false);
     accountsRepository.debitCash.mockResolvedValue(true);
     charactersRepository.getInventoryBuffer.mockResolvedValue(Buffer.from(EMPTY_INVENTORY));
     charactersRepository.updateInventory.mockResolvedValue();
@@ -327,10 +365,10 @@ describe('POST /api/v1/shop/purchase — resgate de pacote (bundle)', () => {
     }
   });
 
-  it('estorna os créditos e não grava nada se faltar espaço para TODOS os itens do pacote', async () => {
+  it('rejeita sem debitar créditos se faltar espaço para TODOS os itens do pacote', async () => {
     shopBundlesRepository.findById.mockResolvedValue(makeBundleFixture());
     charactersRepository.findOwnedCharacter.mockResolvedValue({ Name: 'Hero1' });
-    accountsRepository.debitCash.mockResolvedValue(true);
+    accountsRepository.isAccountOnline.mockResolvedValue(false);
     // Só 3 slots livres na mochila, mas o pacote precisa de 5 (2 + 3).
     charactersRepository.getInventoryBuffer.mockResolvedValue(inventoryWithFreeSlots([12, 13, 14]));
 
@@ -341,7 +379,8 @@ describe('POST /api/v1/shop/purchase — resgate de pacote (bundle)', () => {
 
     expect(res.status).toBe(409);
     expect(res.body.error.code).toBe('INVENTORY_FULL');
-    expect(accountsRepository.creditCash).toHaveBeenCalledWith('player1', 900);
+    expect(accountsRepository.debitCash).not.toHaveBeenCalled();
+    expect(accountsRepository.creditCash).not.toHaveBeenCalled();
     expect(charactersRepository.updateInventory).not.toHaveBeenCalled();
     expect(bundleRedemptionsRepository.create).not.toHaveBeenCalled();
   });

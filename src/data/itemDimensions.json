@@ -1,0 +1,2547 @@
+{
+  "0:0": {
+    "width": 1,
+    "height": 2,
+    "name": "Kris"
+  },
+  "0:1": {
+    "width": 1,
+    "height": 3,
+    "name": "Short Sword"
+  },
+  "0:2": {
+    "width": 1,
+    "height": 3,
+    "name": "Rapier"
+  },
+  "0:3": {
+    "width": 1,
+    "height": 3,
+    "name": "Katana"
+  },
+  "0:4": {
+    "width": 1,
+    "height": 3,
+    "name": "Sword of Assassin"
+  },
+  "0:5": {
+    "width": 1,
+    "height": 3,
+    "name": "Blade"
+  },
+  "0:6": {
+    "width": 1,
+    "height": 3,
+    "name": "Gladius"
+  },
+  "0:7": {
+    "width": 1,
+    "height": 3,
+    "name": "Falchion"
+  },
+  "0:8": {
+    "width": 1,
+    "height": 3,
+    "name": "Serpent Sword"
+  },
+  "0:9": {
+    "width": 2,
+    "height": 3,
+    "name": "Sword of Salamander"
+  },
+  "0:10": {
+    "width": 2,
+    "height": 4,
+    "name": "Light Saber"
+  },
+  "0:11": {
+    "width": 2,
+    "height": 3,
+    "name": "Legendary Sword"
+  },
+  "0:12": {
+    "width": 2,
+    "height": 3,
+    "name": "Heliacal Sword"
+  },
+  "0:13": {
+    "width": 1,
+    "height": 3,
+    "name": "Double Blade"
+  },
+  "0:14": {
+    "width": 1,
+    "height": 3,
+    "name": "Lighting Sword"
+  },
+  "0:15": {
+    "width": 2,
+    "height": 3,
+    "name": "Giant Sword"
+  },
+  "0:16": {
+    "width": 1,
+    "height": 4,
+    "name": "Sword of Destruction"
+  },
+  "0:17": {
+    "width": 2,
+    "height": 4,
+    "name": "Dark Breaker"
+  },
+  "0:18": {
+    "width": 2,
+    "height": 3,
+    "name": "Thunder Blade"
+  },
+  "0:19": {
+    "width": 1,
+    "height": 4,
+    "name": "Divine Sword of Archangel"
+  },
+  "0:20": {
+    "width": 1,
+    "height": 4,
+    "name": "Knight Blade"
+  },
+  "0:21": {
+    "width": 2,
+    "height": 4,
+    "name": "Dark Reign Blade"
+  },
+  "0:22": {
+    "width": 1,
+    "height": 4,
+    "name": "Bone Blade"
+  },
+  "0:23": {
+    "width": 1,
+    "height": 4,
+    "name": "Explosion Blade"
+  },
+  "0:24": {
+    "width": 1,
+    "height": 4,
+    "name": "Daybreak"
+  },
+  "0:25": {
+    "width": 2,
+    "height": 4,
+    "name": "Sword Dancer"
+  },
+  "0:31": {
+    "width": 2,
+    "height": 4,
+    "name": "Rune Blade"
+  },
+  "1:0": {
+    "width": 1,
+    "height": 3,
+    "name": "Small Axe"
+  },
+  "1:1": {
+    "width": 1,
+    "height": 3,
+    "name": "Hand Axe"
+  },
+  "1:2": {
+    "width": 1,
+    "height": 3,
+    "name": "Double Axe"
+  },
+  "1:3": {
+    "width": 1,
+    "height": 3,
+    "name": "Tomahawk"
+  },
+  "1:4": {
+    "width": 1,
+    "height": 3,
+    "name": "Elven Axe"
+  },
+  "1:5": {
+    "width": 2,
+    "height": 3,
+    "name": "Battle Axe"
+  },
+  "1:6": {
+    "width": 2,
+    "height": 3,
+    "name": "Nikea Axe"
+  },
+  "1:7": {
+    "width": 2,
+    "height": 3,
+    "name": "Larkan Axe"
+  },
+  "1:8": {
+    "width": 2,
+    "height": 3,
+    "name": "Crescent Axe"
+  },
+  "2:0": {
+    "width": 1,
+    "height": 3,
+    "name": "Mace"
+  },
+  "2:1": {
+    "width": 1,
+    "height": 3,
+    "name": "Morning Star"
+  },
+  "2:2": {
+    "width": 1,
+    "height": 3,
+    "name": "Flail"
+  },
+  "2:3": {
+    "width": 2,
+    "height": 3,
+    "name": "Great Hammer"
+  },
+  "2:4": {
+    "width": 2,
+    "height": 3,
+    "name": "Crystal Morning Star"
+  },
+  "2:5": {
+    "width": 2,
+    "height": 4,
+    "name": "Crystal Sword"
+  },
+  "2:6": {
+    "width": 2,
+    "height": 4,
+    "name": "Chaos Dragon Axe"
+  },
+  "2:7": {
+    "width": 1,
+    "height": 3,
+    "name": "Elemental Mace"
+  },
+  "2:8": {
+    "width": 1,
+    "height": 3,
+    "name": "Battle Scepter"
+  },
+  "2:9": {
+    "width": 1,
+    "height": 3,
+    "name": "Master Scepter"
+  },
+  "2:10": {
+    "width": 1,
+    "height": 4,
+    "name": "Great Scepter"
+  },
+  "2:11": {
+    "width": 1,
+    "height": 4,
+    "name": "Lord Scepter"
+  },
+  "2:12": {
+    "width": 1,
+    "height": 4,
+    "name": "Great Lord Scepter"
+  },
+  "2:13": {
+    "width": 1,
+    "height": 4,
+    "name": "Divine Scepter of Archangel"
+  },
+  "2:14": {
+    "width": 1,
+    "height": 4,
+    "name": "Soleil Sceptor"
+  },
+  "2:15": {
+    "width": 1,
+    "height": 4,
+    "name": "Shining Scepter"
+  },
+  "2:16": {
+    "width": 1,
+    "height": 3,
+    "name": "Mace of King"
+  },
+  "3:0": {
+    "width": 2,
+    "height": 4,
+    "name": "Light Spear"
+  },
+  "3:1": {
+    "width": 2,
+    "height": 4,
+    "name": "Spear"
+  },
+  "3:2": {
+    "width": 2,
+    "height": 4,
+    "name": "Dragon Lance"
+  },
+  "3:3": {
+    "width": 2,
+    "height": 4,
+    "name": "Giant Trident"
+  },
+  "3:4": {
+    "width": 2,
+    "height": 4,
+    "name": "Serpent Spear"
+  },
+  "3:5": {
+    "width": 2,
+    "height": 4,
+    "name": "Double Poleaxe"
+  },
+  "3:6": {
+    "width": 2,
+    "height": 4,
+    "name": "Halberd"
+  },
+  "3:7": {
+    "width": 2,
+    "height": 4,
+    "name": "Berdysh"
+  },
+  "3:8": {
+    "width": 2,
+    "height": 4,
+    "name": "Great Scythe"
+  },
+  "3:9": {
+    "width": 2,
+    "height": 4,
+    "name": "Bill of Balrog"
+  },
+  "3:10": {
+    "width": 2,
+    "height": 4,
+    "name": "Dragon Spear"
+  },
+  "4:0": {
+    "width": 2,
+    "height": 3,
+    "name": "Short Bow"
+  },
+  "4:1": {
+    "width": 2,
+    "height": 3,
+    "name": "Bow"
+  },
+  "4:2": {
+    "width": 2,
+    "height": 3,
+    "name": "Elven Bow"
+  },
+  "4:3": {
+    "width": 2,
+    "height": 3,
+    "name": "Battle Bow"
+  },
+  "4:4": {
+    "width": 2,
+    "height": 4,
+    "name": "Tiger Bow"
+  },
+  "4:5": {
+    "width": 2,
+    "height": 4,
+    "name": "Silver Bow"
+  },
+  "4:6": {
+    "width": 2,
+    "height": 4,
+    "name": "Chaos Nature Bow"
+  },
+  "4:7": {
+    "width": 1,
+    "height": 1,
+    "name": "Bolt"
+  },
+  "4:8": {
+    "width": 2,
+    "height": 2,
+    "name": "Crossbow"
+  },
+  "4:9": {
+    "width": 2,
+    "height": 2,
+    "name": "Golden Crossbow"
+  },
+  "4:10": {
+    "width": 2,
+    "height": 2,
+    "name": "Arquebus"
+  },
+  "4:11": {
+    "width": 2,
+    "height": 3,
+    "name": "Light Crossbow"
+  },
+  "4:12": {
+    "width": 2,
+    "height": 3,
+    "name": "Serpent Crossbow"
+  },
+  "4:13": {
+    "width": 2,
+    "height": 3,
+    "name": "Bluewing Crossbow"
+  },
+  "4:14": {
+    "width": 2,
+    "height": 3,
+    "name": "Aquagold Crossbow"
+  },
+  "4:15": {
+    "width": 1,
+    "height": 1,
+    "name": "Arrow"
+  },
+  "4:16": {
+    "width": 2,
+    "height": 4,
+    "name": "Saint Crossbow"
+  },
+  "4:17": {
+    "width": 2,
+    "height": 4,
+    "name": "Celestial Bow"
+  },
+  "4:18": {
+    "width": 2,
+    "height": 3,
+    "name": "Divine Crossbow of Archangel"
+  },
+  "4:19": {
+    "width": 2,
+    "height": 3,
+    "name": "Great Reign Crossbow"
+  },
+  "4:20": {
+    "width": 2,
+    "height": 4,
+    "name": "Arrow Viper Bow"
+  },
+  "4:21": {
+    "width": 2,
+    "height": 4,
+    "name": "Sylph Wind Bow"
+  },
+  "4:22": {
+    "width": 2,
+    "height": 4,
+    "name": "Albatross Bow"
+  },
+  "5:0": {
+    "width": 1,
+    "height": 3,
+    "name": "Skull Staff"
+  },
+  "5:1": {
+    "width": 2,
+    "height": 3,
+    "name": "Angelic Staff"
+  },
+  "5:2": {
+    "width": 2,
+    "height": 3,
+    "name": "Serpent Staff"
+  },
+  "5:3": {
+    "width": 2,
+    "height": 4,
+    "name": "Thunder Staff"
+  },
+  "5:4": {
+    "width": 2,
+    "height": 4,
+    "name": "Gorgon Staff"
+  },
+  "5:5": {
+    "width": 1,
+    "height": 4,
+    "name": "Legendary Staff"
+  },
+  "5:6": {
+    "width": 1,
+    "height": 4,
+    "name": "Staff of Resurrection"
+  },
+  "5:7": {
+    "width": 2,
+    "height": 4,
+    "name": "Chaos Lighting Staff"
+  },
+  "5:8": {
+    "width": 2,
+    "height": 4,
+    "name": "Staff of Destruction"
+  },
+  "5:9": {
+    "width": 1,
+    "height": 4,
+    "name": "Dragon Soul Staff"
+  },
+  "5:10": {
+    "width": 1,
+    "height": 4,
+    "name": "Divine Staff of Archangel"
+  },
+  "5:11": {
+    "width": 1,
+    "height": 4,
+    "name": "Staff of Kundun"
+  },
+  "5:12": {
+    "width": 1,
+    "height": 4,
+    "name": "Grand Viper Staff"
+  },
+  "5:13": {
+    "width": 1,
+    "height": 4,
+    "name": "Platina Staff"
+  },
+  "6:0": {
+    "width": 2,
+    "height": 2,
+    "name": "Small Shield"
+  },
+  "6:1": {
+    "width": 2,
+    "height": 2,
+    "name": "Horn Shield"
+  },
+  "6:2": {
+    "width": 2,
+    "height": 2,
+    "name": "Kite Shield"
+  },
+  "6:3": {
+    "width": 2,
+    "height": 2,
+    "name": "Elven Shield"
+  },
+  "6:4": {
+    "width": 2,
+    "height": 2,
+    "name": "Buckler"
+  },
+  "6:5": {
+    "width": 2,
+    "height": 2,
+    "name": "Dragon Slayer Shield"
+  },
+  "6:6": {
+    "width": 2,
+    "height": 2,
+    "name": "Skull Shield"
+  },
+  "6:7": {
+    "width": 2,
+    "height": 2,
+    "name": "Spiked Shield"
+  },
+  "6:8": {
+    "width": 2,
+    "height": 2,
+    "name": "Tower Shield"
+  },
+  "6:9": {
+    "width": 2,
+    "height": 2,
+    "name": "Plate Shield"
+  },
+  "6:10": {
+    "width": 2,
+    "height": 2,
+    "name": "Large Round Shield"
+  },
+  "6:11": {
+    "width": 2,
+    "height": 2,
+    "name": "Serpent Shield"
+  },
+  "6:12": {
+    "width": 2,
+    "height": 2,
+    "name": "Bronze Shield"
+  },
+  "6:13": {
+    "width": 2,
+    "height": 2,
+    "name": "Dragon Shield"
+  },
+  "6:14": {
+    "width": 2,
+    "height": 2,
+    "name": "Legendary Shield"
+  },
+  "6:15": {
+    "width": 2,
+    "height": 2,
+    "name": "Grand Soul Shield"
+  },
+  "6:16": {
+    "width": 2,
+    "height": 2,
+    "name": "Elemental Shield"
+  },
+  "7:0": {
+    "width": 2,
+    "height": 2,
+    "name": "Bronze Helm"
+  },
+  "7:1": {
+    "width": 2,
+    "height": 2,
+    "name": "Dragon Helm"
+  },
+  "7:2": {
+    "width": 2,
+    "height": 2,
+    "name": "Pad Helm"
+  },
+  "7:3": {
+    "width": 2,
+    "height": 2,
+    "name": "Legendary Helm"
+  },
+  "7:4": {
+    "width": 2,
+    "height": 2,
+    "name": "Bone Helm"
+  },
+  "7:5": {
+    "width": 2,
+    "height": 2,
+    "name": "Leather Helm"
+  },
+  "7:6": {
+    "width": 2,
+    "height": 2,
+    "name": "Scale Helm"
+  },
+  "7:7": {
+    "width": 2,
+    "height": 2,
+    "name": "Sphinx Mask"
+  },
+  "7:8": {
+    "width": 2,
+    "height": 2,
+    "name": "Brass Helm"
+  },
+  "7:9": {
+    "width": 2,
+    "height": 2,
+    "name": "Plate Helm"
+  },
+  "7:10": {
+    "width": 2,
+    "height": 2,
+    "name": "Vine Helm"
+  },
+  "7:11": {
+    "width": 2,
+    "height": 2,
+    "name": "Silk Helm"
+  },
+  "7:12": {
+    "width": 2,
+    "height": 2,
+    "name": "Wind Helm"
+  },
+  "7:13": {
+    "width": 2,
+    "height": 2,
+    "name": "Spirit Helm"
+  },
+  "7:14": {
+    "width": 2,
+    "height": 2,
+    "name": "Guardian Helm"
+  },
+  "7:16": {
+    "width": 2,
+    "height": 2,
+    "name": "Black Dragon Helm"
+  },
+  "7:17": {
+    "width": 2,
+    "height": 2,
+    "name": "Dark Phoenix Helm"
+  },
+  "7:18": {
+    "width": 2,
+    "height": 2,
+    "name": "Grand Soul Helm"
+  },
+  "7:19": {
+    "width": 2,
+    "height": 2,
+    "name": "Divine Helm"
+  },
+  "7:21": {
+    "width": 2,
+    "height": 2,
+    "name": "Great Dragon Helm"
+  },
+  "7:22": {
+    "width": 2,
+    "height": 2,
+    "name": "Dark Soul Helm"
+  },
+  "7:24": {
+    "width": 2,
+    "height": 2,
+    "name": "Red Spirit Helm"
+  },
+  "7:25": {
+    "width": 2,
+    "height": 2,
+    "name": "Light Plate Mask"
+  },
+  "7:26": {
+    "width": 2,
+    "height": 2,
+    "name": "Adamantine Mask"
+  },
+  "7:27": {
+    "width": 2,
+    "height": 2,
+    "name": "Dark Steel Mask"
+  },
+  "7:28": {
+    "width": 2,
+    "height": 2,
+    "name": "Dark Master Mask"
+  },
+  "7:29": {
+    "width": 2,
+    "height": 2,
+    "name": "Dragon Knight Helm"
+  },
+  "7:30": {
+    "width": 2,
+    "height": 2,
+    "name": "Venom Mist Helm"
+  },
+  "7:31": {
+    "width": 2,
+    "height": 2,
+    "name": "Sylphid Ray Helm"
+  },
+  "7:33": {
+    "width": 2,
+    "height": 2,
+    "name": "Sunlight Mask"
+  },
+  "7:34": {
+    "width": 2,
+    "height": 2,
+    "name": "Ashcrow Helm"
+  },
+  "7:35": {
+    "width": 2,
+    "height": 2,
+    "name": "Eclipse Helm"
+  },
+  "7:36": {
+    "width": 2,
+    "height": 2,
+    "name": "Iris Helm"
+  },
+  "7:38": {
+    "width": 2,
+    "height": 2,
+    "name": "Glorious Mask"
+  },
+  "8:0": {
+    "width": 2,
+    "height": 2,
+    "name": "Bronze Armor"
+  },
+  "8:1": {
+    "width": 2,
+    "height": 2,
+    "name": "Dragon Armor"
+  },
+  "8:2": {
+    "width": 2,
+    "height": 2,
+    "name": "Pad Armor"
+  },
+  "8:3": {
+    "width": 2,
+    "height": 2,
+    "name": "Legendary Armor"
+  },
+  "8:4": {
+    "width": 2,
+    "height": 2,
+    "name": "Bone Armor"
+  },
+  "8:5": {
+    "width": 2,
+    "height": 2,
+    "name": "Leather Armor"
+  },
+  "8:6": {
+    "width": 2,
+    "height": 2,
+    "name": "Scale Armor"
+  },
+  "8:7": {
+    "width": 2,
+    "height": 2,
+    "name": "Sphinx Armor"
+  },
+  "8:8": {
+    "width": 2,
+    "height": 2,
+    "name": "Brass Armor"
+  },
+  "8:9": {
+    "width": 2,
+    "height": 2,
+    "name": "Plate Armor"
+  },
+  "8:10": {
+    "width": 2,
+    "height": 2,
+    "name": "Vine Armor"
+  },
+  "8:11": {
+    "width": 2,
+    "height": 2,
+    "name": "Silk Armor"
+  },
+  "8:12": {
+    "width": 2,
+    "height": 2,
+    "name": "Wind Armor"
+  },
+  "8:13": {
+    "width": 2,
+    "height": 2,
+    "name": "Spirit Armor"
+  },
+  "8:14": {
+    "width": 2,
+    "height": 2,
+    "name": "Guardian Armor"
+  },
+  "8:15": {
+    "width": 2,
+    "height": 2,
+    "name": "Storm Crow Armor"
+  },
+  "8:16": {
+    "width": 2,
+    "height": 2,
+    "name": "Black Dragon Armor"
+  },
+  "8:17": {
+    "width": 2,
+    "height": 2,
+    "name": "Dark Phoenix Armor"
+  },
+  "8:18": {
+    "width": 2,
+    "height": 2,
+    "name": "Grand Soul Armor"
+  },
+  "8:19": {
+    "width": 2,
+    "height": 2,
+    "name": "Divine Armor"
+  },
+  "8:20": {
+    "width": 2,
+    "height": 2,
+    "name": "Thunder Hawk Armor"
+  },
+  "8:21": {
+    "width": 2,
+    "height": 2,
+    "name": "Great Dragon Armor"
+  },
+  "8:22": {
+    "width": 2,
+    "height": 2,
+    "name": "Dark Soul Armor"
+  },
+  "8:23": {
+    "width": 2,
+    "height": 2,
+    "name": "Hurricane Armor"
+  },
+  "8:24": {
+    "width": 2,
+    "height": 2,
+    "name": "Red Sprit Armor"
+  },
+  "8:25": {
+    "width": 2,
+    "height": 2,
+    "name": "Light Plate Armor"
+  },
+  "8:26": {
+    "width": 2,
+    "height": 2,
+    "name": "Adamantine Armor"
+  },
+  "8:27": {
+    "width": 2,
+    "height": 2,
+    "name": "Dark Steel Armor"
+  },
+  "8:28": {
+    "width": 2,
+    "height": 2,
+    "name": "Dark Master Armor"
+  },
+  "8:29": {
+    "width": 2,
+    "height": 2,
+    "name": "Dragon Knight Armor"
+  },
+  "8:30": {
+    "width": 2,
+    "height": 2,
+    "name": "Venom Mist Armor"
+  },
+  "8:31": {
+    "width": 2,
+    "height": 2,
+    "name": "Sylphid Ray Armor"
+  },
+  "8:32": {
+    "width": 2,
+    "height": 2,
+    "name": "Volcano Armor"
+  },
+  "8:33": {
+    "width": 2,
+    "height": 2,
+    "name": "Sunlight Armor"
+  },
+  "8:34": {
+    "width": 2,
+    "height": 2,
+    "name": "Ashcrow Armor"
+  },
+  "8:35": {
+    "width": 2,
+    "height": 2,
+    "name": "Eclipse Armor"
+  },
+  "8:36": {
+    "width": 2,
+    "height": 2,
+    "name": "Iris Armor"
+  },
+  "8:37": {
+    "width": 2,
+    "height": 2,
+    "name": "Valiant Armor"
+  },
+  "8:38": {
+    "width": 2,
+    "height": 2,
+    "name": "Glorious Armor"
+  },
+  "9:0": {
+    "width": 2,
+    "height": 2,
+    "name": "Bronze Pants"
+  },
+  "9:1": {
+    "width": 2,
+    "height": 2,
+    "name": "Dragon Pants"
+  },
+  "9:2": {
+    "width": 2,
+    "height": 2,
+    "name": "Pad Pants"
+  },
+  "9:3": {
+    "width": 2,
+    "height": 2,
+    "name": "Legendary Pants"
+  },
+  "9:4": {
+    "width": 2,
+    "height": 2,
+    "name": "Bone Pants"
+  },
+  "9:5": {
+    "width": 2,
+    "height": 2,
+    "name": "Leather Pants"
+  },
+  "9:6": {
+    "width": 2,
+    "height": 2,
+    "name": "Scale Pants"
+  },
+  "9:7": {
+    "width": 2,
+    "height": 2,
+    "name": "Sphinx Pants"
+  },
+  "9:8": {
+    "width": 2,
+    "height": 2,
+    "name": "Brass Pants"
+  },
+  "9:9": {
+    "width": 2,
+    "height": 2,
+    "name": "Plate Pants"
+  },
+  "9:10": {
+    "width": 2,
+    "height": 2,
+    "name": "Vine Pants"
+  },
+  "9:11": {
+    "width": 2,
+    "height": 2,
+    "name": "Silk Pants"
+  },
+  "9:12": {
+    "width": 2,
+    "height": 2,
+    "name": "Wind Pants"
+  },
+  "9:13": {
+    "width": 2,
+    "height": 2,
+    "name": "Spirit Pants"
+  },
+  "9:14": {
+    "width": 2,
+    "height": 2,
+    "name": "Guardian Pants"
+  },
+  "9:15": {
+    "width": 2,
+    "height": 2,
+    "name": "Storm Crow Pants"
+  },
+  "9:16": {
+    "width": 2,
+    "height": 2,
+    "name": "Black Dragon Pants"
+  },
+  "9:17": {
+    "width": 2,
+    "height": 2,
+    "name": "Dark Phoenix Pants"
+  },
+  "9:18": {
+    "width": 2,
+    "height": 2,
+    "name": "Grand Soul Pants"
+  },
+  "9:19": {
+    "width": 2,
+    "height": 2,
+    "name": "Divine Pants"
+  },
+  "9:20": {
+    "width": 2,
+    "height": 2,
+    "name": "Thunder Hawk Pants"
+  },
+  "9:21": {
+    "width": 2,
+    "height": 2,
+    "name": "Great Dragon Pants"
+  },
+  "9:22": {
+    "width": 2,
+    "height": 2,
+    "name": "Dark Soul Pants"
+  },
+  "9:23": {
+    "width": 2,
+    "height": 2,
+    "name": "Hurricane Pants"
+  },
+  "9:24": {
+    "width": 2,
+    "height": 2,
+    "name": "Red Spirit Pants"
+  },
+  "9:25": {
+    "width": 2,
+    "height": 2,
+    "name": "Light Plate Pants"
+  },
+  "9:26": {
+    "width": 2,
+    "height": 2,
+    "name": "Adamantine Pants"
+  },
+  "9:27": {
+    "width": 2,
+    "height": 2,
+    "name": "Dark Steel Pants"
+  },
+  "9:28": {
+    "width": 2,
+    "height": 2,
+    "name": "Dark Master Pants"
+  },
+  "9:29": {
+    "width": 2,
+    "height": 2,
+    "name": "Dragon Knight Pants"
+  },
+  "9:30": {
+    "width": 2,
+    "height": 2,
+    "name": "Venom Mist Pants"
+  },
+  "9:31": {
+    "width": 2,
+    "height": 2,
+    "name": "Sylphid Ray Pants"
+  },
+  "9:32": {
+    "width": 2,
+    "height": 2,
+    "name": "Volcano Pants"
+  },
+  "9:33": {
+    "width": 2,
+    "height": 2,
+    "name": "Sunlight Pants"
+  },
+  "9:34": {
+    "width": 2,
+    "height": 2,
+    "name": "Ashcrow Pants"
+  },
+  "9:35": {
+    "width": 2,
+    "height": 2,
+    "name": "Eclipse Pants"
+  },
+  "9:36": {
+    "width": 2,
+    "height": 2,
+    "name": "Iris Pants"
+  },
+  "9:37": {
+    "width": 2,
+    "height": 2,
+    "name": "Valiant Pants"
+  },
+  "9:38": {
+    "width": 2,
+    "height": 2,
+    "name": "Glorious Pants"
+  },
+  "10:0": {
+    "width": 2,
+    "height": 2,
+    "name": "Bronze Gloves"
+  },
+  "10:1": {
+    "width": 2,
+    "height": 2,
+    "name": "Dragon Gloves"
+  },
+  "10:2": {
+    "width": 2,
+    "height": 2,
+    "name": "Pad Gloves"
+  },
+  "10:3": {
+    "width": 2,
+    "height": 2,
+    "name": "Legendary Gloves"
+  },
+  "10:4": {
+    "width": 2,
+    "height": 2,
+    "name": "Bone Gloves"
+  },
+  "10:5": {
+    "width": 2,
+    "height": 2,
+    "name": "Leather Gloves"
+  },
+  "10:6": {
+    "width": 2,
+    "height": 2,
+    "name": "Scale Gloves"
+  },
+  "10:7": {
+    "width": 2,
+    "height": 2,
+    "name": "Sphinx Gloves"
+  },
+  "10:8": {
+    "width": 2,
+    "height": 2,
+    "name": "Brass Gloves"
+  },
+  "10:9": {
+    "width": 2,
+    "height": 2,
+    "name": "Plate Gloves"
+  },
+  "10:10": {
+    "width": 2,
+    "height": 2,
+    "name": "Vine Gloves"
+  },
+  "10:11": {
+    "width": 2,
+    "height": 2,
+    "name": "Silk Gloves"
+  },
+  "10:12": {
+    "width": 2,
+    "height": 2,
+    "name": "Wind Gloves"
+  },
+  "10:13": {
+    "width": 2,
+    "height": 2,
+    "name": "Spirit Gloves"
+  },
+  "10:14": {
+    "width": 2,
+    "height": 2,
+    "name": "Guardian Gloves"
+  },
+  "10:15": {
+    "width": 2,
+    "height": 2,
+    "name": "Storm Crow Gloves"
+  },
+  "10:16": {
+    "width": 2,
+    "height": 2,
+    "name": "Black Dragon Gloves"
+  },
+  "10:17": {
+    "width": 2,
+    "height": 2,
+    "name": "Dark Phoenix Gloves"
+  },
+  "10:18": {
+    "width": 2,
+    "height": 2,
+    "name": "Grand Soul Gloves"
+  },
+  "10:19": {
+    "width": 2,
+    "height": 2,
+    "name": "Divine Gloves"
+  },
+  "10:20": {
+    "width": 2,
+    "height": 2,
+    "name": "Thunder Hawk Gloves"
+  },
+  "10:21": {
+    "width": 2,
+    "height": 2,
+    "name": "Great Dragon Gloves"
+  },
+  "10:22": {
+    "width": 2,
+    "height": 2,
+    "name": "Dark Soul Gloves"
+  },
+  "10:23": {
+    "width": 2,
+    "height": 2,
+    "name": "Hurricane Gloves"
+  },
+  "10:24": {
+    "width": 2,
+    "height": 2,
+    "name": "Red Spirit Gloves"
+  },
+  "10:25": {
+    "width": 2,
+    "height": 2,
+    "name": "Light Plate Gloves"
+  },
+  "10:26": {
+    "width": 2,
+    "height": 2,
+    "name": "Adamantine Gloves"
+  },
+  "10:27": {
+    "width": 2,
+    "height": 2,
+    "name": "Dark Steel Gloves"
+  },
+  "10:28": {
+    "width": 2,
+    "height": 2,
+    "name": "Dark Master Gloves"
+  },
+  "10:29": {
+    "width": 2,
+    "height": 2,
+    "name": "Dragon Knight Gloves"
+  },
+  "10:30": {
+    "width": 2,
+    "height": 2,
+    "name": "Venom Mist Gloves"
+  },
+  "10:31": {
+    "width": 2,
+    "height": 2,
+    "name": "Sylphid Ray Gloves"
+  },
+  "10:32": {
+    "width": 2,
+    "height": 2,
+    "name": "Volcano Gloves"
+  },
+  "10:33": {
+    "width": 2,
+    "height": 2,
+    "name": "Sunlight Gloves"
+  },
+  "10:34": {
+    "width": 2,
+    "height": 2,
+    "name": "Ashcrow Gloves"
+  },
+  "10:35": {
+    "width": 2,
+    "height": 2,
+    "name": "Eclipse Gloves"
+  },
+  "10:36": {
+    "width": 2,
+    "height": 2,
+    "name": "Iris Gloves"
+  },
+  "10:37": {
+    "width": 2,
+    "height": 2,
+    "name": "Valiant Gloves"
+  },
+  "10:38": {
+    "width": 2,
+    "height": 2,
+    "name": "Glorious Gloves"
+  },
+  "11:0": {
+    "width": 2,
+    "height": 2,
+    "name": "Bronze Boots"
+  },
+  "11:1": {
+    "width": 2,
+    "height": 2,
+    "name": "Dragon Boots"
+  },
+  "11:2": {
+    "width": 2,
+    "height": 2,
+    "name": "Pad Boots"
+  },
+  "11:3": {
+    "width": 2,
+    "height": 2,
+    "name": "Legendary Boots"
+  },
+  "11:4": {
+    "width": 2,
+    "height": 2,
+    "name": "Bone Boots"
+  },
+  "11:5": {
+    "width": 2,
+    "height": 2,
+    "name": "Leather Boots"
+  },
+  "11:6": {
+    "width": 2,
+    "height": 2,
+    "name": "Scale Boots"
+  },
+  "11:7": {
+    "width": 2,
+    "height": 2,
+    "name": "Sphinx Boots"
+  },
+  "11:8": {
+    "width": 2,
+    "height": 2,
+    "name": "Brass Boots"
+  },
+  "11:9": {
+    "width": 2,
+    "height": 2,
+    "name": "Plate Boots"
+  },
+  "11:10": {
+    "width": 2,
+    "height": 2,
+    "name": "Vine Boots"
+  },
+  "11:11": {
+    "width": 2,
+    "height": 2,
+    "name": "Silk Boots"
+  },
+  "11:12": {
+    "width": 2,
+    "height": 2,
+    "name": "Wind Boots"
+  },
+  "11:13": {
+    "width": 2,
+    "height": 2,
+    "name": "Spirit Boots"
+  },
+  "11:14": {
+    "width": 2,
+    "height": 2,
+    "name": "Guardian Boots"
+  },
+  "11:15": {
+    "width": 2,
+    "height": 2,
+    "name": "Storm Crow Boots"
+  },
+  "11:16": {
+    "width": 2,
+    "height": 2,
+    "name": "Black Dragon Boots"
+  },
+  "11:17": {
+    "width": 2,
+    "height": 2,
+    "name": "Dark Phoenix Boots"
+  },
+  "11:18": {
+    "width": 2,
+    "height": 2,
+    "name": "Grand Soul Boots"
+  },
+  "11:19": {
+    "width": 2,
+    "height": 2,
+    "name": "Divine Boots"
+  },
+  "11:20": {
+    "width": 2,
+    "height": 2,
+    "name": "Thunder Hawk Boots"
+  },
+  "11:21": {
+    "width": 2,
+    "height": 2,
+    "name": "Great Dragon Boots"
+  },
+  "11:22": {
+    "width": 2,
+    "height": 2,
+    "name": "Dark Soul Boots"
+  },
+  "11:23": {
+    "width": 2,
+    "height": 2,
+    "name": "Hurricane Boots"
+  },
+  "11:24": {
+    "width": 2,
+    "height": 2,
+    "name": "Red Spirit Boots"
+  },
+  "11:25": {
+    "width": 2,
+    "height": 2,
+    "name": "Light Plate Boots"
+  },
+  "11:26": {
+    "width": 2,
+    "height": 2,
+    "name": "Adamantine Boots"
+  },
+  "11:27": {
+    "width": 2,
+    "height": 2,
+    "name": "Dark Steel Boots"
+  },
+  "11:28": {
+    "width": 2,
+    "height": 2,
+    "name": "Dark Master Boots"
+  },
+  "11:29": {
+    "width": 2,
+    "height": 2,
+    "name": "Dragon Knight Boots"
+  },
+  "11:30": {
+    "width": 2,
+    "height": 2,
+    "name": "Venom Mist Boots"
+  },
+  "11:31": {
+    "width": 2,
+    "height": 2,
+    "name": "Sylphid Ray Boots"
+  },
+  "11:32": {
+    "width": 2,
+    "height": 2,
+    "name": "Volcano Boots"
+  },
+  "11:33": {
+    "width": 2,
+    "height": 2,
+    "name": "Sunlight Boots"
+  },
+  "11:34": {
+    "width": 2,
+    "height": 2,
+    "name": "Ashcrow Boots"
+  },
+  "11:35": {
+    "width": 2,
+    "height": 2,
+    "name": "Eclipse Boots"
+  },
+  "11:36": {
+    "width": 2,
+    "height": 2,
+    "name": "Iris Boots"
+  },
+  "11:37": {
+    "width": 2,
+    "height": 2,
+    "name": "Valiant Boots"
+  },
+  "11:38": {
+    "width": 2,
+    "height": 2,
+    "name": "Glorious Boots"
+  },
+  "12:0": {
+    "width": 3,
+    "height": 2,
+    "name": "Wings of Elf"
+  },
+  "12:1": {
+    "width": 5,
+    "height": 3,
+    "name": "Wings of Heaven"
+  },
+  "12:2": {
+    "width": 5,
+    "height": 2,
+    "name": "Wings of Satan"
+  },
+  "12:3": {
+    "width": 5,
+    "height": 3,
+    "name": "Wings of Spirits"
+  },
+  "12:4": {
+    "width": 5,
+    "height": 3,
+    "name": "Wings of Soul"
+  },
+  "12:5": {
+    "width": 3,
+    "height": 3,
+    "name": "Wings of Dragon"
+  },
+  "12:6": {
+    "width": 4,
+    "height": 2,
+    "name": "Wings of Darkness"
+  },
+  "12:7": {
+    "width": 1,
+    "height": 1,
+    "name": "Orb of Twisting Slash"
+  },
+  "12:8": {
+    "width": 1,
+    "height": 1,
+    "name": "Healing Orb"
+  },
+  "12:9": {
+    "width": 1,
+    "height": 1,
+    "name": "Orb of Greater Fortitude"
+  },
+  "12:10": {
+    "width": 1,
+    "height": 1,
+    "name": "Orb of Greater Damage"
+  },
+  "12:11": {
+    "width": 1,
+    "height": 1,
+    "name": "Orb of Summoning"
+  },
+  "12:12": {
+    "width": 1,
+    "height": 1,
+    "name": "Orb of Rageful Blow"
+  },
+  "12:13": {
+    "width": 1,
+    "height": 1,
+    "name": "Orb of Impale"
+  },
+  "12:14": {
+    "width": 1,
+    "height": 1,
+    "name": "Orb of Greater Fortitude"
+  },
+  "12:15": {
+    "width": 1,
+    "height": 1,
+    "name": "Jewel of Chaos"
+  },
+  "12:16": {
+    "width": 1,
+    "height": 1,
+    "name": "Orb of Fire Slash"
+  },
+  "12:17": {
+    "width": 1,
+    "height": 1,
+    "name": "Orb of Penetration"
+  },
+  "12:18": {
+    "width": 1,
+    "height": 1,
+    "name": "Orb of Ice Arrow"
+  },
+  "12:19": {
+    "width": 1,
+    "height": 1,
+    "name": "Orb of Death Stab"
+  },
+  "12:21": {
+    "width": 1,
+    "height": 2,
+    "name": "Scroll of FireBurst"
+  },
+  "12:22": {
+    "width": 1,
+    "height": 2,
+    "name": "Scroll of Summon"
+  },
+  "12:23": {
+    "width": 1,
+    "height": 2,
+    "name": "Scroll of Critical Damage"
+  },
+  "12:24": {
+    "width": 1,
+    "height": 2,
+    "name": "Scroll of Electric Spark"
+  },
+  "12:26": {
+    "width": 1,
+    "height": 1,
+    "name": "gem of secret"
+  },
+  "12:30": {
+    "width": 1,
+    "height": 1,
+    "name": "bundle of Jewel of Bless"
+  },
+  "12:31": {
+    "width": 1,
+    "height": 1,
+    "name": "budle of Jewel of Soul"
+  },
+  "12:32": {
+    "width": 1,
+    "height": 1,
+    "name": "box of red ribbon"
+  },
+  "12:33": {
+    "width": 1,
+    "height": 1,
+    "name": "box of green ribbon"
+  },
+  "12:34": {
+    "width": 1,
+    "height": 1,
+    "name": "box of blue ribbon"
+  },
+  "12:35": {
+    "width": 1,
+    "height": 2,
+    "name": "Scroll of Fire Scream"
+  },
+  "12:36": {
+    "width": 4,
+    "height": 3,
+    "name": "Wing of Storm"
+  },
+  "12:37": {
+    "width": 4,
+    "height": 3,
+    "name": "Wing of Eternal"
+  },
+  "12:38": {
+    "width": 4,
+    "height": 3,
+    "name": "Wing of Illusion"
+  },
+  "12:39": {
+    "width": 4,
+    "height": 3,
+    "name": "Wing of Doom"
+  },
+  "12:40": {
+    "width": 2,
+    "height": 3,
+    "name": "Mantle of Monarch"
+  },
+  "13:0": {
+    "width": 1,
+    "height": 1,
+    "name": "Guardian Angel"
+  },
+  "13:1": {
+    "width": 1,
+    "height": 1,
+    "name": "Imp"
+  },
+  "13:2": {
+    "width": 1,
+    "height": 1,
+    "name": "Horn of Uniria"
+  },
+  "13:3": {
+    "width": 1,
+    "height": 1,
+    "name": "Horn of Dinorant"
+  },
+  "13:4": {
+    "width": 1,
+    "height": 1,
+    "name": "Dark Horse"
+  },
+  "13:5": {
+    "width": 1,
+    "height": 1,
+    "name": "Dark Raven"
+  },
+  "13:7": {
+    "width": 1,
+    "height": 1,
+    "name": "Contract (Summon)"
+  },
+  "13:8": {
+    "width": 1,
+    "height": 1,
+    "name": "Ring of Ice"
+  },
+  "13:9": {
+    "width": 1,
+    "height": 1,
+    "name": "Ring of Poison"
+  },
+  "13:10": {
+    "width": 1,
+    "height": 1,
+    "name": "Transformation Ring"
+  },
+  "13:11": {
+    "width": 1,
+    "height": 1,
+    "name": "Order (Guardian/Life Stone)"
+  },
+  "13:12": {
+    "width": 1,
+    "height": 1,
+    "name": "Pendant of Lighting"
+  },
+  "13:13": {
+    "width": 1,
+    "height": 1,
+    "name": "Pendant of Fire"
+  },
+  "13:14": {
+    "width": 1,
+    "height": 2,
+    "name": "Loch's Feather"
+  },
+  "13:15": {
+    "width": 1,
+    "height": 1,
+    "name": "Fruits"
+  },
+  "13:16": {
+    "width": 1,
+    "height": 2,
+    "name": "Scroll of Archangel"
+  },
+  "13:17": {
+    "width": 1,
+    "height": 2,
+    "name": "Blood Bone"
+  },
+  "13:18": {
+    "width": 2,
+    "height": 2,
+    "name": "Invisibility Cloak"
+  },
+  "13:19": {
+    "width": 1,
+    "height": 2,
+    "name": "Absolute Weapon of Archangel"
+  },
+  "13:20": {
+    "width": 1,
+    "height": 1,
+    "name": "Wizards Ring"
+  },
+  "13:21": {
+    "width": 1,
+    "height": 1,
+    "name": "Ring of Fire"
+  },
+  "13:22": {
+    "width": 1,
+    "height": 1,
+    "name": "Ring of Earth"
+  },
+  "13:23": {
+    "width": 1,
+    "height": 1,
+    "name": "Ring of Wind"
+  },
+  "13:24": {
+    "width": 1,
+    "height": 1,
+    "name": "Ring of Magic"
+  },
+  "13:25": {
+    "width": 1,
+    "height": 1,
+    "name": "Pendant of Ice"
+  },
+  "13:26": {
+    "width": 1,
+    "height": 1,
+    "name": "Pendant of Wind"
+  },
+  "13:27": {
+    "width": 1,
+    "height": 1,
+    "name": "Pendant of Water"
+  },
+  "13:28": {
+    "width": 1,
+    "height": 1,
+    "name": "Pendant of Ability"
+  },
+  "13:29": {
+    "width": 2,
+    "height": 2,
+    "name": "Armor of Guardsman"
+  },
+  "13:30": {
+    "width": 2,
+    "height": 3,
+    "name": "Cape of Lord"
+  },
+  "13:31": {
+    "width": 1,
+    "height": 1,
+    "name": "Spirit"
+  },
+  "13:32": {
+    "width": 1,
+    "height": 1,
+    "name": "Splinter of Armor"
+  },
+  "13:33": {
+    "width": 1,
+    "height": 1,
+    "name": "Bless of Guardian"
+  },
+  "13:34": {
+    "width": 1,
+    "height": 1,
+    "name": "Claw of Beast"
+  },
+  "13:35": {
+    "width": 1,
+    "height": 1,
+    "name": "Fragment of Horn"
+  },
+  "13:36": {
+    "width": 2,
+    "height": 2,
+    "name": "Broken Horn"
+  },
+  "13:37": {
+    "width": 2,
+    "height": 2,
+    "name": "Horn of Fenrir"
+  },
+  "13:38": {
+    "width": 1,
+    "height": 1,
+    "name": "Moonstone Pendant"
+  },
+  "13:39": {
+    "width": 1,
+    "height": 1,
+    "name": "Elite Skeleton Ring"
+  },
+  "13:40": {
+    "width": 1,
+    "height": 1,
+    "name": "Jack O'Lantern Ring"
+  },
+  "13:41": {
+    "width": 1,
+    "height": 1,
+    "name": "SantaGirl Ring"
+  },
+  "13:42": {
+    "width": 1,
+    "height": 1,
+    "name": "GameMaster Ring"
+  },
+  "13:43": {
+    "width": 1,
+    "height": 1,
+    "name": "Seal of Ascension"
+  },
+  "13:44": {
+    "width": 1,
+    "height": 1,
+    "name": "Seal of Wealth"
+  },
+  "13:45": {
+    "width": 1,
+    "height": 1,
+    "name": "Seal of Sustenance"
+  },
+  "13:46": {
+    "width": 1,
+    "height": 1,
+    "name": "Devil Square Ticket"
+  },
+  "13:47": {
+    "width": 1,
+    "height": 1,
+    "name": "Blood Castle Ticket"
+  },
+  "13:48": {
+    "width": 1,
+    "height": 1,
+    "name": "Kalima Ticket"
+  },
+  "13:49": {
+    "width": 1,
+    "height": 1,
+    "name": "Old Scroll"
+  },
+  "13:50": {
+    "width": 1,
+    "height": 2,
+    "name": "Covenant"
+  },
+  "13:51": {
+    "width": 2,
+    "height": 2,
+    "name": "Scroll Of Blood"
+  },
+  "13:52": {
+    "width": 1,
+    "height": 2,
+    "name": "Condor Flame"
+  },
+  "13:53": {
+    "width": 1,
+    "height": 2,
+    "name": "Condor Feather"
+  },
+  "13:54": {
+    "width": 1,
+    "height": 1,
+    "name": "Reset Fruit Strenght"
+  },
+  "13:55": {
+    "width": 1,
+    "height": 1,
+    "name": "Reset Fruit Agility"
+  },
+  "13:56": {
+    "width": 1,
+    "height": 1,
+    "name": "Reset Fruit Vitality"
+  },
+  "13:57": {
+    "width": 1,
+    "height": 1,
+    "name": "Reset Fruit Energy"
+  },
+  "13:58": {
+    "width": 1,
+    "height": 1,
+    "name": "Reset Fruit Command"
+  },
+  "13:59": {
+    "width": 1,
+    "height": 1,
+    "name": "Seal of Mobility"
+  },
+  "13:60": {
+    "width": 1,
+    "height": 2,
+    "name": "Indulgence"
+  },
+  "13:61": {
+    "width": 1,
+    "height": 1,
+    "name": "Illusion Temple Ticket"
+  },
+  "14:0": {
+    "width": 1,
+    "height": 1,
+    "name": "Apple"
+  },
+  "14:1": {
+    "width": 1,
+    "height": 1,
+    "name": "Small Healing Potion"
+  },
+  "14:2": {
+    "width": 1,
+    "height": 1,
+    "name": "Healing Potion"
+  },
+  "14:3": {
+    "width": 1,
+    "height": 1,
+    "name": "Large Healing Potion"
+  },
+  "14:4": {
+    "width": 1,
+    "height": 1,
+    "name": "Small Mana Potion"
+  },
+  "14:5": {
+    "width": 1,
+    "height": 1,
+    "name": "Mana Potion"
+  },
+  "14:6": {
+    "width": 1,
+    "height": 1,
+    "name": "Large Mana Potion"
+  },
+  "14:7": {
+    "width": 1,
+    "height": 1,
+    "name": "Siege Potion"
+  },
+  "14:8": {
+    "width": 1,
+    "height": 1,
+    "name": "Antidote"
+  },
+  "14:9": {
+    "width": 1,
+    "height": 2,
+    "name": "Ale"
+  },
+  "14:10": {
+    "width": 1,
+    "height": 2,
+    "name": "Town Portal Scroll"
+  },
+  "14:11": {
+    "width": 1,
+    "height": 1,
+    "name": "Box of Luck"
+  },
+  "14:12": {
+    "width": 1,
+    "height": 1,
+    "name": "Heart"
+  },
+  "14:13": {
+    "width": 1,
+    "height": 1,
+    "name": "Jewel of Bless"
+  },
+  "14:14": {
+    "width": 1,
+    "height": 1,
+    "name": "Jewel of Soul"
+  },
+  "14:15": {
+    "width": 1,
+    "height": 1,
+    "name": "Zen"
+  },
+  "14:16": {
+    "width": 1,
+    "height": 1,
+    "name": "Jewel of Life"
+  },
+  "14:17": {
+    "width": 1,
+    "height": 1,
+    "name": "Devil's Eye"
+  },
+  "14:18": {
+    "width": 1,
+    "height": 1,
+    "name": "Devil's Key"
+  },
+  "14:19": {
+    "width": 1,
+    "height": 1,
+    "name": "Devil's Invitation"
+  },
+  "14:20": {
+    "width": 1,
+    "height": 1,
+    "name": "Remedy of Love"
+  },
+  "14:21": {
+    "width": 1,
+    "height": 1,
+    "name": "Rena"
+  },
+  "14:22": {
+    "width": 1,
+    "height": 1,
+    "name": "Jewel of Creation"
+  },
+  "14:23": {
+    "width": 1,
+    "height": 1,
+    "name": "Scroll of the Emperor"
+  },
+  "14:24": {
+    "width": 1,
+    "height": 2,
+    "name": "Broken Sword"
+  },
+  "14:25": {
+    "width": 1,
+    "height": 1,
+    "name": "Tear of Elf"
+  },
+  "14:26": {
+    "width": 1,
+    "height": 1,
+    "name": "Soul Shard of Wizard"
+  },
+  "14:28": {
+    "width": 1,
+    "height": 1,
+    "name": "Lost Map"
+  },
+  "14:29": {
+    "width": 1,
+    "height": 1,
+    "name": "Symbol of Kundun"
+  },
+  "14:31": {
+    "width": 1,
+    "height": 1,
+    "name": "Jewel of Guardian"
+  },
+  "14:32": {
+    "width": 1,
+    "height": 1,
+    "name": "Pink Chocolate Box"
+  },
+  "14:33": {
+    "width": 1,
+    "height": 1,
+    "name": "Red Chocolate Box"
+  },
+  "14:34": {
+    "width": 1,
+    "height": 1,
+    "name": "Blue Chocolate Box"
+  },
+  "14:35": {
+    "width": 1,
+    "height": 1,
+    "name": "Small SD Potion"
+  },
+  "14:36": {
+    "width": 1,
+    "height": 1,
+    "name": "SD Potion"
+  },
+  "14:37": {
+    "width": 1,
+    "height": 1,
+    "name": "Large SD Potion"
+  },
+  "14:38": {
+    "width": 1,
+    "height": 1,
+    "name": "Small Complex Potion"
+  },
+  "14:39": {
+    "width": 1,
+    "height": 1,
+    "name": "Complex Potion"
+  },
+  "14:40": {
+    "width": 1,
+    "height": 1,
+    "name": "Large Complex Potion"
+  },
+  "14:41": {
+    "width": 1,
+    "height": 1,
+    "name": "Gemstone"
+  },
+  "14:42": {
+    "width": 1,
+    "height": 1,
+    "name": "Jewel of Harmony"
+  },
+  "14:43": {
+    "width": 1,
+    "height": 1,
+    "name": "Lower refining stone"
+  },
+  "14:44": {
+    "width": 1,
+    "height": 1,
+    "name": "Higher refining stone"
+  },
+  "14:45": {
+    "width": 1,
+    "height": 1,
+    "name": "Halloween Pumpkin"
+  },
+  "14:46": {
+    "width": 1,
+    "height": 2,
+    "name": "Jack O'Lantern Blessing Scroll"
+  },
+  "14:47": {
+    "width": 1,
+    "height": 2,
+    "name": "Jack O'Lantern Rage Scroll"
+  },
+  "14:48": {
+    "width": 1,
+    "height": 2,
+    "name": "Jack O'Lantern Scream Scroll"
+  },
+  "14:49": {
+    "width": 1,
+    "height": 1,
+    "name": "Jack O'Lantern Food Scroll"
+  },
+  "14:50": {
+    "width": 1,
+    "height": 1,
+    "name": "Jack O'Lantern Drink Scroll"
+  },
+  "14:51": {
+    "width": 1,
+    "height": 1,
+    "name": "Star"
+  },
+  "14:52": {
+    "width": 1,
+    "height": 1,
+    "name": "GameMaster Box"
+  },
+  "14:53": {
+    "width": 1,
+    "height": 1,
+    "name": "Talisman of Luck"
+  },
+  "14:54": {
+    "width": 1,
+    "height": 1,
+    "name": "Chaos Card"
+  },
+  "14:55": {
+    "width": 1,
+    "height": 1,
+    "name": "Green Chaos Box"
+  },
+  "14:56": {
+    "width": 1,
+    "height": 1,
+    "name": "Red Chaos Box"
+  },
+  "14:57": {
+    "width": 1,
+    "height": 1,
+    "name": "Purple Chaos Box"
+  },
+  "14:58": {
+    "width": 1,
+    "height": 1,
+    "name": "Flameberge Gambling Talisman"
+  },
+  "14:59": {
+    "width": 1,
+    "height": 1,
+    "name": "Sword Breaker Gambling Talisma"
+  },
+  "14:60": {
+    "width": 1,
+    "height": 1,
+    "name": "Cross Shield Gambling Talisman"
+  },
+  "14:61": {
+    "width": 1,
+    "height": 1,
+    "name": "Deadly Staff Gambling Talisman"
+  },
+  "14:62": {
+    "width": 1,
+    "height": 1,
+    "name": "Reserved Gambling Talisman"
+  },
+  "14:63": {
+    "width": 1,
+    "height": 1,
+    "name": "Firework"
+  },
+  "14:64": {
+    "width": 1,
+    "height": 1,
+    "name": "Illusion Torch"
+  },
+  "14:65": {
+    "width": 1,
+    "height": 1,
+    "name": "Flame of Death Beam Knight"
+  },
+  "14:66": {
+    "width": 1,
+    "height": 2,
+    "name": "Horn of Hell Maine"
+  },
+  "14:67": {
+    "width": 1,
+    "height": 2,
+    "name": "Feather of Phoenix of Darkness"
+  },
+  "14:70": {
+    "width": 1,
+    "height": 1,
+    "name": "Elite Healing Potion"
+  },
+  "14:71": {
+    "width": 1,
+    "height": 1,
+    "name": "Elite Mana Potion"
+  },
+  "14:72": {
+    "width": 2,
+    "height": 2,
+    "name": "Scroll of Quickness"
+  },
+  "14:73": {
+    "width": 2,
+    "height": 2,
+    "name": "Scroll of Defense"
+  },
+  "14:74": {
+    "width": 2,
+    "height": 2,
+    "name": "Scroll of Wrath"
+  },
+  "14:75": {
+    "width": 2,
+    "height": 2,
+    "name": "Scroll of Wizardry"
+  },
+  "14:76": {
+    "width": 2,
+    "height": 2,
+    "name": "Scroll of Health"
+  },
+  "14:77": {
+    "width": 2,
+    "height": 2,
+    "name": "Scroll of Mana"
+  },
+  "14:78": {
+    "width": 1,
+    "height": 2,
+    "name": "Leap of Strength"
+  },
+  "14:79": {
+    "width": 1,
+    "height": 2,
+    "name": "Leap of Agility"
+  },
+  "14:80": {
+    "width": 1,
+    "height": 2,
+    "name": "Leap of Health"
+  },
+  "14:81": {
+    "width": 1,
+    "height": 2,
+    "name": "Leap of Energy"
+  },
+  "14:82": {
+    "width": 1,
+    "height": 2,
+    "name": "Leap of Control"
+  },
+  "14:83": {
+    "width": 1,
+    "height": 1,
+    "name": "Rare Item Ticket Special"
+  },
+  "14:84": {
+    "width": 1,
+    "height": 1,
+    "name": "Jewel of Excelente"
+  },
+  "14:85": {
+    "width": 1,
+    "height": 1,
+    "name": "Jewel of Level"
+  },
+  "14:86": {
+    "width": 1,
+    "height": 1,
+    "name": "Jewel of Luck"
+  },
+  "14:87": {
+    "width": 1,
+    "height": 1,
+    "name": "Jewel of Option"
+  },
+  "14:88": {
+    "width": 2,
+    "height": 2,
+    "name": "Death Invitation"
+  },
+  "15:0": {
+    "width": 1,
+    "height": 2,
+    "name": "Scroll of Poison"
+  },
+  "15:1": {
+    "width": 1,
+    "height": 2,
+    "name": "Scroll of Meteorite"
+  },
+  "15:2": {
+    "width": 1,
+    "height": 2,
+    "name": "Scroll of Lighting"
+  },
+  "15:3": {
+    "width": 1,
+    "height": 2,
+    "name": "Scroll of Fire Ball"
+  },
+  "15:4": {
+    "width": 1,
+    "height": 2,
+    "name": "Scroll of Flame"
+  },
+  "15:5": {
+    "width": 1,
+    "height": 2,
+    "name": "Scroll of Teleport"
+  },
+  "15:6": {
+    "width": 1,
+    "height": 2,
+    "name": "Scroll of Ice"
+  },
+  "15:7": {
+    "width": 1,
+    "height": 2,
+    "name": "Scroll of Twister"
+  },
+  "15:8": {
+    "width": 1,
+    "height": 2,
+    "name": "Scroll of Evil Spirit"
+  },
+  "15:9": {
+    "width": 1,
+    "height": 2,
+    "name": "Scroll of Hellfire"
+  },
+  "15:10": {
+    "width": 1,
+    "height": 2,
+    "name": "Scroll of Power Wave"
+  },
+  "15:11": {
+    "width": 1,
+    "height": 2,
+    "name": "Scroll of Aqua Beam"
+  },
+  "15:12": {
+    "width": 1,
+    "height": 2,
+    "name": "Scroll of Cometfall"
+  },
+  "15:13": {
+    "width": 1,
+    "height": 2,
+    "name": "Scroll of Inferno"
+  },
+  "15:14": {
+    "width": 1,
+    "height": 2,
+    "name": "Scroll of Teleport Ally"
+  },
+  "15:15": {
+    "width": 1,
+    "height": 2,
+    "name": "Scroll of Soul Barrier"
+  },
+  "15:16": {
+    "width": 1,
+    "height": 2,
+    "name": "Scroll of Decay"
+  },
+  "15:17": {
+    "width": 1,
+    "height": 2,
+    "name": "Scroll of Ice Storm"
+  },
+  "15:18": {
+    "width": 1,
+    "height": 2,
+    "name": "Scroll of Nova"
+  }
+}
