@@ -6,12 +6,14 @@ const request = require('supertest');
 jest.mock('../src/db/accountsRepository');
 jest.mock('../src/db/auditLogRepository');
 jest.mock('../src/db/shopItemsRepository');
+jest.mock('../src/db/shopBundlesRepository');
 jest.mock('../src/db/creditPackagesRepository');
 jest.mock('../src/db/refreshTokensRepository');
 
 const app = require('../src/app');
 const accountsRepository = require('../src/db/accountsRepository');
 const shopItemsRepository = require('../src/db/shopItemsRepository');
+const shopBundlesRepository = require('../src/db/shopBundlesRepository');
 const creditPackagesRepository = require('../src/db/creditPackagesRepository');
 const refreshTokensRepository = require('../src/db/refreshTokensRepository');
 const tokenService = require('../src/services/tokenService');
@@ -39,6 +41,32 @@ describe('autorização reforçada em /admin', () => {
     accountsRepository.findAllPaginated.mockResolvedValue({ items: [], total: 0 });
     const res = await request(app).get('/api/v1/admin/accounts').set('Authorization', authHeader('adminuser'));
     expect(res.status).toBe(200);
+  });
+
+  it('cada item da listagem de contas traz id e role', async () => {
+    accountsRepository.findAllPaginated.mockResolvedValue({
+      items: [{ username: 'player1', displayName: 'Player1', email: 'p1@x.com', banned: false }],
+      total: 1,
+    });
+
+    const res = await request(app).get('/api/v1/admin/accounts').set('Authorization', authHeader('adminuser'));
+
+    expect(res.status).toBe(200);
+    expect(res.body.items[0]).toEqual(
+      expect.objectContaining({ id: 'player1', username: 'player1', role: 'player' }),
+    );
+  });
+
+  it('reconhece staff/admin na listagem de contas', async () => {
+    accountsRepository.findAllPaginated.mockResolvedValue({
+      items: [{ username: 'staffuser' }, { username: 'adminuser' }],
+      total: 2,
+    });
+
+    const res = await request(app).get('/api/v1/admin/accounts').set('Authorization', authHeader('adminuser'));
+
+    expect(res.body.items[0]).toEqual(expect.objectContaining({ id: 'staffuser', role: 'staff' }));
+    expect(res.body.items[1]).toEqual(expect.objectContaining({ id: 'adminuser', role: 'admin' }));
   });
 });
 
@@ -109,6 +137,81 @@ describe('CRUD de itens da loja', () => {
       .set('Authorization', authHeader('adminuser'));
     expect(res.status).toBe(200);
     expect(shopItemsRepository.setActive).toHaveBeenCalledWith(10, false);
+  });
+});
+
+describe('CRUD de pacotes de itens (bundles)', () => {
+  it('cria um pacote combinando itens já cadastrados', async () => {
+    shopBundlesRepository.create.mockResolvedValue(5);
+
+    const res = await request(app)
+      .post('/api/v1/admin/shop/bundles')
+      .set('Authorization', authHeader('adminuser'))
+      .send({
+        name: 'Pacote PK',
+        priceCredits: 900,
+        items: [
+          { shopItemId: 2, quantity: 10 },
+          { shopItemId: 3, quantity: 10 },
+        ],
+      });
+
+    expect(res.status).toBe(201);
+    expect(res.body.id).toBe(5);
+    expect(shopBundlesRepository.create).toHaveBeenCalledWith(
+      expect.objectContaining({
+        name: 'Pacote PK',
+        priceCredits: 900,
+        items: [
+          { shopItemId: 2, quantity: 10 },
+          { shopItemId: 3, quantity: 10 },
+        ],
+      }),
+    );
+  });
+
+  it('rejeita criação sem nenhum item', async () => {
+    const res = await request(app)
+      .post('/api/v1/admin/shop/bundles')
+      .set('Authorization', authHeader('adminuser'))
+      .send({ name: 'Pacote vazio', priceCredits: 100, items: [] });
+
+    expect(res.status).toBe(400);
+    expect(shopBundlesRepository.create).not.toHaveBeenCalled();
+  });
+
+  it('substitui a lista de itens do pacote via PATCH', async () => {
+    shopBundlesRepository.update.mockResolvedValue();
+
+    const res = await request(app)
+      .patch('/api/v1/admin/shop/bundles/5')
+      .set('Authorization', authHeader('adminuser'))
+      .send({ items: [{ shopItemId: 3, quantity: 20 }] });
+
+    expect(res.status).toBe(200);
+    expect(shopBundlesRepository.update).toHaveBeenCalledWith(5, { items: [{ shopItemId: 3, quantity: 20 }] });
+  });
+
+  it('desativa (soft delete) um pacote', async () => {
+    shopBundlesRepository.setActive.mockResolvedValue();
+    const res = await request(app)
+      .delete('/api/v1/admin/shop/bundles/5')
+      .set('Authorization', authHeader('adminuser'));
+    expect(res.status).toBe(200);
+    expect(shopBundlesRepository.setActive).toHaveBeenCalledWith(5, false);
+  });
+
+  it('lista os pacotes cadastrados', async () => {
+    shopBundlesRepository.findAllAdmin.mockResolvedValue([
+      { id: 5, name: 'Pacote PK', priceCredits: 900, active: true, items: [{ shopItemId: 2, itemName: 'Jewel Pack', quantity: 10 }] },
+    ]);
+
+    const res = await request(app).get('/api/v1/admin/shop/bundles').set('Authorization', authHeader('adminuser'));
+
+    expect(res.status).toBe(200);
+    expect(res.body.items[0]).toEqual(
+      expect.objectContaining({ id: 5, name: 'Pacote PK', active: true }),
+    );
   });
 });
 

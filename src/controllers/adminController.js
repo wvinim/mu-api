@@ -2,8 +2,10 @@ const AppError = require('../utils/AppError');
 const accountsRepository = require('../db/accountsRepository');
 const auditLogRepository = require('../db/auditLogRepository');
 const shopItemsRepository = require('../db/shopItemsRepository');
+const shopBundlesRepository = require('../db/shopBundlesRepository');
 const creditPackagesRepository = require('../db/creditPackagesRepository');
 const tokenService = require('../services/tokenService');
+const { getRole } = require('../services/roleService');
 
 function requestMeta(req) {
   return { ipAddress: req.ip, userAgent: req.headers['user-agent'] };
@@ -24,7 +26,12 @@ async function listAccounts(req, res, next) {
   try {
     const { page, limit, search, banned } = req.query;
     const result = await accountsRepository.findAllPaginated({ page, limit, search, banned });
-    res.json({ page, limit, total: result.total, items: result.items });
+    // Não existe id numérico em MEMB_INFO — username (memb___id) é a chave
+    // real e é o mesmo valor que /admin/accounts/:id/ban espera. Expomos
+    // como `id` também pra não obrigar o front a saber disso, e computamos
+    // `role` (não é uma coluna, é derivado das listas fixas do .env).
+    const items = result.items.map((item) => ({ id: item.username, ...item, role: getRole(item.username) }));
+    res.json({ page, limit, total: result.total, items });
   } catch (err) {
     next(err);
   }
@@ -112,6 +119,47 @@ async function deactivateShopItem(req, res, next) {
   }
 }
 
+async function listShopBundles(req, res, next) {
+  try {
+    const items = await shopBundlesRepository.findAllAdmin();
+    res.json({ items });
+  } catch (err) {
+    next(err);
+  }
+}
+
+async function createShopBundle(req, res, next) {
+  try {
+    const id = await shopBundlesRepository.create(req.body);
+    await logAdminAction(req, 'admin.shop_bundle_created', { id, ...req.body });
+    res.status(201).json({ id });
+  } catch (err) {
+    next(err);
+  }
+}
+
+async function updateShopBundle(req, res, next) {
+  try {
+    const { id } = req.params;
+    await shopBundlesRepository.update(id, req.body);
+    await logAdminAction(req, 'admin.shop_bundle_updated', { id, ...req.body });
+    res.json({ message: 'Pacote de itens atualizado.' });
+  } catch (err) {
+    next(err);
+  }
+}
+
+async function deactivateShopBundle(req, res, next) {
+  try {
+    const { id } = req.params;
+    await shopBundlesRepository.setActive(id, false);
+    await logAdminAction(req, 'admin.shop_bundle_deactivated', { id });
+    res.json({ message: 'Pacote de itens desativado.' });
+  } catch (err) {
+    next(err);
+  }
+}
+
 async function listCreditPackages(req, res, next) {
   try {
     const items = await creditPackagesRepository.findAllAdmin();
@@ -162,6 +210,10 @@ module.exports = {
   createShopItem,
   updateShopItem,
   deactivateShopItem,
+  listShopBundles,
+  createShopBundle,
+  updateShopBundle,
+  deactivateShopBundle,
   listCreditPackages,
   createCreditPackage,
   updateCreditPackage,

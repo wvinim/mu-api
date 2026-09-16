@@ -44,6 +44,29 @@ const updateShopItem = Joi.object({
   active: Joi.boolean(),
 }).min(1);
 
+const bundleIdParam = shopItemIdParam;
+
+const bundleItem = Joi.object({
+  shopItemId: Joi.number().integer().min(1).required(),
+  quantity: Joi.number().integer().min(1).max(255).default(1),
+});
+
+const createShopBundle = Joi.object({
+  name: Joi.string().max(50).required(),
+  description: Joi.string().max(255).allow('', null),
+  priceCredits: Joi.number().integer().min(0).required(),
+  active: Joi.boolean().default(true),
+  items: Joi.array().items(bundleItem).min(1).required(),
+});
+
+const updateShopBundle = Joi.object({
+  name: Joi.string().max(50),
+  description: Joi.string().max(255).allow('', null),
+  priceCredits: Joi.number().integer().min(0),
+  active: Joi.boolean(),
+  items: Joi.array().items(bundleItem).min(1),
+}).min(1);
+
 const creditPackageIdParam = shopItemIdParam;
 
 const createCreditPackage = Joi.object({
@@ -67,6 +90,9 @@ module.exports = {
   shopItemIdParam,
   createShopItem,
   updateShopItem,
+  bundleIdParam,
+  createShopBundle,
+  updateShopBundle,
   creditPackageIdParam,
   createCreditPackage,
   updateCreditPackage,

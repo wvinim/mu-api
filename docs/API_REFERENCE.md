@@ -25,9 +25,10 @@ de confiar cegamente nele.
 ## Papéis (roles)
 
 `player` | `staff` | `admin`, calculado no backend por lista fixa de
-usernames (não vem em nenhum endpoint de listagem, só em `GET /account/me`
-como `role`, e em `req.user.role` internamente). Rotas `/admin/*` exigem
-`admin` (staff recebe 403).
+usernames (nunca é uma coluna do banco). Aparece em `GET /account/me`
+como `role`, em `GET /admin/accounts` (um `role` por item da listagem) e
+em `req.user.role` internamente. Rotas `/admin/*` exigem `admin` (staff
+recebe 403).
 
 ---
 
@@ -83,19 +84,26 @@ inventário).
 
 | Método | Rota | Auth | Body/Query | Resposta |
 |---|---|---|---|---|
-| GET | `/shop/items` | não | — | `{ items: [...] }` — catálogo único misturando pacotes de crédito e itens resgatáveis, diferenciados por `kind` |
-| GET | `/shop/items/:id` | não | `id` = `credit:<n>` ou `item:<n>` | uma entrada do catálogo, 404 se inativo/inexistente |
-| POST | `/shop/purchase` | 🔒 | `{ catalogId }` (compra créditos) ou `{ catalogId, characterName }` (resgata item) | ver abaixo |
+| GET | `/shop/items` | não | — | `{ items: [...] }` — catálogo único misturando pacotes de crédito, itens resgatáveis e **pacotes de itens (bundles)**, diferenciados por `kind` |
+| GET | `/shop/items/:id` | não | `id` = `credit:<n>`, `item:<n>` ou `bundle:<n>` | uma entrada do catálogo, 404 se inativo/inexistente |
+| POST | `/shop/purchase` | 🔒 | `{ catalogId }` (compra créditos) ou `{ catalogId, characterName }` (resgata item ou pacote) | ver abaixo |
 | GET | `/shop/credits` | 🔒 | — | `{ cash }` |
-| GET | `/shop/history` | 🔒 | `?page&limit` | `{ page, limit, total, items }` — unifica compras de crédito + resgates |
+| GET | `/shop/history` | 🔒 | `?page&limit` | `{ page, limit, total, items }` — unifica compras de crédito + resgates de item + resgates de pacote |
 
-**`catalogId`** sempre no formato `"credit:<id>"` (pacote Pix→Cash) ou
-`"item:<id>"` (item resgatável, gasta Cash). O front-end deve usar esse
-`catalogId` exatamente como veio de `/shop/items` — não montar na mão.
+**`catalogId`** sempre no formato `"credit:<id>"` (pacote Pix→Cash),
+`"item:<id>"` (item avulso resgatável, gasta Cash) ou `"bundle:<id>"`
+(pacote — vários itens do catálogo entregues juntos por um preço único).
+O front-end deve usar esse `catalogId` exatamente como veio de
+`/shop/items` — não montar na mão.
+
+Uma entrada `kind: "item_bundle"` de `/shop/items` traz
+`items: [{ name, quantity }]` com o conteúdo do pacote, pra mostrar pro
+comprador o que ele está levando (ex: `[{ name: "Jewel Pack", quantity: 10 }, { name: "Kundun Box", quantity: 10 }]`).
 
 Resposta de `POST /shop/purchase`:
 - Se `catalogId` é `credit:*` → **201** `{ type: "pix_charge", txid, pixCopiaECola, qrCodeImage, amountCents, creditsAmount }`. O front-end mostra o QR code / copia-e-cola Pix; o crédito de `cash` só acontece depois, via webhook confirmado pela Efí (assíncrono — o front-end precisa fazer polling em `/shop/credits` ou `/shop/history` até o saldo mudar, não há WebSocket/push).
 - Se `catalogId` é `item:*` → precisa também de `characterName` no body. **201** `{ type: "item_redeemed", item, characterName, slot }`. Erros: 402 `INSUFFICIENT_CREDITS`, 404 se personagem não pertence à conta.
+- Se `catalogId` é `bundle:*` → precisa também de `characterName`. **201** `{ type: "bundle_redeemed", bundle, characterName, slots: [...] }` — um slot da mochila por unidade de cada item do pacote. **Tudo ou nada**: se não houver espaço pra todos os itens, nada é gravado e o Cash é estornado (mesmos erros 402/404/409 `INVENTORY_FULL` do resgate de item avulso).
 - Rate limit: 1 compra a cada 3s por conta (evita clique duplicado).
 
 `GET /shop/payment/webhook/:secret` **não é para o front-end** — é
@@ -119,14 +127,21 @@ chamado pela Efí diretamente.
 
 | Método | Rota | Body/Query | Resposta |
 |---|---|---|---|
-| GET | `/admin/accounts` | `?page&limit&search&banned(bool)` | `{ page, limit, total, items }` |
-| POST | `/admin/accounts/:id/ban` | — | `{ message }` — também revoga todos os refresh tokens da conta |
+| GET | `/admin/accounts` | `?page&limit&search&banned(bool)` | `{ page, limit, total, items }` — item: `{ id, username, displayName, email, emailConfirmed, banned, cash, vip, createdAt, role }`. `id` = `username` (MEMB_INFO não tem PK numérica própria — memb___id é a chave real, e é o mesmo valor esperado em `:id` nas rotas de ban/unban abaixo). `role` é derivado (`player`/`staff`/`admin`) das listas fixas do `.env`, não é coluna |
+| POST | `/admin/accounts/:id/ban` | — | `{ message }` — também revoga todos os refresh tokens da conta. `:id` é o username |
 | POST | `/admin/accounts/:id/unban` | — | `{ message }` |
-| GET | `/admin/logs` | `?page&limit&accountId&eventType` | `{ page, limit, total, items }` — `WebAuditLog` completo |
+| GET | `/admin/logs` | `?page&limit&accountId&eventType` | `{ page, limit, total, items }` — `WebAuditLog` completo, incluindo `id` (PK própria da tabela) |
 | GET/POST | `/admin/shop/items` | POST: `{ name, description?, priceCredits, itemGroup, itemIndex, itemLevel?, quantity?, active? }` | GET `{ items }`; POST 201 `{ id }` |
 | PATCH/DELETE | `/admin/shop/items/:id` | PATCH: qualquer subconjunto dos campos acima | `{ message }`. DELETE é soft-delete (`active=false`) |
+| GET/POST | `/admin/shop/bundles` | POST: `{ name, description?, priceCredits, active?, items: [{ shopItemId, quantity? }] }` (`items` não pode ser vazio) | GET `{ items }` — cada item traz `items: [{ shopItemId, itemName, quantity }]`; POST 201 `{ id }` |
+| PATCH/DELETE | `/admin/shop/bundles/:id` | PATCH: qualquer subconjunto dos campos acima — **se `items` vier, substitui a lista inteira**, não faz merge | `{ message }`. DELETE é soft-delete (`active=false`) |
 | GET/POST | `/admin/shop/credit-packages` | POST: `{ name, priceCents, creditsAmount, active? }` | igual ao padrão acima |
 | PATCH/DELETE | `/admin/shop/credit-packages/:id` | PATCH: subconjunto dos campos | igual ao padrão acima |
+
+`shopItemId` em `/admin/shop/bundles` referencia um item já cadastrado em
+`/admin/shop/items` — pra vender só dentro do pacote (não avulso), marque
+esse item com `active: false`; ele some do catálogo avulso mas continua
+funcionando como componente de um pacote.
 
 ---
 

@@ -81,6 +81,89 @@ deixou para a etapa de deploy (IIS+ARR vs Caddy). Por isso, hoje:
   **confirme o IP atual na documentação deles antes de usar** — IPs de
   provedores mudam) na frente do webhook.
 
+## Adendo — Pacotes de itens (bundles)
+
+Pedido seu: vender vários itens do catálogo juntos, num produto só (ex:
+"10x Jewel Pack + 10x Kundun Box" por um preço fixo), sem precisar expor
+cada item individualmente na loja.
+
+- **Modelo escolhido**: um bundle **referencia itens que já existem em
+  `WebShopItems`** (você continua cadastrando "Jewel Pack" e "Kundun Box"
+  exatamente como já fazia, cada um já validado empiricamente conforme
+  `docs/INVENTORY_BYTE_FORMAT.md`) — não duplica grupo/índice/level em
+  outro lugar. O bundle só guarda **quantas instâncias de cada item
+  conceder**.
+- **Pra não vender o item avulso**: marque o item componente com
+  `active: false` no `PATCH /admin/shop/items/:id` de sempre. Ele some do
+  catálogo avulso (`GET /shop/items`) e não pode mais ser comprado via
+  `catalogId: "item:<id>"`, mas continua funcionando normalmente como
+  componente de um bundle (a busca de componente não filtra por `Active`
+  — só o bundle em si precisa estar ativo).
+- **Novo `catalogId`**: `"bundle:<id>"`, aparece em `GET /shop/items` /
+  `GET /shop/items/:id` misturado com `credit:*` e `item:*`
+  (`kind: "item_bundle"`), com `items: [{ name, quantity }]` mostrando o
+  conteúdo pro comprador.
+- **Compra** (`POST /shop/purchase` com `catalogId: "bundle:<id>"` +
+  `characterName`): debita o **preço do bundle** (não a soma dos itens —
+  dá pra vender com desconto ou ágio em relação ao preço avulso), depois
+  insere **cada instância de cada componente num slot da mochila
+  separado** (2x Jewel Pack + 3x Kundun Box = 5 slots, cada um do jeito
+  que já era inserido individualmente). **Tudo ou nada**: se não houver
+  espaço pra todos os itens do pacote, nada é gravado no `Inventory` e o
+  Cash debitado é estornado automaticamente (mesmo padrão de estorno já
+  usado pra item avulso) — nunca entrega metade de um pacote.
+- **Auditoria**: uma linha só em `WebBundleRedemptions` por compra (preço
+  do pacote), com o detalhe de quais itens/slots entraram no
+  `WebAuditLog` (`eventType: 'shop.bundle_redeemed'`) — não uma linha por
+  item, pra não conflitar com o preço individual de cada componente
+  (que pode nem fazer sentido fora do contexto do bundle).
+- `GET /shop/history` agora também lista compras de bundle
+  (`type: "bundle_redemption"`), unificado com `credit_purchase` e
+  `item_redemption` no mesmo `UNION ALL`.
+
+### Admin (CRUD de bundles)
+
+- `GET/POST /admin/shop/bundles` — POST:
+  `{ name, description?, priceCredits, active?, items: [{ shopItemId, quantity }] }`
+  (`items` não pode ser vazio).
+- `PATCH /admin/shop/bundles/:id` — qualquer subconjunto dos campos
+  acima. **Se `items` for enviado, substitui a lista inteira** (não faz
+  merge/diff com o que já existia) — mais previsível pra editar do que
+  tentar adivinhar adição/remoção implícita.
+- `DELETE /admin/shop/bundles/:id` — soft-delete (`active = false`).
+
+### Bug corrigido (relatado pelo front, contra o banco real)
+
+`GET /admin/shop/bundles` retornava erro do SQL Server: *"A column has
+been specified more than once in the order by list."* Causa: o `JOIN` de
+`WebShopBundles` + `WebShopBundleItems` + `WebShopItems` junta três
+tabelas que **cada uma tem sua própria coluna chamada `Id`**, e o
+`ORDER BY` ordenava por `bi.Id` (a PK de `WebShopBundleItems`) sem esse
+campo nunca ter sido incluído no `SELECT`. Os testes automatizados desse
+endpoint mockam o repositório inteiro (não rodam SQL de verdade), por
+isso isso só apareceu contra o banco real — bug real, não coberto pela
+suíte até então.
+
+Corrigido em `src/db/shopBundlesRepository.js`: agora sempre seleciona a
+PK de cada tabela envolvida com um alias próprio (`ComponentId`/
+`componentId`) e o `ORDER BY` referencia só esses aliases, nunca
+`tabela.Id` qualificado — elimina a ambiguidade de vez, não só nesse
+`SELECT` específico. Adicionado `tests/shopBundlesRepository.test.js` que
+inspeciona o texto da query pra travar essa regra (confirmado que ele
+falha se alguém reintroduzir `ORDER BY b.Id, bi.Id`).
+
+### Schema novo
+
+`migrations/0004_shop_bundles.sql` — **não aplicada**, mesma mecânica das
+anteriores (idempotente, revise antes). Três tabelas novas, nenhuma
+alteração em tabela existente:
+- `WebShopBundles` — o produto (nome, descrição, preço, active).
+- `WebShopBundleItems` — a composição (`BundleId` + `ShopItemId` +
+  `Quantity`, com FK pra `WebShopItems` — não duplica dado do item).
+- `WebBundleRedemptions` — uma linha por compra de bundle (mesmo espírito
+  de `WebItemRedemptions`, mas 1:1 com a compra, não 1:1 com o item
+  concedido).
+
 ## Decisões técnicas (não pedidas explicitamente)
 
 - **SDK oficial usado**: `sdk-node-apis-efi` (conforme preferência do
@@ -124,6 +207,9 @@ deixou para a etapa de deploy (IIS+ARR vs Caddy). Por isso, hoje:
    item num personagem de teste, e confira o dump do `Inventory` antes/
    depois.
 6. Rodar `npm install` (novo pacote `sdk-node-apis-efi`) e `npm test`.
+7. **Aplicar `migrations/0004_shop_bundles.sql`** (revisar antes) — cria
+   `WebShopBundles`, `WebShopBundleItems`, `WebBundleRedemptions` pro
+   recurso de pacotes/bundles (ver adendo acima).
 
 ## Próxima seção
 

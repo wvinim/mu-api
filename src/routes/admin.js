@@ -27,6 +27,18 @@ router.patch(
 );
 router.delete('/admin/shop/items/:id', validate(schemas.shopItemIdParam, 'params'), controller.deactivateShopItem);
 
+// Pacotes (bundles) — combinam vários itens de /admin/shop/items num
+// produto vendido por um preço único. Ver docs/SECTION_5_SHOP.md.
+router.get('/admin/shop/bundles', controller.listShopBundles);
+router.post('/admin/shop/bundles', validate(schemas.createShopBundle), controller.createShopBundle);
+router.patch(
+  '/admin/shop/bundles/:id',
+  validate(schemas.bundleIdParam, 'params'),
+  validate(schemas.updateShopBundle),
+  controller.updateShopBundle,
+);
+router.delete('/admin/shop/bundles/:id', validate(schemas.bundleIdParam, 'params'), controller.deactivateShopBundle);
+
 // Extensão além do brief literal (só citava "shop/items") — necessária pra
 // gerenciar os pacotes de crédito sem SQL manual. Ver docs/SECTION_7_ADMIN.md.
 router.get('/admin/shop/credit-packages', controller.listCreditPackages);

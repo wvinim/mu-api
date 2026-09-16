@@ -24,7 +24,9 @@ async function findById(id) {
 async function findAllAdmin() {
   const pool = getPool();
   const result = await pool.request().query(`
-    SELECT Id, Name, Description, PriceCredits, ItemGroup, ItemIndex, ItemLevel, Quantity, Active, CreatedAt
+    SELECT Id AS id, Name AS name, Description AS description, PriceCredits AS priceCredits,
+           ItemGroup AS itemGroup, ItemIndex AS itemIndex, ItemLevel AS itemLevel, Quantity AS quantity,
+           Active AS active, CreatedAt AS createdAt
     FROM WebShopItems ORDER BY Id DESC
   `);
   return result.recordset;

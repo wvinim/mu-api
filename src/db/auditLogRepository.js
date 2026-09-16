@@ -45,6 +45,7 @@ async function findByAccount(accountId, { page = 1, limit = 20 } = {}) {
     .query(`
       WITH Numbered AS (
         SELECT
+          Id AS id,
           EventType AS eventType,
           Success AS success,
           IpAddress AS ipAddress,
@@ -53,7 +54,7 @@ async function findByAccount(accountId, { page = 1, limit = 20 } = {}) {
         FROM WebAuditLog
         WHERE AccountId = @accountId
       )
-      SELECT eventType, success, ipAddress, createdAt
+      SELECT id, eventType, success, ipAddress, createdAt
       FROM Numbered
       WHERE RowNum BETWEEN @firstRow AND @lastRow
       ORDER BY RowNum;
@@ -87,13 +88,13 @@ async function findAll({ page = 1, limit = 20, accountId, eventType } = {}) {
   const result = await request.query(`
     WITH Ranked AS (
       SELECT
-        AccountId AS accountId, Username AS username, EventType AS eventType, Success AS success,
+        Id AS id, AccountId AS accountId, Username AS username, EventType AS eventType, Success AS success,
         IpAddress AS ipAddress, CreatedAt AS createdAt,
         ROW_NUMBER() OVER (ORDER BY CreatedAt DESC) AS rank
       FROM WebAuditLog
       ${whereClause}
     )
-    SELECT accountId, username, eventType, success, ipAddress, createdAt
+    SELECT id, accountId, username, eventType, success, ipAddress, createdAt
     FROM Ranked WHERE rank BETWEEN @firstRow AND @lastRow ORDER BY rank;
 
     SELECT COUNT(*) AS total FROM WebAuditLog ${whereClause};

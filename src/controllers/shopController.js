@@ -1,8 +1,10 @@
 const AppError = require('../utils/AppError');
 const creditPackagesRepository = require('../db/creditPackagesRepository');
 const shopItemsRepository = require('../db/shopItemsRepository');
+const shopBundlesRepository = require('../db/shopBundlesRepository');
 const pixChargesRepository = require('../db/pixChargesRepository');
 const itemRedemptionsRepository = require('../db/itemRedemptionsRepository');
+const bundleRedemptionsRepository = require('../db/bundleRedemptionsRepository');
 const shopHistoryRepository = require('../db/shopHistoryRepository');
 const accountsRepository = require('../db/accountsRepository');
 const charactersRepository = require('../db/charactersRepository');
@@ -19,6 +21,16 @@ function toCatalogEntry(kind, row) {
       name: row.Name,
       priceCents: row.PriceCents,
       creditsAmount: row.CreditsAmount,
+    };
+  }
+  if (kind === 'bundle') {
+    return {
+      catalogId: `bundle:${row.Id}`,
+      kind: 'item_bundle',
+      name: row.Name,
+      description: row.Description,
+      priceCredits: row.PriceCredits,
+      items: row.Items.map((component) => ({ name: component.ItemName, quantity: component.ComponentQuantity })),
     };
   }
   return {
@@ -42,12 +54,17 @@ function requestMeta(req) {
 
 async function getItems(req, res, next) {
   try {
-    const [packages, items] = await Promise.all([
+    const [packages, items, bundles] = await Promise.all([
       creditPackagesRepository.findActive(),
       shopItemsRepository.findActive(),
+      shopBundlesRepository.findActiveWithItems(),
     ]);
     res.json({
-      items: [...packages.map((p) => toCatalogEntry('credit', p)), ...items.map((i) => toCatalogEntry('item', i))],
+      items: [
+        ...packages.map((p) => toCatalogEntry('credit', p)),
+        ...items.map((i) => toCatalogEntry('item', i)),
+        ...bundles.map((b) => toCatalogEntry('bundle', b)),
+      ],
     });
   } catch (err) {
     next(err);
@@ -62,6 +79,12 @@ async function getItemById(req, res, next) {
       const row = await creditPackagesRepository.findById(id);
       if (!row || !row.Active) throw new AppError(404, 'NOT_FOUND', 'Pacote de créditos não encontrado.');
       return res.json(toCatalogEntry('credit', row));
+    }
+
+    if (kind === 'bundle') {
+      const row = await shopBundlesRepository.findById(id);
+      if (!row || !row.Active) throw new AppError(404, 'NOT_FOUND', 'Pacote não encontrado.');
+      return res.json(toCatalogEntry('bundle', row));
     }
 
     const row = await shopItemsRepository.findById(id);
@@ -169,6 +192,84 @@ async function purchaseItem(req, res, id, username, meta) {
   res.status(201).json({ type: 'item_redeemed', item: item.Name, characterName, slot: inventoryResult.slot });
 }
 
+/**
+ * Cada componente do pacote vira N itemSpecs (um por instância/slot) —
+ * "10x Jewel Pack" ocupa 10 slots, um pra cada unidade, exatamente como
+ * comprar o mesmo item avulso 10 vezes.
+ */
+function expandBundleComponents(bundle) {
+  return bundle.Items.flatMap((component) =>
+    Array.from({ length: component.ComponentQuantity }, () => ({
+      itemGroup: component.ItemGroup,
+      itemIndex: component.ItemIndex,
+      itemLevel: component.ItemLevel,
+      quantity: component.ItemQuantity,
+    })),
+  );
+}
+
+async function purchaseBundle(req, res, id, username, meta) {
+  const { characterName } = req.body;
+  if (!characterName) {
+    throw new AppError(400, 'VALIDATION_ERROR', 'characterName é obrigatório para resgatar um pacote.');
+  }
+
+  const bundle = await shopBundlesRepository.findById(id);
+  if (!bundle || !bundle.Active) throw new AppError(404, 'NOT_FOUND', 'Pacote não encontrado.');
+
+  const character = await charactersRepository.findOwnedCharacter(username, characterName);
+  if (!character) throw new AppError(404, 'NOT_FOUND', 'Personagem não encontrado nesta conta.');
+
+  const debited = await accountsRepository.debitCash(username, bundle.PriceCredits);
+  if (!debited) {
+    throw new AppError(402, 'INSUFFICIENT_CREDITS', 'Créditos insuficientes.');
+  }
+
+  let insertResult;
+  try {
+    const inventoryBuffer = await charactersRepository.getInventoryBuffer(characterName);
+    insertResult = inventoryService.insertItemsIntoInventory(inventoryBuffer, expandBundleComponents(bundle));
+    await charactersRepository.updateInventory(characterName, insertResult.buffer);
+  } catch (err) {
+    // Tudo ou nada: se faltou espaço pra qualquer item do pacote, nada foi
+    // gravado no Inventory — só precisa estornar o débito.
+    await accountsRepository.creditCash(username, bundle.PriceCredits);
+    await auditLog.record({
+      accountId: username,
+      username,
+      eventType: 'shop.bundle_redeemed',
+      success: false,
+      ...meta,
+      details: { bundleId: bundle.Id, characterName, reason: err.code || err.message },
+    });
+    throw err;
+  }
+
+  await bundleRedemptionsRepository.create({
+    accountId: username,
+    characterName,
+    bundleId: bundle.Id,
+    priceCredits: bundle.PriceCredits,
+  });
+
+  await auditLog.record({
+    accountId: username,
+    username,
+    eventType: 'shop.bundle_redeemed',
+    success: true,
+    ...meta,
+    details: {
+      bundleId: bundle.Id,
+      characterName,
+      priceCredits: bundle.PriceCredits,
+      slots: insertResult.slots,
+      items: bundle.Items.map((c) => ({ shopItemId: c.ItemId, name: c.ItemName, quantity: c.ComponentQuantity })),
+    },
+  });
+
+  res.status(201).json({ type: 'bundle_redeemed', bundle: bundle.Name, characterName, slots: insertResult.slots });
+}
+
 async function purchase(req, res, next) {
   try {
     const { catalogId } = req.body;
@@ -178,6 +279,8 @@ async function purchase(req, res, next) {
 
     if (kind === 'credit') {
       await purchaseCreditPackage(req, res, id, username, meta);
+    } else if (kind === 'bundle') {
+      await purchaseBundle(req, res, id, username, meta);
     } else {
       await purchaseItem(req, res, id, username, meta);
     }

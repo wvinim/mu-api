@@ -21,7 +21,11 @@ async function findAllAdmin() {
   const pool = getPool();
   const result = await pool
     .request()
-    .query('SELECT Id, Name, PriceCents, CreditsAmount, Active, CreatedAt FROM WebCreditPackages ORDER BY Id DESC');
+    .query(`
+      SELECT Id AS id, Name AS name, PriceCents AS priceCents, CreditsAmount AS creditsAmount,
+             Active AS active, CreatedAt AS createdAt
+      FROM WebCreditPackages ORDER BY Id DESC
+    `);
   return result.recordset;
 }
 

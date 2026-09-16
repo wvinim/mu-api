@@ -66,6 +66,43 @@ function insertItemIntoInventory(inventoryBuffer, itemSpec) {
   return { buffer: newBuffer, slot: slotIndex };
 }
 
+/**
+ * Insere vários itens de uma vez (pacote/bundle) — cada entrada de
+ * `itemSpecs` ocupa seu próprio slot da mochila (12-75). Tudo ou nada:
+ * o buffer original só é lido, a escrita acontece num buffer novo, e se
+ * faltar espaço para QUALQUER item da lista a função lança antes de
+ * devolver nada — quem chamar não deve persistir nem debitar em caso de
+ * erro (mesmo padrão de rollback do insertItemIntoInventory).
+ */
+function insertItemsIntoInventory(inventoryBuffer, itemSpecs) {
+  if (!Buffer.isBuffer(inventoryBuffer) || inventoryBuffer.length !== ITEM_DB_BYTE * INVENTORY_SIZE) {
+    throw new AppError(
+      500,
+      'INVALID_INVENTORY_FORMAT',
+      'Formato do inventário do personagem não reconhecido — abortando para não corromper dados.',
+    );
+  }
+
+  const newBuffer = Buffer.from(inventoryBuffer);
+  const slots = [];
+
+  for (const itemSpec of itemSpecs) {
+    const slotIndex = findEmptyBagSlot(newBuffer);
+    if (slotIndex === -1) {
+      throw new AppError(
+        409,
+        'INVENTORY_FULL',
+        'Mochila cheia. Espaço insuficiente para todos os itens do pacote — nada foi alterado.',
+      );
+    }
+    const itemSlotBytes = makeSimpleItemSlot(itemSpec);
+    itemSlotBytes.copy(newBuffer, slotIndex * ITEM_DB_BYTE);
+    slots.push(slotIndex);
+  }
+
+  return { buffer: newBuffer, slots };
+}
+
 module.exports = {
   ITEM_DB_BYTE,
   INVENTORY_SIZE,
@@ -75,4 +112,5 @@ module.exports = {
   findEmptyBagSlot,
   makeSimpleItemSlot,
   insertItemIntoInventory,
+  insertItemsIntoInventory,
 };
