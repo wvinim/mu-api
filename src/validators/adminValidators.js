@@ -83,6 +83,25 @@ const updateCreditPackage = Joi.object({
   active: Joi.boolean(),
 }).min(1);
 
+const vipPlanIdParam = shopItemIdParam;
+
+// Só PriceCredits/Active são editáveis — Tier/Name/DurationDays são fixos
+// (decisão do usuário: catálogo de VIP não é um CRUD livre).
+const updateVipPlan = Joi.object({
+  priceCredits: Joi.number().integer().min(0),
+  active: Joi.boolean(),
+}).min(1);
+
+// tier=0 revoga (não precisa de days); tier 1/2/3 exige days (dias somados
+// à validade atual, mesma regra da compra normal).
+const setAccountVip = Joi.object({
+  tier: Joi.number().integer().min(0).max(3).required(),
+  days: Joi.number()
+    .integer()
+    .min(1)
+    .when('tier', { is: 0, then: Joi.forbidden(), otherwise: Joi.required() }),
+});
+
 module.exports = {
   accountIdParam,
   accountsListQuery,
@@ -96,4 +115,7 @@ module.exports = {
   creditPackageIdParam,
   createCreditPackage,
   updateCreditPackage,
+  vipPlanIdParam,
+  updateVipPlan,
+  setAccountVip,
 };

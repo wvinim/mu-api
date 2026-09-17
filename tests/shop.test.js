@@ -13,6 +13,9 @@ jest.mock('../src/db/shopBundlesRepository');
 jest.mock('../src/db/pixChargesRepository');
 jest.mock('../src/db/itemRedemptionsRepository');
 jest.mock('../src/db/bundleRedemptionsRepository');
+jest.mock('../src/db/vipPlansRepository');
+jest.mock('../src/db/vipPurchasesRepository');
+jest.mock('../src/db/autopickRepository');
 jest.mock('../src/db/shopHistoryRepository');
 jest.mock('../src/db/accountsRepository');
 jest.mock('../src/db/charactersRepository');
@@ -26,6 +29,9 @@ const shopBundlesRepository = require('../src/db/shopBundlesRepository');
 const pixChargesRepository = require('../src/db/pixChargesRepository');
 const itemRedemptionsRepository = require('../src/db/itemRedemptionsRepository');
 const bundleRedemptionsRepository = require('../src/db/bundleRedemptionsRepository');
+const vipPlansRepository = require('../src/db/vipPlansRepository');
+const vipPurchasesRepository = require('../src/db/vipPurchasesRepository');
+const autopickRepository = require('../src/db/autopickRepository');
 const shopHistoryRepository = require('../src/db/shopHistoryRepository');
 const accountsRepository = require('../src/db/accountsRepository');
 const charactersRepository = require('../src/db/charactersRepository');
@@ -75,6 +81,7 @@ beforeEach(() => {
 describe('GET /api/v1/shop/items', () => {
   beforeEach(() => {
     shopBundlesRepository.findActiveWithItems.mockResolvedValue([]);
+    vipPlansRepository.findActive.mockResolvedValue([]);
   });
 
   it('combina pacotes de crédito e itens em um catálogo único', async () => {
@@ -122,6 +129,109 @@ describe('GET /api/v1/shop/items', () => {
         ],
       },
     ]);
+  });
+
+  it('inclui planos VIP no catálogo', async () => {
+    creditPackagesRepository.findActive.mockResolvedValue([]);
+    shopItemsRepository.findActive.mockResolvedValue([]);
+    vipPlansRepository.findActive.mockResolvedValue([
+      { Id: 1, Tier: 1, Name: 'Vip', PriceCredits: 60, DurationDays: 30 },
+      { Id: 2, Tier: 2, Name: 'Super Vip', PriceCredits: 120, DurationDays: 30 },
+    ]);
+
+    const res = await request(app).get('/api/v1/shop/items');
+
+    expect(res.status).toBe(200);
+    expect(res.body.items).toEqual([
+      { catalogId: 'vip:1', kind: 'vip_plan', name: 'Vip', tier: 1, priceCredits: 60, durationDays: 30 },
+      { catalogId: 'vip:2', kind: 'vip_plan', name: 'Super Vip', tier: 2, priceCredits: 120, durationDays: 30 },
+    ]);
+  });
+});
+
+describe('POST /api/v1/shop/purchase — plano VIP', () => {
+  it('retorna 404 para plano inexistente ou inativo', async () => {
+    vipPlansRepository.findById.mockResolvedValue(null);
+
+    const res = await request(app)
+      .post('/api/v1/shop/purchase')
+      .set('Authorization', authHeader())
+      .send({ catalogId: 'vip:1' });
+
+    expect(res.status).toBe(404);
+    expect(accountsRepository.debitCash).not.toHaveBeenCalled();
+  });
+
+  it('rejeita quando não há créditos suficientes', async () => {
+    vipPlansRepository.findById.mockResolvedValue({ Id: 1, Tier: 1, Name: 'Vip', PriceCredits: 60, DurationDays: 30, Active: true });
+    accountsRepository.debitCash.mockResolvedValue(false);
+
+    const res = await request(app)
+      .post('/api/v1/shop/purchase')
+      .set('Authorization', authHeader())
+      .send({ catalogId: 'vip:1' });
+
+    expect(res.status).toBe(402);
+    expect(res.body.error.code).toBe('INSUFFICIENT_CREDITS');
+    expect(accountsRepository.renewVip).not.toHaveBeenCalled();
+  });
+
+  it('debita o Cash, renova o VIP e grava o histórico (sem characterName)', async () => {
+    vipPlansRepository.findById.mockResolvedValue({ Id: 1, Tier: 1, Name: 'Vip', PriceCredits: 60, DurationDays: 30, Active: true });
+    accountsRepository.debitCash.mockResolvedValue(true);
+    accountsRepository.renewVip.mockResolvedValue({ vip: 1, vipStartDate: '2026-09-16', vipEndDate: '2026-10-16' });
+    vipPurchasesRepository.create.mockResolvedValue();
+
+    const res = await request(app)
+      .post('/api/v1/shop/purchase')
+      .set('Authorization', authHeader())
+      .send({ catalogId: 'vip:1' });
+
+    expect(res.status).toBe(201);
+    expect(res.body).toEqual({ type: 'vip_purchased', tier: 1, vipStartDate: '2026-09-16', vipEndDate: '2026-10-16' });
+    expect(accountsRepository.debitCash).toHaveBeenCalledWith('player1', 60);
+    expect(accountsRepository.renewVip).toHaveBeenCalledWith('player1', { tier: 1, days: 30 });
+    expect(vipPurchasesRepository.create).toHaveBeenCalledWith({
+      accountId: 'player1',
+      planId: 1,
+      tier: 1,
+      priceCredits: 60,
+      durationDays: 30,
+    });
+    expect(autopickRepository.ensureItemsExist).not.toHaveBeenCalled();
+  });
+
+  it('comprar Super Vip (tier 2) grava os 2 itens fixos de autopick', async () => {
+    vipPlansRepository.findById.mockResolvedValue({ Id: 2, Tier: 2, Name: 'Super Vip', PriceCredits: 120, DurationDays: 30, Active: true });
+    accountsRepository.debitCash.mockResolvedValue(true);
+    accountsRepository.renewVip.mockResolvedValue({ vip: 2, vipStartDate: '2026-09-16', vipEndDate: '2026-10-16' });
+    vipPurchasesRepository.create.mockResolvedValue();
+    autopickRepository.ensureItemsExist.mockResolvedValue();
+
+    const res = await request(app)
+      .post('/api/v1/shop/purchase')
+      .set('Authorization', authHeader())
+      .send({ catalogId: 'vip:2' });
+
+    expect(res.status).toBe(201);
+    expect(autopickRepository.ensureItemsExist).toHaveBeenCalledWith('player1', [
+      { itemGroup: 14, itemIndex: 14, itemLevel: 0 }, // Jewel of Soul
+      { itemGroup: 14, itemIndex: 13, itemLevel: 0 }, // Jewel of Bless
+    ]);
+  });
+
+  it('estorna os créditos se a renovação do VIP falhar', async () => {
+    vipPlansRepository.findById.mockResolvedValue({ Id: 1, Tier: 1, Name: 'Vip', PriceCredits: 60, DurationDays: 30, Active: true });
+    accountsRepository.debitCash.mockResolvedValue(true);
+    accountsRepository.renewVip.mockRejectedValue(new Error('falha de banco'));
+
+    const res = await request(app)
+      .post('/api/v1/shop/purchase')
+      .set('Authorization', authHeader())
+      .send({ catalogId: 'vip:1' });
+
+    expect(res.status).toBe(500);
+    expect(accountsRepository.creditCash).toHaveBeenCalledWith('player1', 60);
   });
 });
 

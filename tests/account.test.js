@@ -5,11 +5,13 @@ const request = require('supertest');
 jest.mock('../src/db/accountsRepository');
 jest.mock('../src/db/charactersRepository');
 jest.mock('../src/db/auditLogRepository');
+jest.mock('../src/db/autopickRepository');
 
 const app = require('../src/app');
 const accountsRepository = require('../src/db/accountsRepository');
 const charactersRepository = require('../src/db/charactersRepository');
 const auditLogRepository = require('../src/db/auditLogRepository');
+const autopickRepository = require('../src/db/autopickRepository');
 const tokenService = require('../src/services/tokenService');
 
 function makeAccount(overrides = {}) {
@@ -111,5 +113,85 @@ describe('GET /api/v1/account/security-log', () => {
       .set('Authorization', authHeader());
 
     expect(res.status).toBe(400);
+  });
+});
+
+describe('GET /api/v1/account/autopick', () => {
+  it('retorna a seleção salva, com o nome do item resolvido', async () => {
+    autopickRepository.findByAccount.mockResolvedValue([{ ItemGroup: 14, ItemIndex: 13, ItemLevel: 0 }]);
+
+    const res = await request(app).get('/api/v1/account/autopick').set('Authorization', authHeader());
+
+    expect(res.status).toBe(200);
+    expect(res.body.items).toEqual([{ itemGroup: 14, itemIndex: 13, itemLevel: 0, name: 'Jewel of Bless' }]);
+  });
+
+  it('não exige ser Mega Vip pra consultar (mostra o que já foi salvo antes)', async () => {
+    accountsRepository.findByUsername.mockResolvedValue(makeAccount({ vip: 0 }));
+    autopickRepository.findByAccount.mockResolvedValue([]);
+
+    const res = await request(app).get('/api/v1/account/autopick').set('Authorization', authHeader());
+
+    expect(res.status).toBe(200);
+    expect(accountsRepository.findByUsername).not.toHaveBeenCalled();
+  });
+});
+
+describe('PUT /api/v1/account/autopick', () => {
+  it('rejeita se a conta não é Mega Vip (tier 3) no momento', async () => {
+    accountsRepository.findByUsername.mockResolvedValue(makeAccount({ vip: 2 }));
+
+    const res = await request(app)
+      .put('/api/v1/account/autopick')
+      .set('Authorization', authHeader())
+      .send({ items: [{ itemGroup: 14, itemIndex: 13, itemLevel: 0 }] });
+
+    expect(res.status).toBe(403);
+    expect(res.body.error.code).toBe('MEGA_VIP_REQUIRED');
+    expect(autopickRepository.replaceAll).not.toHaveBeenCalled();
+  });
+
+  it('rejeita item fora da lista fechada permitida', async () => {
+    accountsRepository.findByUsername.mockResolvedValue(makeAccount({ vip: 3 }));
+
+    const res = await request(app)
+      .put('/api/v1/account/autopick')
+      .set('Authorization', authHeader())
+      .send({ items: [{ itemGroup: 99, itemIndex: 99, itemLevel: 0 }] });
+
+    expect(res.status).toBe(400);
+    expect(autopickRepository.replaceAll).not.toHaveBeenCalled();
+  });
+
+  it('rejeita mais de 12 itens (tamanho da lista fechada)', async () => {
+    accountsRepository.findByUsername.mockResolvedValue(makeAccount({ vip: 3 }));
+
+    const res = await request(app)
+      .put('/api/v1/account/autopick')
+      .set('Authorization', authHeader())
+      .send({ items: Array.from({ length: 13 }, () => ({ itemGroup: 14, itemIndex: 13, itemLevel: 0 })) });
+
+    expect(res.status).toBe(400);
+  });
+
+  it('substitui a seleção inteira quando a conta é Mega Vip', async () => {
+    accountsRepository.findByUsername.mockResolvedValue(makeAccount({ vip: 3 }));
+    autopickRepository.replaceAll.mockResolvedValue();
+
+    const items = [
+      { itemGroup: 14, itemIndex: 13, itemLevel: 0 }, // Jewel of Bless
+      { itemGroup: 14, itemIndex: 11, itemLevel: 8 }, // Box of Kundun +1
+    ];
+
+    const res = await request(app)
+      .put('/api/v1/account/autopick')
+      .set('Authorization', authHeader())
+      .send({ items });
+
+    expect(res.status).toBe(200);
+    expect(autopickRepository.replaceAll).toHaveBeenCalledWith('player1', items);
+    expect(auditLogRepository.record).toHaveBeenCalledWith(
+      expect.objectContaining({ accountId: 'player1', eventType: 'account.autopick_updated' }),
+    );
   });
 });

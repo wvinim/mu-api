@@ -144,6 +144,52 @@ async function isAccountOnline(username) {
   return result.recordset.length > 0;
 }
 
+/**
+ * Renova/estende o VIP: soma `days` dias em cima do que sobrar da
+ * validade atual (nunca em cima de uma data já vencida no passado — se o
+ * VIP estava expirado ou nunca existiu, conta a partir de agora). A tier
+ * é sempre atualizada pra `tier` (decisão do usuário: comprar uma tier
+ * diferente da atual não bloqueia, só passa a valer a nova tier com os
+ * dias somados). `VipStartDate` só é resetado pra agora quando o VIP
+ * anterior já tinha expirado — se ainda estava ativo, mantém a data de
+ * início original (é uma extensão do mesmo período, não um novo).
+ * Retorna o estado atualizado de Vip/VipStartDate/VipEndDate.
+ */
+async function renewVip(username, { tier, days }) {
+  const pool = getPool();
+  const result = await pool
+    .request()
+    .input('username', sql.VarChar(10), username)
+    .input('tier', sql.Int, tier)
+    .input('days', sql.Int, days)
+    .query(`
+      UPDATE MEMB_INFO
+      SET
+        Vip = @tier,
+        VipStartDate = CASE WHEN VipEndDate IS NOT NULL AND VipEndDate > GETDATE() THEN VipStartDate ELSE GETDATE() END,
+        VipEndDate = DATEADD(day, @days, CASE WHEN VipEndDate IS NOT NULL AND VipEndDate > GETDATE() THEN VipEndDate ELSE GETDATE() END),
+        modi_days = GETDATE()
+      OUTPUT INSERTED.Vip AS vip, INSERTED.VipStartDate AS vipStartDate, INSERTED.VipEndDate AS vipEndDate
+      WHERE memb___id = @username
+    `);
+  return result.recordset[0] || null;
+}
+
+/** Revogação imediata (admin) — zera a tier e expira a validade agora. Não mexe em VipStartDate (histórico). */
+async function revokeVip(username) {
+  const pool = getPool();
+  const result = await pool
+    .request()
+    .input('username', sql.VarChar(10), username)
+    .query(`
+      UPDATE MEMB_INFO
+      SET Vip = 0, VipEndDate = GETDATE(), modi_days = GETDATE()
+      OUTPUT INSERTED.Vip AS vip, INSERTED.VipStartDate AS vipStartDate, INSERTED.VipEndDate AS vipEndDate
+      WHERE memb___id = @username
+    `);
+  return result.recordset[0] || null;
+}
+
 /** Crédito incondicional (ex: confirmação de pagamento Pix). */
 async function creditCash(username, amount) {
   const pool = getPool();
@@ -232,6 +278,8 @@ module.exports = {
   updatePasswordBoth,
   updateProfile,
   isAccountOnline,
+  renewVip,
+  revokeVip,
   creditCash,
   debitCash,
   findAllPaginated,

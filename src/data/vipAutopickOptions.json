@@ -1,0 +1,14 @@
+[
+  { "key": "uniria", "name": "Horn of Uniria", "itemGroup": 13, "itemIndex": 2, "itemLevel": 0 },
+  { "key": "imp", "name": "Imp", "itemGroup": 13, "itemIndex": 1, "itemLevel": 0 },
+  { "key": "jewel_of_chaos", "name": "Jewel of Chaos", "itemGroup": 12, "itemIndex": 15, "itemLevel": 0 },
+  { "key": "jewel_of_soul", "name": "Jewel of Soul", "itemGroup": 14, "itemIndex": 14, "itemLevel": 0 },
+  { "key": "jewel_of_bless", "name": "Jewel of Bless", "itemGroup": 14, "itemIndex": 13, "itemLevel": 0 },
+  { "key": "jewel_of_life", "name": "Jewel of Life", "itemGroup": 14, "itemIndex": 16, "itemLevel": 0 },
+  { "key": "kundun_box_1", "name": "Box of Kundun +1", "itemGroup": 14, "itemIndex": 11, "itemLevel": 8 },
+  { "key": "kundun_box_2", "name": "Box of Kundun +2", "itemGroup": 14, "itemIndex": 11, "itemLevel": 9 },
+  { "key": "kundun_box_3", "name": "Box of Kundun +3", "itemGroup": 14, "itemIndex": 11, "itemLevel": 10 },
+  { "key": "kundun_box_4", "name": "Box of Kundun +4", "itemGroup": 14, "itemIndex": 11, "itemLevel": 11 },
+  { "key": "kundun_box_5", "name": "Box of Kundun +5", "itemGroup": 14, "itemIndex": 11, "itemLevel": 12 },
+  { "key": "lochs_feather", "name": "Loch's Feather", "itemGroup": 13, "itemIndex": 14, "itemLevel": 0 }
+]

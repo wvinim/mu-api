@@ -14,6 +14,12 @@ router.use('/admin', requireAuth, requireRole('admin'));
 router.get('/admin/accounts', validate(schemas.accountsListQuery, 'query'), controller.listAccounts);
 router.post('/admin/accounts/:id/ban', validate(schemas.accountIdParam, 'params'), controller.banAccount);
 router.post('/admin/accounts/:id/unban', validate(schemas.accountIdParam, 'params'), controller.unbanAccount);
+router.post(
+  '/admin/accounts/:id/vip',
+  validate(schemas.accountIdParam, 'params'),
+  validate(schemas.setAccountVip),
+  controller.setAccountVip,
+);
 
 router.get('/admin/logs', validate(schemas.logsListQuery, 'query'), controller.listLogs);
 
@@ -53,6 +59,17 @@ router.delete(
   '/admin/shop/credit-packages/:id',
   validate(schemas.creditPackageIdParam, 'params'),
   controller.deactivateCreditPackage,
+);
+
+// Catálogo VIP é fixo (3 tiers, semeadas pela migration 0006) — só
+// permite editar preço/active de uma linha existente, não cria/remove.
+// Ver docs/SECTION_9_VIP.md.
+router.get('/admin/shop/vip-plans', controller.listVipPlans);
+router.patch(
+  '/admin/shop/vip-plans/:id',
+  validate(schemas.vipPlanIdParam, 'params'),
+  validate(schemas.updateVipPlan),
+  controller.updateVipPlan,
 );
 
 module.exports = router;

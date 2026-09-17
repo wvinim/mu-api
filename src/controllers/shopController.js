@@ -5,13 +5,19 @@ const shopBundlesRepository = require('../db/shopBundlesRepository');
 const pixChargesRepository = require('../db/pixChargesRepository');
 const itemRedemptionsRepository = require('../db/itemRedemptionsRepository');
 const bundleRedemptionsRepository = require('../db/bundleRedemptionsRepository');
+const vipPlansRepository = require('../db/vipPlansRepository');
+const vipPurchasesRepository = require('../db/vipPurchasesRepository');
+const autopickRepository = require('../db/autopickRepository');
 const shopHistoryRepository = require('../db/shopHistoryRepository');
 const accountsRepository = require('../db/accountsRepository');
 const charactersRepository = require('../db/charactersRepository');
 const auditLog = require('../db/auditLogRepository');
 const efiClient = require('../services/efiClient');
 const inventoryService = require('../services/inventoryService');
+const vipAutopickCatalog = require('../services/vipAutopickCatalog');
 const logger = require('../utils/logger');
+
+const SUPER_VIP_TIER = 2;
 
 function toCatalogEntry(kind, row) {
   if (kind === 'credit') {
@@ -31,6 +37,16 @@ function toCatalogEntry(kind, row) {
       description: row.Description,
       priceCredits: row.PriceCredits,
       items: row.Items.map((component) => ({ name: component.ItemName, quantity: component.ComponentQuantity })),
+    };
+  }
+  if (kind === 'vip') {
+    return {
+      catalogId: `vip:${row.Id}`,
+      kind: 'vip_plan',
+      name: row.Name,
+      tier: row.Tier,
+      priceCredits: row.PriceCredits,
+      durationDays: row.DurationDays,
     };
   }
   return {
@@ -54,16 +70,18 @@ function requestMeta(req) {
 
 async function getItems(req, res, next) {
   try {
-    const [packages, items, bundles] = await Promise.all([
+    const [packages, items, bundles, vipPlans] = await Promise.all([
       creditPackagesRepository.findActive(),
       shopItemsRepository.findActive(),
       shopBundlesRepository.findActiveWithItems(),
+      vipPlansRepository.findActive(),
     ]);
     res.json({
       items: [
         ...packages.map((p) => toCatalogEntry('credit', p)),
         ...items.map((i) => toCatalogEntry('item', i)),
         ...bundles.map((b) => toCatalogEntry('bundle', b)),
+        ...vipPlans.map((v) => toCatalogEntry('vip', v)),
       ],
     });
   } catch (err) {
@@ -85,6 +103,12 @@ async function getItemById(req, res, next) {
       const row = await shopBundlesRepository.findById(id);
       if (!row || !row.Active) throw new AppError(404, 'NOT_FOUND', 'Pacote não encontrado.');
       return res.json(toCatalogEntry('bundle', row));
+    }
+
+    if (kind === 'vip') {
+      const row = await vipPlansRepository.findById(id);
+      if (!row || !row.Active) throw new AppError(404, 'NOT_FOUND', 'Plano VIP não encontrado.');
+      return res.json(toCatalogEntry('vip', row));
     }
 
     const row = await shopItemsRepository.findById(id);
@@ -297,6 +321,62 @@ async function purchaseBundle(req, res, id, username, meta) {
   res.status(201).json({ type: 'bundle_redeemed', bundle: bundle.Name, characterName, slots: insertResult.slots });
 }
 
+/**
+ * VIP é da CONTA, não do personagem — não recebe characterName. Renova/
+ * estende Vip/VipStartDate/VipEndDate em MEMB_INFO (ver
+ * accountsRepository.renewVip para a regra de soma de dias) e, se for
+ * Super Vip, garante os 2 itens fixos de autopick (Jewel of Soul + Jewel
+ * of Bless) em MEMB_AUTOPICK_ITEMS sem apagar uma seleção de Mega Vip que
+ * já existisse. Ver docs/SECTION_9_VIP.md.
+ */
+async function purchaseVipPlan(req, res, id, username, meta) {
+  const plan = await vipPlansRepository.findById(id);
+  if (!plan || !plan.Active) throw new AppError(404, 'NOT_FOUND', 'Plano VIP não encontrado.');
+
+  const debited = await accountsRepository.debitCash(username, plan.PriceCredits);
+  if (!debited) {
+    throw new AppError(402, 'INSUFFICIENT_CREDITS', 'Créditos insuficientes.');
+  }
+
+  let updated;
+  try {
+    updated = await accountsRepository.renewVip(username, { tier: plan.Tier, days: plan.DurationDays });
+    await vipPurchasesRepository.create({
+      accountId: username,
+      planId: plan.Id,
+      tier: plan.Tier,
+      priceCredits: plan.PriceCredits,
+      durationDays: plan.DurationDays,
+    });
+    if (plan.Tier === SUPER_VIP_TIER) {
+      await autopickRepository.ensureItemsExist(username, vipAutopickCatalog.getSuperVipFixedItems());
+    }
+  } catch (err) {
+    // Falhou depois de já ter debitado — devolve os créditos.
+    await accountsRepository.creditCash(username, plan.PriceCredits);
+    await auditLog.record({
+      accountId: username,
+      username,
+      eventType: 'shop.vip_purchased',
+      success: false,
+      ...meta,
+      details: { planId: plan.Id, tier: plan.Tier, reason: err.code || err.message },
+    });
+    throw err;
+  }
+
+  await auditLog.record({
+    accountId: username,
+    username,
+    eventType: 'shop.vip_purchased',
+    success: true,
+    ...meta,
+    details: { planId: plan.Id, tier: plan.Tier, priceCredits: plan.PriceCredits, durationDays: plan.DurationDays, vipEndDate: updated.vipEndDate },
+  });
+
+  res.status(201).json({ type: 'vip_purchased', tier: updated.vip, vipStartDate: updated.vipStartDate, vipEndDate: updated.vipEndDate });
+}
+
 async function purchase(req, res, next) {
   try {
     const { catalogId } = req.body;
@@ -308,6 +388,8 @@ async function purchase(req, res, next) {
       await purchaseCreditPackage(req, res, id, username, meta);
     } else if (kind === 'bundle') {
       await purchaseBundle(req, res, id, username, meta);
+    } else if (kind === 'vip') {
+      await purchaseVipPlan(req, res, id, username, meta);
     } else {
       await purchaseItem(req, res, id, username, meta);
     }

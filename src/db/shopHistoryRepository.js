@@ -51,6 +51,21 @@ async function findByAccount(accountId, { page = 1, limit = 20 } = {}) {
     FROM WebBundleRedemptions r
     JOIN WebShopBundles b ON b.Id = r.BundleId
     WHERE r.AccountId = @accountId
+
+    UNION ALL
+
+    SELECT
+      'vip_purchase' AS type,
+      CAST(r.PlanId AS VARCHAR(20)) AS reference,
+      p.Name AS itemName,
+      NULL AS amountCents,
+      r.PriceCredits AS creditsAmount,
+      NULL AS characterName,
+      'completed' AS status,
+      r.CreatedAt AS createdAt
+    FROM WebVipPurchases r
+    JOIN WebVipPlans p ON p.Id = r.PlanId
+    WHERE r.AccountId = @accountId
   `;
 
   const result = await pool

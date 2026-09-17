@@ -61,6 +61,31 @@ primeiro 401 e refaz a request original).
 | PATCH | `/account/me` | `{ displayName }` (obrigatório, max 10) | `{ message }` |
 | GET | `/account/characters` | — | `{ characters: [...] }` — mesmos campos do perfil de personagem completo (ver abaixo), sem filtro de privacidade (é o dono) |
 | GET | `/account/security-log` | `?page&limit` (limit máx 100) | `{ page, limit, total, items }` — histórico de login/troca de senha/etc |
+| GET | `/account/autopick` | — | `{ items: [{ itemGroup, itemIndex, itemLevel, name }] }` — seleção salva de autopick VIP. Retorna o que já foi salvo **mesmo que a conta não seja Mega Vip agora** (não limpa em downgrade/expiração) |
+| PUT | `/account/autopick` | `{ items: [{ itemGroup, itemIndex, itemLevel }] }` (máx 12, sem duplicados) | `{ message, items }`. **Substitui a seleção inteira**. Só permitido se a conta é Mega Vip (`vip === 3`) **no momento da chamada** — senão **403** `MEGA_VIP_REQUIRED`. Cada item precisa estar na lista fechada de 12 permitidos abaixo — item fora da lista dá **400** |
+
+Lista fechada de itens selecionáveis pro autopick (Mega Vip) — o
+front-end deve mostrar os `name` abaixo como opções fixas, marcando as
+combinações `itemGroup:itemIndex:itemLevel` já presentes em
+`GET /account/autopick`:
+
+| name | itemGroup | itemIndex | itemLevel |
+|---|---|---|---|
+| Horn of Uniria | 13 | 2 | 0 |
+| Imp | 13 | 1 | 0 |
+| Jewel of Chaos | 12 | 15 | 0 |
+| Jewel of Soul | 14 | 14 | 0 |
+| Jewel of Bless | 14 | 13 | 0 |
+| Jewel of Life | 14 | 16 | 0 |
+| Box of Kundun +1 | 14 | 11 | 8 |
+| Box of Kundun +2 | 14 | 11 | 9 |
+| Box of Kundun +3 | 14 | 11 | 10 |
+| Box of Kundun +4 | 14 | 11 | 11 |
+| Box of Kundun +5 | 14 | 11 | 12 |
+| Loch's Feather | 13 | 14 | 0 |
+
+O Super Vip (tier 2) tem autopick **fixo** (Jewel of Soul + Jewel of
+Bless, gravado automaticamente na compra) — não usa `PUT /account/autopick`.
 
 ---
 
@@ -88,13 +113,20 @@ inventário).
 | GET | `/shop/items/:id` | não | `id` = `credit:<n>`, `item:<n>` ou `bundle:<n>` | uma entrada do catálogo, 404 se inativo/inexistente |
 | POST | `/shop/purchase` | 🔒 | `{ catalogId }` (compra créditos) ou `{ catalogId, characterName }` (resgata item ou pacote) | ver abaixo |
 | GET | `/shop/credits` | 🔒 | — | `{ cash }` |
-| GET | `/shop/history` | 🔒 | `?page&limit` | `{ page, limit, total, items }` — unifica compras de crédito + resgates de item + resgates de pacote |
+| GET | `/shop/history` | 🔒 | `?page&limit` | `{ page, limit, total, items }` — unifica compras de crédito + resgates de item + resgates de pacote + compras de VIP (`type: "vip_purchase"`) |
 
 **`catalogId`** sempre no formato `"credit:<id>"` (pacote Pix→Cash),
-`"item:<id>"` (item avulso resgatável, gasta Cash) ou `"bundle:<id>"`
-(pacote — vários itens do catálogo entregues juntos por um preço único).
-O front-end deve usar esse `catalogId` exatamente como veio de
-`/shop/items` — não montar na mão.
+`"item:<id>"` (item avulso resgatável, gasta Cash), `"bundle:<id>"`
+(pacote — vários itens do catálogo entregues juntos por um preço único)
+ou `"vip:<id>"` (plano VIP, gasta Cash, **sem** `characterName` — VIP é
+da conta, não do personagem). O front-end deve usar esse `catalogId`
+exatamente como veio de `/shop/items` — não montar na mão.
+
+Uma entrada `kind: "vip_plan"` de `/shop/items` traz `{ tier, priceCredits, durationDays }`
+(`tier`: 1 = Vip, 2 = Super Vip, 3 = Mega Vip; `durationDays` sempre 30
+hoje, mas trate como dinâmico). Catálogo sempre tem exatamente 3 planos
+ativos por padrão (um por tier) — admin só edita preço/ativo, não
+cria/remove planos.
 
 Uma entrada `kind: "item_bundle"` de `/shop/items` traz
 `items: [{ name, quantity }]` com o conteúdo do pacote, pra mostrar pro
@@ -104,6 +136,7 @@ Resposta de `POST /shop/purchase`:
 - Se `catalogId` é `credit:*` → **201** `{ type: "pix_charge", txid, pixCopiaECola, qrCodeImage, amountCents, creditsAmount }`. O front-end mostra o QR code / copia-e-cola Pix; o crédito de `cash` só acontece depois, via webhook confirmado pela Efí (assíncrono — o front-end precisa fazer polling em `/shop/credits` ou `/shop/history` até o saldo mudar, não há WebSocket/push).
 - Se `catalogId` é `item:*` → precisa também de `characterName` no body. **201** `{ type: "item_redeemed", item, characterName, slot }`. Erros: 402 `INSUFFICIENT_CREDITS`, 404 se personagem não pertence à conta, 409 `CHARACTER_ONLINE` se o personagem (conta) está logado no jogo neste momento, 409 `INVENTORY_FULL` se não há espaço livre de verdade na mochila (a checagem entende o tamanho real de cada item já presente — um item 2x2 ocupa 4 células, não 1 — não só conta bytes vazios no array), 409 `INVENTORY_UNKNOWN_ITEM` se a mochila do personagem tiver algum item que não reconhecemos (não sabemos o footprint dele com segurança, então a API recusa em vez de arriscar) — nesses 409 e no 402 o Cash **não é debitado** (checagem acontece antes do débito, front-end não precisa se preocupar com estorno aqui).
 - Se `catalogId` é `bundle:*` → precisa também de `characterName`. **201** `{ type: "bundle_redeemed", bundle, characterName, slots: [...] }` — um slot da mochila por unidade de cada item do pacote. Mesmos erros do resgate de item avulso (402/404/409 `CHARACTER_ONLINE`/`INVENTORY_FULL`/`INVENTORY_UNKNOWN_ITEM`, o `INVENTORY_FULL` aqui é quando não há espaço pra **todos** os itens do pacote de uma vez); em nenhum desses casos o Cash é debitado.
+- Se `catalogId` é `vip:*` → **sem** `characterName`. **201** `{ type: "vip_purchased", tier, vipStartDate, vipEndDate }`. Erros: 402 `INSUFFICIENT_CREDITS`, 404 se o plano não existe/está inativo. **Comprar de novo soma dias** à validade atual em vez de substituir — se a conta já tinha VIP ativo, `vipEndDate` = validade atual + duração do plano; se estava expirado/nunca teve, conta a partir de agora. A tier sempre passa a ser a do plano comprado (dá pra trocar de tier "no meio" da validade). Comprar Super Vip (tier 2) grava automaticamente o autopick fixo (Jewel of Soul + Jewel of Bless) — ver seção `/account/autopick` acima.
 - Rate limit: 1 compra a cada 3s por conta (evita clique duplicado).
 
 `GET /shop/payment/webhook/:secret` **não é para o front-end** — é
@@ -130,6 +163,7 @@ chamado pela Efí diretamente.
 | GET | `/admin/accounts` | `?page&limit&search&banned(bool)` | `{ page, limit, total, items }` — item: `{ id, username, displayName, email, emailConfirmed, banned, cash, vip, createdAt, role }`. `id` = `username` (MEMB_INFO não tem PK numérica própria — memb___id é a chave real, e é o mesmo valor esperado em `:id` nas rotas de ban/unban abaixo). `role` é derivado (`player`/`staff`/`admin`) das listas fixas do `.env`, não é coluna |
 | POST | `/admin/accounts/:id/ban` | — | `{ message }` — também revoga todos os refresh tokens da conta. `:id` é o username |
 | POST | `/admin/accounts/:id/unban` | — | `{ message }` |
+| POST | `/admin/accounts/:id/vip` | `{ tier(0-3), days }` — `days` obrigatório se `tier > 0`, proibido se `tier === 0` | `{ message, vip, vipStartDate, vipEndDate }`. `tier > 0`: concede/estende (mesma regra de soma de dias da compra normal). `tier === 0`: revoga imediatamente (`VipEndDate = agora`) |
 | GET | `/admin/logs` | `?page&limit&accountId&eventType` | `{ page, limit, total, items }` — `WebAuditLog` completo, incluindo `id` (PK própria da tabela) |
 | GET/POST | `/admin/shop/items` | POST: `{ name, description?, priceCredits, itemGroup, itemIndex, itemLevel?, quantity?, active? }` | GET `{ items }`; POST 201 `{ id }` |
 | PATCH/DELETE | `/admin/shop/items/:id` | PATCH: qualquer subconjunto dos campos acima | `{ message }`. DELETE é soft-delete (`active=false`) |
@@ -137,6 +171,8 @@ chamado pela Efí diretamente.
 | PATCH/DELETE | `/admin/shop/bundles/:id` | PATCH: qualquer subconjunto dos campos acima — **se `items` vier, substitui a lista inteira**, não faz merge | `{ message }`. DELETE é soft-delete (`active=false`) |
 | GET/POST | `/admin/shop/credit-packages` | POST: `{ name, priceCents, creditsAmount, active? }` | igual ao padrão acima |
 | PATCH/DELETE | `/admin/shop/credit-packages/:id` | PATCH: subconjunto dos campos | igual ao padrão acima |
+| GET | `/admin/shop/vip-plans` | — | `{ items: [{ id, tier, name, priceCredits, durationDays, active, createdAt }] }` — sempre 3 linhas (uma por tier) |
+| PATCH | `/admin/shop/vip-plans/:id` | `{ priceCredits?, active? }` — **só esses 2 campos**, `tier`/`name`/`durationDays` não são editáveis | `{ message }` |
 
 `shopItemId` em `/admin/shop/bundles` referencia um item já cadastrado em
 `/admin/shop/items` — pra vender só dentro do pacote (não avulso), marque

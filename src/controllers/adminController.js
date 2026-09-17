@@ -4,6 +4,7 @@ const auditLogRepository = require('../db/auditLogRepository');
 const shopItemsRepository = require('../db/shopItemsRepository');
 const shopBundlesRepository = require('../db/shopBundlesRepository');
 const creditPackagesRepository = require('../db/creditPackagesRepository');
+const vipPlansRepository = require('../db/vipPlansRepository');
 const tokenService = require('../services/tokenService');
 const { getRole } = require('../services/roleService');
 
@@ -63,6 +64,57 @@ async function unbanAccount(req, res, next) {
     await logAdminAction(req, 'admin.account_unban', { targetAccount: username });
 
     res.json({ message: `Conta ${username} desbanida.` });
+  } catch (err) {
+    next(err);
+  }
+}
+
+/**
+ * Concede/estende VIP manualmente (compensação de suporte, sem passar
+ * pela compra) ou revoga (tier: 0). Mesma regra de soma de dias da
+ * compra normal (accountsRepository.renewVip) — ver docs/SECTION_9_VIP.md.
+ */
+async function setAccountVip(req, res, next) {
+  try {
+    const { id: username } = req.params;
+    const { tier, days } = req.body;
+
+    const account = await accountsRepository.findByUsername(username);
+    if (!account) throw new AppError(404, 'NOT_FOUND', 'Conta não encontrada.');
+
+    const updated =
+      tier === 0
+        ? await accountsRepository.revokeVip(username)
+        : await accountsRepository.renewVip(username, { tier, days });
+
+    await logAdminAction(req, 'admin.account_vip_changed', { targetAccount: username, tier, days });
+
+    res.json({
+      message: `VIP da conta ${username} atualizado.`,
+      vip: updated.vip,
+      vipStartDate: updated.vipStartDate,
+      vipEndDate: updated.vipEndDate,
+    });
+  } catch (err) {
+    next(err);
+  }
+}
+
+async function listVipPlans(req, res, next) {
+  try {
+    const items = await vipPlansRepository.findAllAdmin();
+    res.json({ items });
+  } catch (err) {
+    next(err);
+  }
+}
+
+async function updateVipPlan(req, res, next) {
+  try {
+    const { id } = req.params;
+    await vipPlansRepository.update(id, req.body);
+    await logAdminAction(req, 'admin.vip_plan_updated', { id, ...req.body });
+    res.json({ message: 'Plano VIP atualizado.' });
   } catch (err) {
     next(err);
   }
@@ -205,6 +257,9 @@ module.exports = {
   listAccounts,
   banAccount,
   unbanAccount,
+  setAccountVip,
+  listVipPlans,
+  updateVipPlan,
   listLogs,
   listShopItems,
   createShopItem,

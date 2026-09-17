@@ -8,6 +8,7 @@ jest.mock('../src/db/auditLogRepository');
 jest.mock('../src/db/shopItemsRepository');
 jest.mock('../src/db/shopBundlesRepository');
 jest.mock('../src/db/creditPackagesRepository');
+jest.mock('../src/db/vipPlansRepository');
 jest.mock('../src/db/refreshTokensRepository');
 
 const app = require('../src/app');
@@ -15,6 +16,7 @@ const accountsRepository = require('../src/db/accountsRepository');
 const shopItemsRepository = require('../src/db/shopItemsRepository');
 const shopBundlesRepository = require('../src/db/shopBundlesRepository');
 const creditPackagesRepository = require('../src/db/creditPackagesRepository');
+const vipPlansRepository = require('../src/db/vipPlansRepository');
 const refreshTokensRepository = require('../src/db/refreshTokensRepository');
 const tokenService = require('../src/services/tokenService');
 
@@ -103,6 +105,82 @@ describe('POST /api/v1/admin/accounts/:id/ban e /unban', () => {
 
     expect(res.status).toBe(200);
     expect(accountsRepository.setBanned).toHaveBeenCalledWith('player1', false);
+  });
+});
+
+describe('POST /api/v1/admin/accounts/:id/vip', () => {
+  it('retorna 404 para conta inexistente', async () => {
+    accountsRepository.findByUsername.mockResolvedValue(null);
+    const res = await request(app)
+      .post('/api/v1/admin/accounts/ghost/vip')
+      .set('Authorization', authHeader('adminuser'))
+      .send({ tier: 1, days: 30 });
+    expect(res.status).toBe(404);
+  });
+
+  it('exige days quando tier > 0', async () => {
+    const res = await request(app)
+      .post('/api/v1/admin/accounts/player1/vip')
+      .set('Authorization', authHeader('adminuser'))
+      .send({ tier: 1 });
+    expect(res.status).toBe(400);
+  });
+
+  it('concede/estende VIP (tier > 0) via renewVip', async () => {
+    accountsRepository.findByUsername.mockResolvedValue({ username: 'player1' });
+    accountsRepository.renewVip.mockResolvedValue({ vip: 2, vipStartDate: '2026-09-16', vipEndDate: '2026-10-16' });
+
+    const res = await request(app)
+      .post('/api/v1/admin/accounts/player1/vip')
+      .set('Authorization', authHeader('adminuser'))
+      .send({ tier: 2, days: 30 });
+
+    expect(res.status).toBe(200);
+    expect(accountsRepository.renewVip).toHaveBeenCalledWith('player1', { tier: 2, days: 30 });
+    expect(accountsRepository.revokeVip).not.toHaveBeenCalled();
+    expect(res.body.vip).toBe(2);
+  });
+
+  it('revoga o VIP (tier 0) via revokeVip, sem exigir days', async () => {
+    accountsRepository.findByUsername.mockResolvedValue({ username: 'player1' });
+    accountsRepository.revokeVip.mockResolvedValue({ vip: 0, vipStartDate: '2026-08-01', vipEndDate: '2026-09-16' });
+
+    const res = await request(app)
+      .post('/api/v1/admin/accounts/player1/vip')
+      .set('Authorization', authHeader('adminuser'))
+      .send({ tier: 0 });
+
+    expect(res.status).toBe(200);
+    expect(accountsRepository.revokeVip).toHaveBeenCalledWith('player1');
+    expect(accountsRepository.renewVip).not.toHaveBeenCalled();
+  });
+});
+
+describe('GET/PATCH /api/v1/admin/shop/vip-plans', () => {
+  it('lista os planos', async () => {
+    vipPlansRepository.findAllAdmin.mockResolvedValue([{ id: 1, tier: 1, name: 'Vip', priceCredits: 60 }]);
+    const res = await request(app).get('/api/v1/admin/shop/vip-plans').set('Authorization', authHeader('adminuser'));
+    expect(res.status).toBe(200);
+    expect(res.body.items).toHaveLength(1);
+  });
+
+  it('edita só o preço/active de um plano existente', async () => {
+    vipPlansRepository.update.mockResolvedValue();
+    const res = await request(app)
+      .patch('/api/v1/admin/shop/vip-plans/1')
+      .set('Authorization', authHeader('adminuser'))
+      .send({ priceCredits: 75 });
+    expect(res.status).toBe(200);
+    expect(vipPlansRepository.update).toHaveBeenCalledWith(1, { priceCredits: 75 });
+  });
+
+  it('rejeita tentar mudar tier/name/durationDays (não são editáveis)', async () => {
+    const res = await request(app)
+      .patch('/api/v1/admin/shop/vip-plans/1')
+      .set('Authorization', authHeader('adminuser'))
+      .send({ tier: 2 });
+    expect(res.status).toBe(400);
+    expect(vipPlansRepository.update).not.toHaveBeenCalled();
   });
 });
 
