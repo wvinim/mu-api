@@ -62,7 +62,7 @@ primeiro 401 e refaz a request original).
 | GET | `/account/characters` | — | `{ characters: [...] }` — mesmos campos do perfil de personagem completo (ver abaixo), sem filtro de privacidade (é o dono) |
 | GET | `/account/security-log` | `?page&limit` (limit máx 100) | `{ page, limit, total, items }` — histórico de login/troca de senha/etc |
 | GET | `/account/autopick` | — | `{ items: [{ itemGroup, itemIndex, itemLevel, name }] }` — seleção salva de autopick VIP. Retorna o que já foi salvo **mesmo que a conta não seja Mega Vip agora** (não limpa em downgrade/expiração) |
-| PUT | `/account/autopick` | `{ items: [{ itemGroup, itemIndex, itemLevel }] }` (máx 12, sem duplicados) | `{ message, items }`. **Substitui a seleção inteira**. Só permitido se a conta é Mega Vip (`vip === 3`) **no momento da chamada** — senão **403** `MEGA_VIP_REQUIRED`. Cada item precisa estar na lista fechada de 12 permitidos abaixo — item fora da lista dá **400** |
+| PUT | `/account/autopick` | `{ items: [{ itemGroup, itemIndex, itemLevel }] }` (máx 12, sem duplicados) | `{ message, items }`. **Substitui a seleção inteira**. Só permitido se a conta é Mega Vip (`vip === 3`) **no momento da chamada** — senão **403** `MEGA_VIP_REQUIRED`. Bloqueado com **409** `CHARACTER_ONLINE` se a conta está logada no jogo neste momento (mesma checagem da loja) — nada é gravado nesse caso. Cada item precisa estar na lista fechada de 12 permitidos abaixo — item fora da lista dá **400** |
 
 Lista fechada de itens selecionáveis pro autopick (Mega Vip) — o
 front-end deve mostrar os `name` abaixo como opções fixas, marcando as

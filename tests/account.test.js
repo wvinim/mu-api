@@ -174,8 +174,23 @@ describe('PUT /api/v1/account/autopick', () => {
     expect(res.status).toBe(400);
   });
 
-  it('substitui a seleção inteira quando a conta é Mega Vip', async () => {
+  it('rejeita se a conta estiver online no jogo, sem gravar nada', async () => {
     accountsRepository.findByUsername.mockResolvedValue(makeAccount({ vip: 3 }));
+    accountsRepository.isAccountOnline.mockResolvedValue(true);
+
+    const res = await request(app)
+      .put('/api/v1/account/autopick')
+      .set('Authorization', authHeader())
+      .send({ items: [{ itemGroup: 14, itemIndex: 13, itemLevel: 0 }] });
+
+    expect(res.status).toBe(409);
+    expect(res.body.error.code).toBe('CHARACTER_ONLINE');
+    expect(autopickRepository.replaceAll).not.toHaveBeenCalled();
+  });
+
+  it('substitui a seleção inteira quando a conta é Mega Vip e está offline', async () => {
+    accountsRepository.findByUsername.mockResolvedValue(makeAccount({ vip: 3 }));
+    accountsRepository.isAccountOnline.mockResolvedValue(false);
     autopickRepository.replaceAll.mockResolvedValue();
 
     const items = [

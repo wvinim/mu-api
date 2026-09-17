@@ -92,12 +92,21 @@ async function getAutopick(req, res, next) {
  * chamada, não guarda estado de "já foi Mega Vip alguma vez"). Substitui
  * a seleção inteira — mesmo padrão de PATCH /admin/shop/bundles/:id com
  * `items`.
+ *
+ * Bloqueia gravação enquanto a conta está logada no jogo (mesma razão do
+ * CHARACTER_ONLINE na loja — o gameserver pode ter/gravar por cima um
+ * estado de MEMB_AUTOPICK_ITEMS já carregado em memória).
  */
 async function updateAutopick(req, res, next) {
   try {
     const account = await accountsRepository.findByUsername(req.user.username);
     if (!account || account.vip !== MEGA_VIP_TIER) {
       throw new AppError(403, 'MEGA_VIP_REQUIRED', 'Seleção de autopick disponível somente para contas Mega Vip.');
+    }
+
+    const online = await accountsRepository.isAccountOnline(req.user.username);
+    if (online) {
+      throw new AppError(409, 'CHARACTER_ONLINE', 'Saia do jogo antes de alterar a seleção de autopick.');
     }
 
     const { items } = req.body;
