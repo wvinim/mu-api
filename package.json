@@ -11,6 +11,7 @@
     "test": "jest --runInBand",
     "test:watch": "jest --runInBand --watch",
     "dump-inventory": "node scripts/dumpInventorySlots.js",
+    "dump-vip-status": "node scripts/dumpVipStatus.js",
     "generate-item-dimensions": "node scripts/generateItemDimensions.js"
   },
   "engines": {

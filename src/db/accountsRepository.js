@@ -148,11 +148,17 @@ async function isAccountOnline(username) {
  * Renova/estende o VIP: soma `days` dias em cima do que sobrar da
  * validade atual (nunca em cima de uma data já vencida no passado — se o
  * VIP estava expirado ou nunca existiu, conta a partir de agora). A tier
- * é sempre atualizada pra `tier` (decisão do usuário: comprar uma tier
- * diferente da atual não bloqueia, só passa a valer a nova tier com os
- * dias somados). `VipStartDate` só é resetado pra agora quando o VIP
- * anterior já tinha expirado — se ainda estava ativo, mantém a data de
- * início original (é uma extensão do mesmo período, não um novo).
+ * é sempre atualizada pra `tier`.
+ *
+ * Regra de negócio (decisão do usuário, 2026-09-17): comprar uma tier
+ * MAIOR que a ativa no momento é upgrade — descarta os dias restantes do
+ * plano antigo e conta só os dias do novo plano a partir de agora (não
+ * soma). Comprar a MESMA tier (renovação) ou uma tier MENOR (downgrade)
+ * continua somando `days` ao período restante, mantendo a data de início
+ * original — mesmo comportamento de antes. `VipEndDate` na comparação
+ * `@tier > Vip` sempre lê o valor da linha ANTES deste UPDATE (garantia
+ * do SQL Server pra expressões no SET), então a comparação é sempre
+ * contra a tier antiga, mesmo sendo a mesma coluna que está sendo escrita.
  * Retorna o estado atualizado de Vip/VipStartDate/VipEndDate.
  */
 async function renewVip(username, { tier, days }) {
@@ -166,8 +172,16 @@ async function renewVip(username, { tier, days }) {
       UPDATE MEMB_INFO
       SET
         Vip = @tier,
-        VipStartDate = CASE WHEN VipEndDate IS NOT NULL AND VipEndDate > GETDATE() THEN VipStartDate ELSE GETDATE() END,
-        VipEndDate = DATEADD(day, @days, CASE WHEN VipEndDate IS NOT NULL AND VipEndDate > GETDATE() THEN VipEndDate ELSE GETDATE() END),
+        VipStartDate = CASE
+          WHEN VipEndDate IS NOT NULL AND VipEndDate > GETDATE() AND @tier > Vip THEN GETDATE()
+          WHEN VipEndDate IS NOT NULL AND VipEndDate > GETDATE() THEN VipStartDate
+          ELSE GETDATE()
+        END,
+        VipEndDate = CASE
+          WHEN VipEndDate IS NOT NULL AND VipEndDate > GETDATE() AND @tier > Vip THEN DATEADD(day, @days, GETDATE())
+          WHEN VipEndDate IS NOT NULL AND VipEndDate > GETDATE() THEN DATEADD(day, @days, VipEndDate)
+          ELSE DATEADD(day, @days, GETDATE())
+        END,
         modi_days = GETDATE()
       OUTPUT INSERTED.Vip AS vip, INSERTED.VipStartDate AS vipStartDate, INSERTED.VipEndDate AS vipEndDate
       WHERE memb___id = @username

@@ -15,6 +15,7 @@ const vipPlansRepository = require('../src/db/vipPlansRepository');
 const vipPurchasesRepository = require('../src/db/vipPurchasesRepository');
 const autopickRepository = require('../src/db/autopickRepository');
 const shopHistoryRepository = require('../src/db/shopHistoryRepository');
+const accountsRepository = require('../src/db/accountsRepository');
 
 function mockPoolQuery(recordset) {
   const query = jest.fn().mockResolvedValue({ recordset });
@@ -67,6 +68,22 @@ describe('autopickRepository.findByAccount', () => {
     const sqlText = query.mock.calls[0][0];
     expect(sqlText).toMatch(/FROM MEMB_AUTOPICK_ITEMS/);
     expect(sqlText).toMatch(/WHERE AccountID = @accountId/);
+  });
+});
+
+describe('accountsRepository.renewVip — upgrade não soma dias, renovação/downgrade soma', () => {
+  it('compara @tier > Vip (valor pré-UPDATE) pra decidir se reseta ou estende as datas', async () => {
+    const query = mockPoolQuery([{ vip: 3, vipStartDate: new Date(), vipEndDate: new Date() }]);
+    await accountsRepository.renewVip('player1', { tier: 3, days: 30 });
+    const sqlText = query.mock.calls[0][0];
+
+    // Upgrade (@tier > Vip antigo): reseta pra agora, sem somar ao VipEndDate antigo.
+    expect(sqlText).toMatch(/WHEN VipEndDate IS NOT NULL AND VipEndDate > GETDATE\(\) AND @tier > Vip THEN GETDATE\(\)/);
+    expect(sqlText).toMatch(/WHEN VipEndDate IS NOT NULL AND VipEndDate > GETDATE\(\) AND @tier > Vip THEN DATEADD\(day, @days, GETDATE\(\)\)/);
+
+    // Renovação (mesma tier) ou downgrade: mantém o comportamento antigo de somar ao VipEndDate/VipStartDate existentes.
+    expect(sqlText).toMatch(/WHEN VipEndDate IS NOT NULL AND VipEndDate > GETDATE\(\) THEN VipStartDate/);
+    expect(sqlText).toMatch(/WHEN VipEndDate IS NOT NULL AND VipEndDate > GETDATE\(\) THEN DATEADD\(day, @days, VipEndDate\)/);
   });
 });
 
