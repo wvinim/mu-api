@@ -18,7 +18,7 @@ jest.mock('../src/db/vipPurchasesRepository');
 jest.mock('../src/db/autopickRepository');
 jest.mock('../src/db/shopHistoryRepository');
 jest.mock('../src/db/accountsRepository');
-jest.mock('../src/db/charactersRepository');
+jest.mock('../src/db/warehouseRepository');
 jest.mock('../src/db/auditLogRepository');
 jest.mock('../src/services/efiClient');
 
@@ -34,12 +34,13 @@ const vipPurchasesRepository = require('../src/db/vipPurchasesRepository');
 const autopickRepository = require('../src/db/autopickRepository');
 const shopHistoryRepository = require('../src/db/shopHistoryRepository');
 const accountsRepository = require('../src/db/accountsRepository');
-const charactersRepository = require('../src/db/charactersRepository');
+const warehouseRepository = require('../src/db/warehouseRepository');
 const efiClient = require('../src/services/efiClient');
 const tokenService = require('../src/services/tokenService');
+const warehouseService = require('../src/services/warehouseService');
 
-const EMPTY_INVENTORY = Buffer.alloc(1728, 0xff);
-const FULL_INVENTORY = Buffer.alloc(1728, 0x00);
+const EMPTY_WAREHOUSE = warehouseService.emptyItemsBuffer();
+const FULL_WAREHOUSE = Buffer.alloc(1920, 0x00);
 
 const EMPTY_SLOT_BYTES = (() => {
   const buf = Buffer.alloc(16, 0x00);
@@ -49,8 +50,8 @@ const EMPTY_SLOT_BYTES = (() => {
   return buf;
 })();
 
-function inventoryWithFreeSlots(freeSlotIndexes) {
-  const buf = Buffer.from(FULL_INVENTORY);
+function warehouseWithFreeSlots(freeSlotIndexes) {
+  const buf = Buffer.from(FULL_WAREHOUSE);
   for (const idx of freeSlotIndexes) {
     EMPTY_SLOT_BYTES.copy(buf, idx * 16);
   }
@@ -266,24 +267,14 @@ describe('POST /api/v1/shop/purchase — pacote de créditos', () => {
   });
 });
 
-describe('POST /api/v1/shop/purchase — resgate de item', () => {
-  it('exige characterName', async () => {
+describe('POST /api/v1/shop/purchase — resgate de item (vai pro baú da conta, sem characterName)', () => {
+  it('retorna 404 para item inexistente ou inativo', async () => {
+    shopItemsRepository.findById.mockResolvedValue(null);
+
     const res = await request(app)
       .post('/api/v1/shop/purchase')
       .set('Authorization', authHeader())
       .send({ catalogId: 'item:2' });
-
-    expect(res.status).toBe(400);
-  });
-
-  it('rejeita personagem que não pertence à conta', async () => {
-    shopItemsRepository.findById.mockResolvedValue({ Id: 2, Name: 'Item', PriceCredits: 100, ItemGroup: 14, ItemIndex: 0, ItemLevel: 0, Quantity: 1, Active: true });
-    charactersRepository.findOwnedCharacter.mockResolvedValue(null);
-
-    const res = await request(app)
-      .post('/api/v1/shop/purchase')
-      .set('Authorization', authHeader())
-      .send({ catalogId: 'item:2', characterName: 'NaoEMeu' });
 
     expect(res.status).toBe(404);
     expect(accountsRepository.debitCash).not.toHaveBeenCalled();
@@ -291,113 +282,91 @@ describe('POST /api/v1/shop/purchase — resgate de item', () => {
 
   it('rejeita quando não há créditos suficientes', async () => {
     shopItemsRepository.findById.mockResolvedValue({ Id: 2, Name: 'Item', PriceCredits: 100, ItemGroup: 14, ItemIndex: 0, ItemLevel: 0, Quantity: 1, Active: true });
-    charactersRepository.findOwnedCharacter.mockResolvedValue({ Name: 'Hero1' });
     accountsRepository.isAccountOnline.mockResolvedValue(false);
-    charactersRepository.getInventoryBuffer.mockResolvedValue(Buffer.from(EMPTY_INVENTORY));
+    warehouseRepository.ensureRowAndGetItems.mockResolvedValue({ items: Buffer.from(EMPTY_WAREHOUSE), vaultId: 0 });
     accountsRepository.debitCash.mockResolvedValue(false);
 
     const res = await request(app)
       .post('/api/v1/shop/purchase')
       .set('Authorization', authHeader())
-      .send({ catalogId: 'item:2', characterName: 'Hero1' });
+      .send({ catalogId: 'item:2' });
 
     expect(res.status).toBe(402);
     expect(res.body.error.code).toBe('INSUFFICIENT_CREDITS');
-    expect(charactersRepository.updateInventory).not.toHaveBeenCalled();
+    expect(warehouseRepository.updateItems).not.toHaveBeenCalled();
   });
 
-  it('rejeita resgate se o personagem (conta) estiver online', async () => {
+  it('rejeita resgate se a conta estiver online no jogo', async () => {
     shopItemsRepository.findById.mockResolvedValue({ Id: 2, Name: 'Item', PriceCredits: 100, ItemGroup: 14, ItemIndex: 0, ItemLevel: 0, Quantity: 1, Active: true });
-    charactersRepository.findOwnedCharacter.mockResolvedValue({ Name: 'Hero1' });
     accountsRepository.isAccountOnline.mockResolvedValue(true);
 
     const res = await request(app)
       .post('/api/v1/shop/purchase')
       .set('Authorization', authHeader())
-      .send({ catalogId: 'item:2', characterName: 'Hero1' });
+      .send({ catalogId: 'item:2' });
 
     expect(res.status).toBe(409);
     expect(res.body.error.code).toBe('CHARACTER_ONLINE');
     expect(accountsRepository.debitCash).not.toHaveBeenCalled();
-    expect(charactersRepository.getInventoryBuffer).not.toHaveBeenCalled();
+    expect(warehouseRepository.ensureRowAndGetItems).not.toHaveBeenCalled();
   });
 
-  it('insere o item na mochila (slot 12-75) e nunca em slot de equipamento', async () => {
+  it('insere o item no baú (slot 0-119) sem pedir characterName, gravando no VaultID real da linha existente', async () => {
     shopItemsRepository.findById.mockResolvedValue({ Id: 2, Name: 'Bundle', PriceCredits: 100, ItemGroup: 14, ItemIndex: 5, ItemLevel: 1, Quantity: 10, Active: true });
-    charactersRepository.findOwnedCharacter.mockResolvedValue({ Name: 'Hero1' });
     accountsRepository.isAccountOnline.mockResolvedValue(false);
     accountsRepository.debitCash.mockResolvedValue(true);
-    charactersRepository.getInventoryBuffer.mockResolvedValue(Buffer.from(EMPTY_INVENTORY));
-    charactersRepository.updateInventory.mockResolvedValue();
+    // VaultID não-zero de propósito — regressão do bug em que o código
+    // assumia VaultID=0 e gravava no lugar errado (ou duplicava a linha).
+    warehouseRepository.ensureRowAndGetItems.mockResolvedValue({ items: Buffer.from(EMPTY_WAREHOUSE), vaultId: 7 });
+    warehouseRepository.updateItems.mockResolvedValue();
     itemRedemptionsRepository.create.mockResolvedValue();
 
     const res = await request(app)
       .post('/api/v1/shop/purchase')
       .set('Authorization', authHeader())
-      .send({ catalogId: 'item:2', characterName: 'Hero1' });
+      .send({ catalogId: 'item:2' });
 
     expect(res.status).toBe(201);
-    expect(res.body.slot).toBeGreaterThanOrEqual(12);
-    expect(res.body.slot).toBeLessThan(76);
+    expect(res.body).not.toHaveProperty('characterName');
+    expect(res.body.slot).toBeGreaterThanOrEqual(0);
+    expect(res.body.slot).toBeLessThan(120);
 
-    const [, savedBuffer] = charactersRepository.updateInventory.mock.calls[0];
+    const [savedAccountId, savedVaultId, savedBuffer] = warehouseRepository.updateItems.mock.calls[0];
+    expect(savedAccountId).toBe('player1');
+    expect(savedVaultId).toBe(7); // usa o VaultID real da linha, não um fixo
     const slotOffset = res.body.slot * 16;
     expect(savedBuffer[slotOffset]).not.toBe(0xff); // slot deixou de estar vazio
-    // slots de equipamento (0-11) continuam intocados.
-    for (let i = 0; i < 12 * 16; i++) {
-      expect(savedBuffer[i]).toBe(0xff);
-    }
+    expect(itemRedemptionsRepository.create).toHaveBeenCalledWith(
+      expect.not.objectContaining({ characterName: expect.anything() }),
+    );
   });
 
-  it('rejeita com mochila cheia SEM debitar créditos (checagem é antes do débito)', async () => {
+  it('rejeita com baú cheio SEM debitar créditos (checagem é antes do débito)', async () => {
     shopItemsRepository.findById.mockResolvedValue({ Id: 2, Name: 'Item', PriceCredits: 100, ItemGroup: 14, ItemIndex: 0, ItemLevel: 0, Quantity: 1, Active: true });
-    charactersRepository.findOwnedCharacter.mockResolvedValue({ Name: 'Hero1' });
     accountsRepository.isAccountOnline.mockResolvedValue(false);
-    charactersRepository.getInventoryBuffer.mockResolvedValue(Buffer.from(FULL_INVENTORY));
+    warehouseRepository.ensureRowAndGetItems.mockResolvedValue({ items: Buffer.from(FULL_WAREHOUSE), vaultId: 0 });
 
     const res = await request(app)
       .post('/api/v1/shop/purchase')
       .set('Authorization', authHeader())
-      .send({ catalogId: 'item:2', characterName: 'Hero1' });
+      .send({ catalogId: 'item:2' });
 
     expect(res.status).toBe(409);
-    expect(res.body.error.code).toBe('INVENTORY_FULL');
+    expect(res.body.error.code).toBe('WAREHOUSE_FULL');
     expect(accountsRepository.debitCash).not.toHaveBeenCalled();
     expect(accountsRepository.creditCash).not.toHaveBeenCalled();
     expect(itemRedemptionsRepository.create).not.toHaveBeenCalled();
   });
 });
 
-describe('POST /api/v1/shop/purchase — resgate de pacote (bundle)', () => {
-  it('exige characterName', async () => {
-    const res = await request(app)
-      .post('/api/v1/shop/purchase')
-      .set('Authorization', authHeader())
-      .send({ catalogId: 'bundle:5' });
-
-    expect(res.status).toBe(400);
-  });
-
+describe('POST /api/v1/shop/purchase — resgate de pacote (bundle, vai pro baú da conta, sem characterName)', () => {
   it('retorna 404 para pacote inexistente ou inativo', async () => {
     shopBundlesRepository.findById.mockResolvedValue(null);
 
     const res = await request(app)
       .post('/api/v1/shop/purchase')
       .set('Authorization', authHeader())
-      .send({ catalogId: 'bundle:5', characterName: 'Hero1' });
-
-    expect(res.status).toBe(404);
-    expect(accountsRepository.debitCash).not.toHaveBeenCalled();
-  });
-
-  it('rejeita personagem que não pertence à conta', async () => {
-    shopBundlesRepository.findById.mockResolvedValue(makeBundleFixture());
-    charactersRepository.findOwnedCharacter.mockResolvedValue(null);
-
-    const res = await request(app)
-      .post('/api/v1/shop/purchase')
-      .set('Authorization', authHeader())
-      .send({ catalogId: 'bundle:5', characterName: 'NaoEMeu' });
+      .send({ catalogId: 'bundle:5' });
 
     expect(res.status).toBe(404);
     expect(accountsRepository.debitCash).not.toHaveBeenCalled();
@@ -405,56 +374,54 @@ describe('POST /api/v1/shop/purchase — resgate de pacote (bundle)', () => {
 
   it('rejeita quando não há créditos suficientes', async () => {
     shopBundlesRepository.findById.mockResolvedValue(makeBundleFixture());
-    charactersRepository.findOwnedCharacter.mockResolvedValue({ Name: 'Hero1' });
     accountsRepository.isAccountOnline.mockResolvedValue(false);
-    charactersRepository.getInventoryBuffer.mockResolvedValue(Buffer.from(EMPTY_INVENTORY));
+    warehouseRepository.ensureRowAndGetItems.mockResolvedValue({ items: Buffer.from(EMPTY_WAREHOUSE), vaultId: 0 });
     accountsRepository.debitCash.mockResolvedValue(false);
 
     const res = await request(app)
       .post('/api/v1/shop/purchase')
       .set('Authorization', authHeader())
-      .send({ catalogId: 'bundle:5', characterName: 'Hero1' });
+      .send({ catalogId: 'bundle:5' });
 
     expect(res.status).toBe(402);
     expect(res.body.error.code).toBe('INSUFFICIENT_CREDITS');
-    expect(charactersRepository.updateInventory).not.toHaveBeenCalled();
+    expect(warehouseRepository.updateItems).not.toHaveBeenCalled();
   });
 
-  it('rejeita resgate de pacote se o personagem (conta) estiver online', async () => {
+  it('rejeita resgate de pacote se a conta estiver online no jogo', async () => {
     shopBundlesRepository.findById.mockResolvedValue(makeBundleFixture());
-    charactersRepository.findOwnedCharacter.mockResolvedValue({ Name: 'Hero1' });
     accountsRepository.isAccountOnline.mockResolvedValue(true);
 
     const res = await request(app)
       .post('/api/v1/shop/purchase')
       .set('Authorization', authHeader())
-      .send({ catalogId: 'bundle:5', characterName: 'Hero1' });
+      .send({ catalogId: 'bundle:5' });
 
     expect(res.status).toBe(409);
     expect(res.body.error.code).toBe('CHARACTER_ONLINE');
     expect(accountsRepository.debitCash).not.toHaveBeenCalled();
   });
 
-  it('insere todos os itens do pacote (2 Jewel Pack + 3 Kundun Box) em slots distintos da mochila', async () => {
+  it('insere todos os itens do pacote (2 Jewel Pack + 3 Kundun Box) em slots distintos do baú', async () => {
     shopBundlesRepository.findById.mockResolvedValue(makeBundleFixture());
-    charactersRepository.findOwnedCharacter.mockResolvedValue({ Name: 'Hero1' });
     accountsRepository.isAccountOnline.mockResolvedValue(false);
     accountsRepository.debitCash.mockResolvedValue(true);
-    charactersRepository.getInventoryBuffer.mockResolvedValue(Buffer.from(EMPTY_INVENTORY));
-    charactersRepository.updateInventory.mockResolvedValue();
+    warehouseRepository.ensureRowAndGetItems.mockResolvedValue({ items: Buffer.from(EMPTY_WAREHOUSE), vaultId: 0 });
+    warehouseRepository.updateItems.mockResolvedValue();
     bundleRedemptionsRepository.create.mockResolvedValue();
 
     const res = await request(app)
       .post('/api/v1/shop/purchase')
       .set('Authorization', authHeader())
-      .send({ catalogId: 'bundle:5', characterName: 'Hero1' });
+      .send({ catalogId: 'bundle:5' });
 
     expect(res.status).toBe(201);
+    expect(res.body).not.toHaveProperty('characterName');
     expect(res.body.slots).toHaveLength(5); // 2 + 3
     expect(new Set(res.body.slots).size).toBe(5); // slots distintos
     for (const slot of res.body.slots) {
-      expect(slot).toBeGreaterThanOrEqual(12);
-      expect(slot).toBeLessThan(76);
+      expect(slot).toBeGreaterThanOrEqual(0);
+      expect(slot).toBeLessThan(120);
     }
 
     // Debita o preço do PACOTE (900), não a soma de itens individuais.
@@ -463,35 +430,27 @@ describe('POST /api/v1/shop/purchase — resgate de pacote (bundle)', () => {
     expect(bundleRedemptionsRepository.create).toHaveBeenCalledTimes(1);
     expect(bundleRedemptionsRepository.create).toHaveBeenCalledWith({
       accountId: 'player1',
-      characterName: 'Hero1',
       bundleId: 5,
       priceCredits: 900,
     });
-
-    const [, savedBuffer] = charactersRepository.updateInventory.mock.calls[0];
-    // slots de equipamento (0-11) continuam intocados.
-    for (let i = 0; i < 12 * 16; i++) {
-      expect(savedBuffer[i]).toBe(0xff);
-    }
   });
 
   it('rejeita sem debitar créditos se faltar espaço para TODOS os itens do pacote', async () => {
     shopBundlesRepository.findById.mockResolvedValue(makeBundleFixture());
-    charactersRepository.findOwnedCharacter.mockResolvedValue({ Name: 'Hero1' });
     accountsRepository.isAccountOnline.mockResolvedValue(false);
-    // Só 3 slots livres na mochila, mas o pacote precisa de 5 (2 + 3).
-    charactersRepository.getInventoryBuffer.mockResolvedValue(inventoryWithFreeSlots([12, 13, 14]));
+    // Só 3 slots livres no baú, mas o pacote precisa de 5 (2 + 3).
+    warehouseRepository.ensureRowAndGetItems.mockResolvedValue({ items: warehouseWithFreeSlots([0, 1, 2]), vaultId: 0 });
 
     const res = await request(app)
       .post('/api/v1/shop/purchase')
       .set('Authorization', authHeader())
-      .send({ catalogId: 'bundle:5', characterName: 'Hero1' });
+      .send({ catalogId: 'bundle:5' });
 
     expect(res.status).toBe(409);
-    expect(res.body.error.code).toBe('INVENTORY_FULL');
+    expect(res.body.error.code).toBe('WAREHOUSE_FULL');
     expect(accountsRepository.debitCash).not.toHaveBeenCalled();
     expect(accountsRepository.creditCash).not.toHaveBeenCalled();
-    expect(charactersRepository.updateInventory).not.toHaveBeenCalled();
+    expect(warehouseRepository.updateItems).not.toHaveBeenCalled();
     expect(bundleRedemptionsRepository.create).not.toHaveBeenCalled();
   });
 });

@@ -10,10 +10,11 @@ const vipPurchasesRepository = require('../db/vipPurchasesRepository');
 const autopickRepository = require('../db/autopickRepository');
 const shopHistoryRepository = require('../db/shopHistoryRepository');
 const accountsRepository = require('../db/accountsRepository');
-const charactersRepository = require('../db/charactersRepository');
+const warehouseRepository = require('../db/warehouseRepository');
 const auditLog = require('../db/auditLogRepository');
 const efiClient = require('../services/efiClient');
-const inventoryService = require('../services/inventoryService');
+const warehouseService = require('../services/warehouseService');
+const itemSlotCodec = require('../services/itemSlotCodec');
 const vipAutopickCatalog = require('../services/vipAutopickCatalog');
 const logger = require('../utils/logger');
 
@@ -156,26 +157,18 @@ async function purchaseCreditPackage(req, res, id, username, meta) {
 }
 
 async function purchaseItem(req, res, id, username, meta) {
-  const { characterName } = req.body;
-  if (!characterName) {
-    throw new AppError(400, 'VALIDATION_ERROR', 'characterName é obrigatório para resgatar um item.');
-  }
-
   const item = await shopItemsRepository.findById(id);
   if (!item || !item.Active) throw new AppError(404, 'NOT_FOUND', 'Item não encontrado.');
-  inventoryService.assertRedeemableAsSimpleItem(item.ItemGroup, item.ItemIndex);
-
-  const character = await charactersRepository.findOwnedCharacter(username, characterName);
-  if (!character) throw new AppError(404, 'NOT_FOUND', 'Personagem não encontrado nesta conta.');
+  itemSlotCodec.assertRedeemableAsSimpleItem(item.ItemGroup, item.ItemIndex);
 
   const online = await accountsRepository.isAccountOnline(username);
   if (online) {
     throw new AppError(409, 'CHARACTER_ONLINE', 'Saia do jogo antes de resgatar itens da loja.');
   }
 
-  const inventoryBuffer = await charactersRepository.getInventoryBuffer(characterName);
-  if (inventoryService.findEmptyBagSlot(inventoryBuffer) === -1) {
-    throw new AppError(409, 'INVENTORY_FULL', 'Mochila cheia. Libere espaço antes de resgatar este item.');
+  const { items: itemsBuffer, vaultId } = await warehouseRepository.ensureRowAndGetItems(username);
+  if (warehouseService.findEmptyWarehouseSlot(itemsBuffer) === -1) {
+    throw new AppError(409, 'WAREHOUSE_FULL', 'Baú cheio. Libere espaço antes de resgatar este item.');
   }
 
   const debited = await accountsRepository.debitCash(username, item.PriceCredits);
@@ -183,15 +176,15 @@ async function purchaseItem(req, res, id, username, meta) {
     throw new AppError(402, 'INSUFFICIENT_CREDITS', 'Créditos insuficientes.');
   }
 
-  let inventoryResult;
+  let insertResult;
   try {
-    inventoryResult = inventoryService.insertItemIntoInventory(inventoryBuffer, {
+    insertResult = warehouseService.insertItemIntoWarehouse(itemsBuffer, {
       itemGroup: item.ItemGroup,
       itemIndex: item.ItemIndex,
       itemLevel: item.ItemLevel,
       quantity: item.Quantity,
     });
-    await charactersRepository.updateInventory(characterName, inventoryResult.buffer);
+    await warehouseRepository.updateItems(username, vaultId, insertResult.buffer);
   } catch (err) {
     // Falhou depois de já ter debitado — devolve os créditos.
     await accountsRepository.creditCash(username, item.PriceCredits);
@@ -201,17 +194,16 @@ async function purchaseItem(req, res, id, username, meta) {
       eventType: 'shop.item_redeemed',
       success: false,
       ...meta,
-      details: { itemId: item.Id, characterName, reason: err.code || err.message },
+      details: { itemId: item.Id, reason: err.code || err.message },
     });
     throw err;
   }
 
   await itemRedemptionsRepository.create({
     accountId: username,
-    characterName,
     shopItemId: item.Id,
     priceCredits: item.PriceCredits,
-    slot: inventoryResult.slot,
+    slot: insertResult.slot,
   });
 
   await auditLog.record({
@@ -220,10 +212,10 @@ async function purchaseItem(req, res, id, username, meta) {
     eventType: 'shop.item_redeemed',
     success: true,
     ...meta,
-    details: { itemId: item.Id, characterName, slot: inventoryResult.slot, priceCredits: item.PriceCredits },
+    details: { itemId: item.Id, slot: insertResult.slot, priceCredits: item.PriceCredits },
   });
 
-  res.status(201).json({ type: 'item_redeemed', item: item.Name, characterName, slot: inventoryResult.slot });
+  res.status(201).json({ type: 'item_redeemed', item: item.Name, slot: insertResult.slot });
 }
 
 /**
@@ -243,19 +235,11 @@ function expandBundleComponents(bundle) {
 }
 
 async function purchaseBundle(req, res, id, username, meta) {
-  const { characterName } = req.body;
-  if (!characterName) {
-    throw new AppError(400, 'VALIDATION_ERROR', 'characterName é obrigatório para resgatar um pacote.');
-  }
-
   const bundle = await shopBundlesRepository.findById(id);
   if (!bundle || !bundle.Active) throw new AppError(404, 'NOT_FOUND', 'Pacote não encontrado.');
   for (const component of bundle.Items) {
-    inventoryService.assertRedeemableAsSimpleItem(component.ItemGroup, component.ItemIndex);
+    itemSlotCodec.assertRedeemableAsSimpleItem(component.ItemGroup, component.ItemIndex);
   }
-
-  const character = await charactersRepository.findOwnedCharacter(username, characterName);
-  if (!character) throw new AppError(404, 'NOT_FOUND', 'Personagem não encontrado nesta conta.');
 
   const online = await accountsRepository.isAccountOnline(username);
   if (online) {
@@ -263,12 +247,12 @@ async function purchaseBundle(req, res, id, username, meta) {
   }
 
   const componentSpecs = expandBundleComponents(bundle);
-  const inventoryBuffer = await charactersRepository.getInventoryBuffer(characterName);
-  if (inventoryService.countEmptyBagSlots(inventoryBuffer) < componentSpecs.length) {
+  const { items: itemsBuffer, vaultId } = await warehouseRepository.ensureRowAndGetItems(username);
+  if (warehouseService.countEmptyWarehouseSlots(itemsBuffer) < componentSpecs.length) {
     throw new AppError(
       409,
-      'INVENTORY_FULL',
-      'Mochila cheia. Espaço insuficiente para todos os itens do pacote — nada foi alterado.',
+      'WAREHOUSE_FULL',
+      'Baú cheio. Espaço insuficiente para todos os itens do pacote — nada foi alterado.',
     );
   }
 
@@ -279,11 +263,11 @@ async function purchaseBundle(req, res, id, username, meta) {
 
   let insertResult;
   try {
-    insertResult = inventoryService.insertItemsIntoInventory(inventoryBuffer, componentSpecs);
-    await charactersRepository.updateInventory(characterName, insertResult.buffer);
+    insertResult = warehouseService.insertItemsIntoWarehouse(itemsBuffer, componentSpecs);
+    await warehouseRepository.updateItems(username, vaultId, insertResult.buffer);
   } catch (err) {
     // Tudo ou nada: se faltou espaço pra qualquer item do pacote, nada foi
-    // gravado no Inventory — só precisa estornar o débito.
+    // gravado no baú — só precisa estornar o débito.
     await accountsRepository.creditCash(username, bundle.PriceCredits);
     await auditLog.record({
       accountId: username,
@@ -291,14 +275,13 @@ async function purchaseBundle(req, res, id, username, meta) {
       eventType: 'shop.bundle_redeemed',
       success: false,
       ...meta,
-      details: { bundleId: bundle.Id, characterName, reason: err.code || err.message },
+      details: { bundleId: bundle.Id, reason: err.code || err.message },
     });
     throw err;
   }
 
   await bundleRedemptionsRepository.create({
     accountId: username,
-    characterName,
     bundleId: bundle.Id,
     priceCredits: bundle.PriceCredits,
   });
@@ -311,14 +294,13 @@ async function purchaseBundle(req, res, id, username, meta) {
     ...meta,
     details: {
       bundleId: bundle.Id,
-      characterName,
       priceCredits: bundle.PriceCredits,
       slots: insertResult.slots,
       items: bundle.Items.map((c) => ({ shopItemId: c.ItemId, name: c.ItemName, quantity: c.ComponentQuantity })),
     },
   });
 
-  res.status(201).json({ type: 'bundle_redeemed', bundle: bundle.Name, characterName, slots: insertResult.slots });
+  res.status(201).json({ type: 'bundle_redeemed', bundle: bundle.Name, slots: insertResult.slots });
 }
 
 /**

@@ -8,11 +8,10 @@ const catalogIdParam = Joi.object({
 
 const purchase = Joi.object({
   catalogId: Joi.string().pattern(CATALOG_ID_PATTERN).required(),
-  // Só é obrigatório para resgate de item ou pacote (catalogId "item:*"
-  // ou "bundle:*") — validado de novo no controller, porque o Joi não
-  // sabe recortar o prefixo aqui sem uma regra `when` mais frágil de manter.
-  // Nunca usado pra "credit:*"/"vip:*" (compra é da conta, não do personagem).
-  characterName: Joi.string().max(10),
+  // Resgate de item/pacote passou a ir pro baú da conta (warehouse), não
+  // mais pro personagem — não recebe characterName (nenhum catalogId
+  // recebe mais). `stripUnknown: true` no middleware `validate` descarta
+  // silenciosamente um characterName que um front-end desatualizado ainda envie.
 });
 
 const historyQuery = Joi.object({

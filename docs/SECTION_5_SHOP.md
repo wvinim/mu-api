@@ -273,6 +273,50 @@ alteração em tabela existente:
   de `WebItemRedemptions`, mas 1:1 com a compra, não 1:1 com o item
   concedido).
 
+## Adendo — Resgate migrado da mochila pro baú da conta (2026-09-17)
+
+Decisão sua: resgate de item/pacote passou a gravar no **baú da conta**
+(`warehouse.Items`) em vez do `Character.Inventory` (mochila do
+personagem) — o baú é maior (120 slots vs. 64 da mochila) e não tem risco
+de escrever em cima de slot de equipamento.
+
+- **Formato investigado e validado empiricamente** antes de escrever
+  qualquer coisa (mesmo método usado pro `Character.Inventory`: dump hex
+  antes/depois de uma ação real no jogo) — ver
+  `docs/WAREHOUSE_BYTE_FORMAT.md` pelo resultado completo. Confirmado:
+  mesmo layout de 16 bytes/slot, grade 8x15 (120 slots), sem faixa de
+  equipamento a excluir.
+- Lógica de bytes/grid compartilhada extraída pra
+  `src/services/itemSlotCodec.js` — `inventoryService.js` (mochila) e o
+  novo `warehouseService.js` (baú) importam dela, não duplicam.
+- `characterName` **removido** do contrato de `POST /shop/purchase` para
+  `item:*`/`bundle:*` — resgate não pede mais personagem. Erros
+  renomeados: `INVENTORY_FULL`→`WAREHOUSE_FULL`,
+  `INVENTORY_UNKNOWN_ITEM`→`WAREHOUSE_UNKNOWN_ITEM`. Ver
+  `docs/API_REFERENCE.md` atualizado e o prompt de sync que te passei.
+- `warehouse` **não tem PK/índice único declarado** — conta que nunca
+  abriu o baú no jogo não tem linha lá. A API cria a linha automaticamente
+  na primeira compra (`warehouseRepository.ensureRowAndGetItems`, valores
+  padrão confirmados com você: `Money=0`, `EndUseDate=NULL`,
+  `DbVersion=3`, `pw=0`, `VaultID=0`), protegido contra corrida com
+  `WITH (UPDLOCK, HOLDLOCK)` numa transação (não há constraint do banco
+  pra confiar). **Bug que você encontrou e eu corrigi**: a checagem
+  inicial de "a conta já tem linha?" filtrava também por `VaultID = 0`,
+  então uma conta com linha em outro `VaultID` seria tratada como "sem
+  baú" e ganharia uma linha duplicada. Corrigido pra checar só por
+  `AccountID` e usar o `VaultID` real encontrado em toda leitura/escrita
+  seguinte (ver `docs/WAREHOUSE_BYTE_FORMAT.md`).
+- **`warehouse` em si não precisou de migration** — já existe em produção,
+  criada fora desta API. Mas você pediu pra remover de vez
+  `WebItemRedemptions.CharacterName`/`WebBundleRedemptions.CharacterName`
+  (não se importa em perder esse histórico) — ver
+  `migrations/0007_drop_redemption_character_name.sql` (**não aplicada
+  ainda**). Código já não referencia mais essas colunas (INSERT/SELECT),
+  então funciona igual antes ou depois da migration rodar.
+- `charactersRepository.findOwnedCharacter/getInventoryBuffer/updateInventory`
+  removidos (ficaram sem uso — a checagem de personagem não existe mais
+  nesse fluxo).
+
 ## Decisões técnicas (não pedidas explicitamente)
 
 - **SDK oficial usado**: `sdk-node-apis-efi` (conforme preferência do
@@ -321,6 +365,20 @@ alteração em tabela existente:
    recurso de pacotes/bundles (ver adendo acima).
 8. ~~Aplicar `migrations/0005_fix_redemption_character_fk.sql`~~ —
    **feito e validado em 2026-09-16** (ver seção acima).
+9. **Testar o resgate no baú de verdade, numa conta de teste**, antes de
+   dar como pronto: comprar um item avulso, comprar um pacote, e conferir
+   com `npm run dump-warehouse -- <AccountID>` que os slots batem com o
+   que aparece no baú do client. O formato foi validado (ver adendo
+   acima), mas o *fluxo completo pela API* (débito + inserção + histórico)
+   ainda não foi exercitado ponta a ponta como foi feito pra mochila.
+10. **Avisar o front-end** — contrato mudou (`characterName` removido,
+    `slot` agora é posição no baú, erros renomeados). Prompt de sync no
+    final desta resposta, pra você repassar.
+11. **Aplicar `migrations/0007_drop_redemption_character_name.sql`**
+    (revisar antes) — remove `CharacterName` de `WebItemRedemptions`/
+    `WebBundleRedemptions` de vez (perde o histórico de qual personagem
+    foi selecionado em resgates antigos — você confirmou que não se
+    importa). Código já funciona sem essa coluna antes de aplicar.
 
 ## Próxima seção
 

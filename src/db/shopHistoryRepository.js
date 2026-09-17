@@ -17,7 +17,6 @@ async function findByAccount(accountId, { page = 1, limit = 20 } = {}) {
       NULL AS itemName,
       AmountCents AS amountCents,
       CreditsAmount AS creditsAmount,
-      NULL AS characterName,
       Status AS status,
       CreatedAt AS createdAt
     FROM WebPixCharges WHERE AccountId = @accountId
@@ -30,7 +29,6 @@ async function findByAccount(accountId, { page = 1, limit = 20 } = {}) {
       i.Name AS itemName,
       NULL AS amountCents,
       r.PriceCredits AS creditsAmount,
-      r.CharacterName AS characterName,
       'completed' AS status,
       r.CreatedAt AS createdAt
     FROM WebItemRedemptions r
@@ -45,7 +43,6 @@ async function findByAccount(accountId, { page = 1, limit = 20 } = {}) {
       b.Name AS itemName,
       NULL AS amountCents,
       r.PriceCredits AS creditsAmount,
-      r.CharacterName AS characterName,
       'completed' AS status,
       r.CreatedAt AS createdAt
     FROM WebBundleRedemptions r
@@ -60,7 +57,6 @@ async function findByAccount(accountId, { page = 1, limit = 20 } = {}) {
       p.Name AS itemName,
       NULL AS amountCents,
       r.PriceCredits AS creditsAmount,
-      NULL AS characterName,
       'completed' AS status,
       r.CreatedAt AS createdAt
     FROM WebVipPurchases r
@@ -78,7 +74,7 @@ async function findByAccount(accountId, { page = 1, limit = 20 } = {}) {
       Ranked AS (
         SELECT *, ROW_NUMBER() OVER (ORDER BY createdAt DESC) AS rank FROM Combined
       )
-      SELECT type, reference, itemName, amountCents, creditsAmount, characterName, status, createdAt
+      SELECT type, reference, itemName, amountCents, creditsAmount, status, createdAt
       FROM Ranked WHERE rank BETWEEN @firstRow AND @lastRow ORDER BY rank;
 
       WITH Combined AS (${combinedCte})

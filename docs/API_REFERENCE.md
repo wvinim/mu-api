@@ -111,16 +111,18 @@ inventário).
 |---|---|---|---|---|
 | GET | `/shop/items` | não | — | `{ items: [...] }` — catálogo único misturando pacotes de crédito, itens resgatáveis e **pacotes de itens (bundles)**, diferenciados por `kind` |
 | GET | `/shop/items/:id` | não | `id` = `credit:<n>`, `item:<n>` ou `bundle:<n>` | uma entrada do catálogo, 404 se inativo/inexistente |
-| POST | `/shop/purchase` | 🔒 | `{ catalogId }` (compra créditos) ou `{ catalogId, characterName }` (resgata item ou pacote) | ver abaixo |
+| POST | `/shop/purchase` | 🔒 | `{ catalogId }` — mesmo body pra todo tipo de compra, nenhuma recebe `characterName` (ver abaixo) | ver abaixo |
 | GET | `/shop/credits` | 🔒 | — | `{ cash }` |
 | GET | `/shop/history` | 🔒 | `?page&limit` | `{ page, limit, total, items }` — unifica compras de crédito + resgates de item + resgates de pacote + compras de VIP (`type: "vip_purchase"`) |
 
 **`catalogId`** sempre no formato `"credit:<id>"` (pacote Pix→Cash),
 `"item:<id>"` (item avulso resgatável, gasta Cash), `"bundle:<id>"`
 (pacote — vários itens do catálogo entregues juntos por um preço único)
-ou `"vip:<id>"` (plano VIP, gasta Cash, **sem** `characterName` — VIP é
-da conta, não do personagem). O front-end deve usar esse `catalogId`
-exatamente como veio de `/shop/items` — não montar na mão.
+ou `"vip:<id>"` (plano VIP, gasta Cash). O front-end deve usar esse
+`catalogId` exatamente como veio de `/shop/items` — não montar na mão.
+**Nenhum tipo de compra recebe `characterName`** — resgate de item/pacote
+vai pro baú da conta (warehouse), não pro personagem (mudou em
+2026-09-17, ver abaixo).
 
 Uma entrada `kind: "vip_plan"` de `/shop/items` traz `{ tier, priceCredits, durationDays }`
 (`tier`: 1 = Vip, 2 = Super Vip, 3 = Mega Vip; `durationDays` sempre 30
@@ -134,8 +136,8 @@ comprador o que ele está levando (ex: `[{ name: "Jewel Pack", quantity: 10 }, {
 
 Resposta de `POST /shop/purchase`:
 - Se `catalogId` é `credit:*` → **201** `{ type: "pix_charge", txid, pixCopiaECola, qrCodeImage, amountCents, creditsAmount }`. O front-end mostra o QR code / copia-e-cola Pix; o crédito de `cash` só acontece depois, via webhook confirmado pela Efí (assíncrono — o front-end precisa fazer polling em `/shop/credits` ou `/shop/history` até o saldo mudar, não há WebSocket/push).
-- Se `catalogId` é `item:*` → precisa também de `characterName` no body. **201** `{ type: "item_redeemed", item, characterName, slot }`. Erros: 402 `INSUFFICIENT_CREDITS`, 404 se personagem não pertence à conta, 409 `CHARACTER_ONLINE` se o personagem (conta) está logado no jogo neste momento, 409 `INVENTORY_FULL` se não há espaço livre de verdade na mochila (a checagem entende o tamanho real de cada item já presente — um item 2x2 ocupa 4 células, não 1 — não só conta bytes vazios no array), 409 `INVENTORY_UNKNOWN_ITEM` se a mochila do personagem tiver algum item que não reconhecemos (não sabemos o footprint dele com segurança, então a API recusa em vez de arriscar) — nesses 409 e no 402 o Cash **não é debitado** (checagem acontece antes do débito, front-end não precisa se preocupar com estorno aqui).
-- Se `catalogId` é `bundle:*` → precisa também de `characterName`. **201** `{ type: "bundle_redeemed", bundle, characterName, slots: [...] }` — um slot da mochila por unidade de cada item do pacote. Mesmos erros do resgate de item avulso (402/404/409 `CHARACTER_ONLINE`/`INVENTORY_FULL`/`INVENTORY_UNKNOWN_ITEM`, o `INVENTORY_FULL` aqui é quando não há espaço pra **todos** os itens do pacote de uma vez); em nenhum desses casos o Cash é debitado.
+- Se `catalogId` é `item:*` → **201** `{ type: "item_redeemed", item, slot }` — `slot` é uma posição no **baú da conta** (warehouse), 0 a 119, não mais na mochila do personagem. Erros: 402 `INSUFFICIENT_CREDITS`, 404 se item não existe/inativo, 409 `CHARACTER_ONLINE` se a conta está logada no jogo neste momento, 409 `WAREHOUSE_FULL` se não há espaço livre de verdade no baú (a checagem entende o tamanho real de cada item já presente — um item 2x2 ocupa 4 células, não 1 — não só conta bytes vazios no array), 409 `WAREHOUSE_UNKNOWN_ITEM` se o baú tiver algum item que não reconhecemos (não sabemos o footprint dele com segurança, então a API recusa em vez de arriscar) — nesses 409 e no 402 o Cash **não é debitado** (checagem acontece antes do débito, front-end não precisa se preocupar com estorno aqui). Se a conta nunca abriu o baú no jogo, a API cria a linha automaticamente (não é erro).
+- Se `catalogId` é `bundle:*` → **201** `{ type: "bundle_redeemed", bundle, slots: [...] }` — um slot do baú por unidade de cada item do pacote. Mesmos erros do resgate de item avulso (402/404/409 `CHARACTER_ONLINE`/`WAREHOUSE_FULL`/`WAREHOUSE_UNKNOWN_ITEM`, o `WAREHOUSE_FULL` aqui é quando não há espaço pra **todos** os itens do pacote de uma vez); em nenhum desses casos o Cash é debitado.
 - Se `catalogId` é `vip:*` → **sem** `characterName`. **201** `{ type: "vip_purchased", tier, vipStartDate, vipEndDate }`. Erros: 402 `INSUFFICIENT_CREDITS`, 404 se o plano não existe/está inativo. A tier sempre passa a ser a do plano comprado (dá pra trocar de tier "no meio" da validade). Regra de soma de dias (mudou em 2026-09-17, ver abaixo): **upgrade não soma, renovação/downgrade soma**. Comprar Super Vip (tier 2) grava automaticamente o autopick fixo (Jewel of Soul + Jewel of Bless) — ver seção `/account/autopick` acima.
 
   **Regra de validade (`vipStartDate`/`vipEndDate`) — vale igual pra `/shop/purchase` (`vip:*`) e `POST /admin/accounts/:id/vip`:**

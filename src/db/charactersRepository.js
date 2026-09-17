@@ -1,11 +1,11 @@
 const { getPool, sql } = require('./pool');
 
 /**
- * Acesso à tabela Character (mesma usada pelo gameserver). Só leitura
- * nesta seção — nenhuma escrita aqui. Campos binários (Inventory,
- * MagicList, Quest) nunca são expostos por esta rota; eles têm formato
- * próprio documentado em docs/INVENTORY_BYTE_FORMAT.md e só serão
- * tocados na Seção 5 (Loja).
+ * Acesso à tabela Character (mesma usada pelo gameserver). Só leitura —
+ * a loja (Seção 5) resgata itens no baú da conta (warehouse), não mais
+ * aqui (ver src/db/warehouseRepository.js). Campos binários (Inventory,
+ * MagicList, Quest) nunca são expostos por esta rota; Inventory tem
+ * formato próprio documentado em docs/INVENTORY_BYTE_FORMAT.md.
  *
  * Nota: [Class] é um tinyint bruto — a decodificação exata de classe +
  * evolução (formato de bits) não foi validada ainda nesta sessão, então
@@ -125,40 +125,8 @@ async function findRanking({ page = 1, limit = 20, classCode, search } = {}) {
   };
 }
 
-/** Confirma que o personagem pertence à conta antes de qualquer escrita (loja). */
-async function findOwnedCharacter(accountId, name) {
-  const pool = getPool();
-  const result = await pool
-    .request()
-    .input('accountId', sql.VarChar(10), accountId)
-    .input('name', sql.VarChar(10), name)
-    .query('SELECT Name FROM Character WHERE AccountID = @accountId AND Name = @name');
-  return result.recordset[0] || null;
-}
-
-async function getInventoryBuffer(name) {
-  const pool = getPool();
-  const result = await pool
-    .request()
-    .input('name', sql.VarChar(10), name)
-    .query('SELECT Inventory FROM Character WHERE Name = @name');
-  return result.recordset[0]?.Inventory || null;
-}
-
-async function updateInventory(name, inventoryBuffer) {
-  const pool = getPool();
-  await pool
-    .request()
-    .input('name', sql.VarChar(10), name)
-    .input('inventory', sql.VarBinary(1728), inventoryBuffer)
-    .query('UPDATE Character SET Inventory = @inventory WHERE Name = @name');
-}
-
 module.exports = {
   findByAccountId,
   findPublicByName,
   findRanking,
-  findOwnedCharacter,
-  getInventoryBuffer,
-  updateInventory,
 };
