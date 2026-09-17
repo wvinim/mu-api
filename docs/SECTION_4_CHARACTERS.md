@@ -36,6 +36,11 @@ pedido. O schema passado não tem tabela de guild.
 ## Pendências / passos manuais seus
 
 - Rodar `npm test` para conferir a nova suíte.
+- ~~Adendo (2026-09-17): índice de apoio pro ranking~~ — **aplicado**.
+  `Character` só tinha índice em `[Name]` (a PK); `ORDER BY Resets DESC,
+  cLevel DESC` do ranking virava table scan + sort completo. Corrigido
+  com `migrations/0008_character_ranking_index.sql` (índice não-clustered
+  aditivo, sem afetar login) — **aplicada em produção** pelo usuário.
 
 ## Próxima seção
 
