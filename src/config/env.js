@@ -109,7 +109,7 @@ const env = {
   // Cache em memória do ranking de personagens — aceitável para instância
   // única (mesma lógica do rate limit). TTL curto porque o dado muda
   // pouco, mas ranking em tempo real não é um requisito.
-  rankingCacheTtlSeconds: int('RANKING_CACHE_TTL_SECONDS', 60),
+  rankingCacheTtlSeconds: int('RANKING_CACHE_TTL_SECONDS', 180),
 
   // Status do servidor (Seção 8) — cache curto porque o dado muda pouco
   // e a query roda a cada request sem cache. Metadados de /server/info
