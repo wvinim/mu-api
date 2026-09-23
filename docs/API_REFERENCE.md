@@ -94,7 +94,7 @@ Bless, gravado automaticamente na compra) — não usa `PUT /account/autopick`.
 | Método | Rota | Query/Params | Resposta |
 |---|---|---|---|
 | GET | `/characters/:name` | — | Perfil público: `{ name, level, classCode, experience, resets, resetsDay, resetsWeek, resetsMonth, strength, dexterity, vitality, energy, pkCount, pkLevel, leadership, createdAt, lastPlayedAt }`. **Nunca inclui** `money`, posição no mapa, `accountId`. 404 se não existir. |
-| GET | `/characters/ranking` | `?page&limit(máx 100)&classCode&search` | `{ page, limit, total, items }` — ordenado por `resets DESC, level DESC`. Cacheado ~60s no servidor. |
+| GET | `/characters/ranking` | `?page&limit(máx 100)&classCode` | `{ page, limit, total, items }` — ordenado por `resets DESC, level DESC`. Cacheado ~60s no servidor. |
 
 `classCode` é o `tinyint` cru da coluna `Class` — **não decodificado**
 para nome de classe (ex: "Dark Knight"). Se precisar exibir nome, o

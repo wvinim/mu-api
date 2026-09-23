@@ -20,12 +20,12 @@ async function getByName(req, res, next) {
 
 async function getRanking(req, res, next) {
   try {
-    const { page, limit, classCode, search } = req.query;
-    const cacheKey = JSON.stringify({ page, limit, classCode, search });
+    const { page, limit, classCode } = req.query;
+    const cacheKey = JSON.stringify({ page, limit, classCode });
 
     let result = rankingCache.get(cacheKey);
     if (!result) {
-      result = await charactersRepository.findRanking({ page, limit, classCode, search });
+      result = await charactersRepository.findRanking({ page, limit, classCode });
       rankingCache.set(cacheKey, result);
     }
 

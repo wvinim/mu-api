@@ -10,7 +10,8 @@
   de privacidade/segurança (evitar expor localização em tempo real de
   jogadores ou ligar personagem a username de conta publicamente).
 - `GET /api/v1/characters/ranking` — paginado (`page`, `limit` até 100),
-  com filtros opcionais `classCode` e `search` (nome, `LIKE`).
+  com filtro opcional `classCode`. Busca por nome de personagem foi
+  removida (decisão do usuário, 2026-09-20).
   Ordenado por `Resets DESC, cLevel DESC`. **Cacheado em memória**
   (`RANKING_CACHE_TTL_SECONDS`, padrão 60s) por combinação de parâmetros
   — evita bater no banco a cada request, conforme pedido no brief.

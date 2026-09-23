@@ -45,7 +45,7 @@ describe('GET /api/v1/characters/ranking', () => {
     expect(res2.body).toEqual(res1.body);
     // A segunda chamada com os mesmos parâmetros deve vir do cache.
     expect(charactersRepository.findRanking).toHaveBeenCalledTimes(1);
-    expect(charactersRepository.findRanking).toHaveBeenCalledWith({ page: 1, limit: 20, classCode: undefined, search: undefined });
+    expect(charactersRepository.findRanking).toHaveBeenCalledWith({ page: 1, limit: 20, classCode: undefined });
   });
 
   it('rejeita limit acima de 100', async () => {
@@ -53,12 +53,12 @@ describe('GET /api/v1/characters/ranking', () => {
     expect(res.status).toBe(400);
   });
 
-  it('aceita filtro por classCode e search', async () => {
+  it('aceita filtro por classCode', async () => {
     charactersRepository.findRanking.mockResolvedValue({ items: [], total: 0 });
 
-    const res = await request(app).get('/api/v1/characters/ranking?classCode=22&search=Her&page=2&limit=5');
+    const res = await request(app).get('/api/v1/characters/ranking?classCode=22&page=2&limit=5');
 
     expect(res.status).toBe(200);
-    expect(charactersRepository.findRanking).toHaveBeenCalledWith({ page: 2, limit: 5, classCode: 22, search: 'Her' });
+    expect(charactersRepository.findRanking).toHaveBeenCalledWith({ page: 2, limit: 5, classCode: 22 });
   });
 });

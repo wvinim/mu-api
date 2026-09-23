@@ -85,7 +85,7 @@ async function findPublicByName(name) {
  * Ranking paginado. Usa ROW_NUMBER() em vez de OFFSET/FETCH — ver
  * docs/DB_NOTES.md (banco em compatibility level anterior ao SQL 2012).
  */
-async function findRanking({ page = 1, limit = 20, classCode, search } = {}) {
+async function findRanking({ page = 1, limit = 20, classCode } = {}) {
   const pool = getPool();
   const firstRow = (page - 1) * limit + 1;
   const lastRow = page * limit;
@@ -99,10 +99,6 @@ async function findRanking({ page = 1, limit = 20, classCode, search } = {}) {
   if (classCode !== undefined) {
     request.input('classCode', sql.TinyInt, classCode);
     filters.push('Class = @classCode');
-  }
-  if (search) {
-    request.input('search', sql.VarChar(10), `%${search}%`);
-    filters.push('Name LIKE @search');
   }
   const whereClause = filters.length ? `WHERE ${filters.join(' AND ')}` : '';
 
