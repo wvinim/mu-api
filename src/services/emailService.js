@@ -1,6 +1,8 @@
 const nodemailer = require('nodemailer');
 const env = require('../config/env');
 const logger = require('../utils/logger');
+const { confirmationEmailTemplate } = require('../emails/confirmationEmail');
+const { passwordResetEmailTemplate } = require('../emails/passwordResetEmail');
 
 let transporter = null;
 
@@ -30,9 +32,8 @@ async function sendConfirmationEmail(to, token) {
   const link = `${env.appUrl}/confirmar-email?token=${encodeURIComponent(token)}`;
   await sendMail({
     to,
-    subject: 'Confirme seu e-mail',
-    html: `<p>Confirme seu e-mail clicando no link abaixo (válido por ${env.emailTokenTtlHours}h):</p>
-           <p><a href="${link}">${link}</a></p>`,
+    subject: 'Confirme seu e-mail — MU PRO',
+    html: confirmationEmailTemplate({ link, ttlHours: env.emailTokenTtlHours }),
   });
 }
 
@@ -40,10 +41,8 @@ async function sendPasswordResetEmail(to, token) {
   const link = `${env.appUrl}/redefinir-senha?token=${encodeURIComponent(token)}`;
   await sendMail({
     to,
-    subject: 'Redefinição de senha',
-    html: `<p>Clique no link abaixo para redefinir sua senha (válido por ${env.passwordResetTokenTtlHours}h).
-           Se você não pediu isso, ignore este e-mail.</p>
-           <p><a href="${link}">${link}</a></p>`,
+    subject: 'Redefinição de senha — MU PRO',
+    html: passwordResetEmailTemplate({ link, ttlHours: env.passwordResetTokenTtlHours }),
   });
 }
 
