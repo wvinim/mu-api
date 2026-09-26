@@ -68,9 +68,20 @@ async function getChargeStatus(txid) {
   return efi.pixDetailCharge({ txid });
 }
 
-async function configureWebhook(webhookUrl) {
+/**
+ * Cadastra a URL de webhook da chave Pix. `skipMtls` só para diagnóstico:
+ * sem mTLS, a única barreira contra notificações forjadas é o segredo na
+ * URL (a reconsulta pelo txid continua impedindo crédito indevido).
+ */
+async function configureWebhook(webhookUrl, { skipMtls = false } = {}) {
   const efi = requireClient();
-  return efi.pixConfigWebhook({ chave: env.efi.pixKey }, { webhookUrl });
+  const headers = skipMtls ? { 'x-skip-mtls-checking': 'true' } : undefined;
+  return efi.pixConfigWebhook({ chave: env.efi.pixKey }, { webhookUrl }, headers);
 }
 
-module.exports = { isConfigured, createImmediateCharge, getChargeStatus, configureWebhook };
+async function getWebhook() {
+  const efi = requireClient();
+  return efi.pixDetailWebhook({ chave: env.efi.pixKey });
+}
+
+module.exports = { isConfigured, createImmediateCharge, getChargeStatus, configureWebhook, getWebhook };
