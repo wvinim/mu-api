@@ -1,3 +1,4 @@
+const sql = require('mssql');
 const AppError = require('../utils/AppError');
 const env = require('../config/env');
 
@@ -10,6 +11,18 @@ function errorHandler(err, req, res, next) {
         code: err.code,
         message: err.message,
         ...(err.details ? { details: err.details } : {}),
+      },
+    });
+  }
+
+  // Banco caiu depois da conexão inicial: o mssql lança ConnectionError ao
+  // tentar pegar conexão do pool. É indisponibilidade, não bug — 503.
+  if (err instanceof sql.ConnectionError) {
+    req.log?.error({ err }, 'SQL Server indisponível');
+    return res.status(503).json({
+      error: {
+        code: 'DB_UNAVAILABLE',
+        message: 'Banco de dados indisponível no momento. Tente novamente em instantes.',
       },
     });
   }

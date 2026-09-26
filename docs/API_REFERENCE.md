@@ -18,6 +18,13 @@ de confiar cegamente nele.
   { "error": { "code": "ALGUM_CODE", "message": "Mensagem legível.", "details": {} } }
   ```
   `details` é opcional e nem sempre existe.
+- **`503 DB_UNAVAILABLE`**: qualquer rota que usa o banco pode devolver isso
+  quando o SQL Server está fora do ar (a API continua de pé e reconecta
+  sozinha). Mostrar "servidor em manutenção / tente em instantes" — não é
+  erro do usuário, não deslogar, não tratar como falha de credencial.
+  Obs: um `502` **sem corpo JSON** (e que o navegador reporta como erro de
+  CORS) significa que o processo da API em si não está respondendo — é
+  problema de infra, não do front.
 - **CORS**: em dev aceita qualquer origin (`credentials: true`). Em
   produção será restrito — ver CLAUDE.md do backend.
 - Rotas paginadas sempre devolvem `{ page, limit, total, items }`.
