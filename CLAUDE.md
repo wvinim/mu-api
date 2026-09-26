@@ -33,13 +33,20 @@ crie app cliente, não crie nada de UI. Só a API.
 
 ## Deploy
 
-- Vai rodar no **mesmo Windows Server do gameserver**.
-- Antes de finalizar instruções de deploy, **pergunte** se existe IIS
-  configurado nessa máquina (para decidir entre IIS com ARR como reverse
-  proxy, ou outra opção como Caddy para Windows).
-- Para manter o processo Node rodando como serviço, proponha uma opção
-  (ex: `pm2` com `pm2-windows-service`, ou NSSM) e **pergunte** antes de
-  aplicar — não assuma qual o usuário já usa/prefere.
+Decidido e em produção (atualizado 2026-09-26 — substitui o plano
+original de rodar no Windows Server do gameserver):
+
+- A API roda num servidor **Ubuntu** separado, atrás de **nginx**
+  (reverse proxy + TLS), em `https://api.mupro.vip`. O site fica em
+  `https://mupro.vip`. O SQL Server continua no Windows do gameserver.
+- Processo gerenciado por **pm2**, com `--exp-backoff-restart-delay`
+  (evita loop de restart travando a CPU se a API cair ao subir).
+- **O usuário executa os comandos no servidor** (via SSH) — dê instruções
+  em bash/Linux; não assuma acesso SSH direto.
+- Deploy = `git pull` + `pm2 restart` no servidor. Push só quando o usuário
+  pedir.
+- E-mail: SMTP da **Umbler**, DNS do domínio na **GoDaddy**; DKIM assinado
+  pela própria API (ver `docs/EMAIL_DKIM.md`).
 
 ---
 
@@ -233,8 +240,8 @@ Pergunte por isso explicitamente se eu não tiver colado ainda:
 3. Credenciais de sandbox da Efí (Gerencianet) e link da documentação da
    API deles que estou usando.
 4. Credenciais SMTP (host, porta, usuário, senha, remetente).
-5. Confirmação se existe IIS já configurado no Windows Server, para a
-   decisão de reverse proxy.
+5. ~~Confirmação de IIS no Windows Server~~ — resolvido: Ubuntu + nginx
+   (ver seção Deploy).
 
 ## Como trabalhar comigo
 

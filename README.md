@@ -151,4 +151,4 @@ detalhes da estratégia híbrida de senha (client do jogo vs. login do site).
 Escopo funcional do `CLAUDE.md` concluído (Seção 6/Notícias pulada por
 decisão do usuário), mais a Seção 9 (VIP) adicionada depois por pedido
 separado. Pendências restantes são as já listadas nos docs de cada seção
-(credenciais Efí/SMTP, migrations a aplicar, decisão de deploy/IIS).
+(credenciais Efí, migrations a aplicar). Deploy: Ubuntu + nginx + pm2 (ver CLAUDE.md).

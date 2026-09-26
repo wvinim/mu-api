@@ -3,7 +3,7 @@ const { getPool } = require('../db/pool');
 
 const router = Router();
 
-// Liveness simples, sem dependências — usado por probes de infra (ex: IIS ARR).
+// Liveness simples, sem dependências — usado por probes de infra (ex: nginx, monitoramento).
 router.get('/health', (req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });

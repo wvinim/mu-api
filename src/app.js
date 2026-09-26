@@ -28,7 +28,7 @@ app.use(express.json());
 app.use(pinoHttp({ logger }));
 
 app.use('/api/v1', routes);
-// Liveness/readiness sem o prefixo de versão, para probes de infra (ex: IIS ARR).
+// Liveness/readiness sem o prefixo de versão, para probes de infra (ex: nginx, pm2, monitoramento).
 app.use(healthRoutes);
 
 app.use(notFound);
