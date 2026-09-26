@@ -406,3 +406,32 @@ Seção 6 (Suporte/Tickets) não tem "pergunte antes" — posso seguir direto.
 - Com o deploy definido (nginx termina o TLS, Node só em 127.0.0.1), o
   mTLS do webhook passa a ser viável no nginx — ver plano no chat /
   próximo adendo.
+
+## Adendo — Webhook em homologação validado + checklist de virada (2026-09-26)
+
+Validado em homologação, na própria API de produção (servidor ainda sem
+jogadores — decisão do usuário):
+- `npm run efi-homolog-check`: cobrança, QR Code e confirmação automática OK.
+- mTLS no nginx (`/etc/nginx/sites-available/mu-api`): `ssl_verify_client
+  optional` + `ssl_client_certificate /etc/nginx/efi/efi-chain-homolog.crt`
+  no server 443, e `location /api/v1/shop/payment/webhook/` que devolve 403
+  se `$ssl_client_verify != SUCCESS`. Rotas normais e o site não mudam.
+- `npm run efi-webhook -- register https://api.mupro.vip`: a Efí testou a
+  URL (primeiro sem certificado → 403 esperado, depois com → 200) e aceitou.
+- Compra real pelo site: webhook chegou em `.../webhook/<segredo>/pix` → 200.
+
+**Checklist para virar para produção (antes de abrir o servidor):**
+1. `.env`: `EFI_SANDBOX=false`, Client ID/Secret de **Produção**,
+   `EFI_CERTIFICATE_PATH` → `.p12` de **produção**, `EFI_PIX_KEY` → chave
+   Pix real da conta Efí (escopos marcados também na aba Produção).
+2. **Novo** `EFI_WEBHOOK_SECRET` (`openssl rand -hex 32`) — o de
+   homologação apareceu em logs e no chat.
+3. nginx: baixar `certificate-chain-prod.crt` e trocar o
+   `ssl_client_certificate` para ele (não manter a cadeia de homologação).
+   `sudo nginx -t && sudo systemctl reload nginx`.
+4. `pm2 restart` (o aviso "Efí em HOMOLOGAÇÃO" some do log) e
+   `npm run efi-webhook -- register https://api.mupro.vip`.
+5. Limpar dados de teste: Cash da conta de teste, linhas de teste em
+   `WebPixCharges`, pacote "Teste Pix" (desativar).
+6. Opcional: `access_log off;` (ou formato sem path) no `location` do
+   webhook no nginx, para o segredo não ficar no access.log.

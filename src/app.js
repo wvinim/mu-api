@@ -1,7 +1,7 @@
 const express = require('express');
 const helmet = require('helmet');
 const cors = require('cors');
-const pinoHttp = require('pino-http');
+const { createHttpLogger } = require('./utils/httpLogger');
 
 const env = require('./config/env');
 const logger = require('./utils/logger');
@@ -29,7 +29,7 @@ app.use(
 );
 
 app.use(express.json());
-app.use(pinoHttp({ logger }));
+app.use(createHttpLogger(logger));
 
 app.use('/api/v1', routes);
 // Liveness/readiness sem o prefixo de versão, para probes de infra (ex: nginx, pm2, monitoramento).
