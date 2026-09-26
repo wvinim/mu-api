@@ -39,6 +39,10 @@ original de rodar no Windows Server do gameserver):
 - A API roda num servidor **Ubuntu** separado, atrás de **nginx**
   (reverse proxy + TLS), em `https://api.mupro.vip`. O site fica em
   `https://mupro.vip`. O SQL Server continua no Windows do gameserver.
+- `.env` de produção precisa de `TRUST_PROXY=1` (nginx na frente), senão
+  `req.ip` é sempre o do nginx — rate limits por IP viram globais e a
+  auditoria perde o IP real. A porta do Node não deve ficar exposta
+  publicamente (só o nginx acessa).
 - Processo gerenciado por **pm2**, com `--exp-backoff-restart-delay`
   (evita loop de restart travando a CPU se a API cair ao subir).
 - **O usuário executa os comandos no servidor** (via SSH) — dê instruções

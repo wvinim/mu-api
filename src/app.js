@@ -12,6 +12,10 @@ const errorHandler = require('./middlewares/errorHandler');
 
 const app = express();
 
+if (env.trustProxy > 0) {
+  app.set('trust proxy', env.trustProxy);
+}
+
 app.use(helmet());
 
 // TODO: antes de ir para produção, confirmar o(s) domínio(s) finais do site
