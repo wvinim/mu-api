@@ -396,8 +396,11 @@ Seção 6 (Suporte/Tickets) não tem "pergunte antes" — posso seguir direto.
   certificado, criação de cobrança (R$ 0,01), QR Code e confirmação
   automática da homologação, usando o mesmo `efiClient.js` da API.
   **Não toca no banco.** Recusa rodar com `EFI_SANDBOX` diferente de
-  `true`. Opções: `--keys`, `--create-key` (chave EVP de homologação),
-  `--webhook`.
+  `true`. Opção: `--webhook`.
+- **Chave Pix em homologação**: a Efí não cria nem lista chaves nesse
+  ambiente (`/v2/gn/evp` só funciona em produção — retorna
+  `erro_aplicacao`/`erro_interno_servidor`). Qualquer chave com formato
+  válido serve em `EFI_PIX_KEY` (ex: a chave real da conta Efí).
 - Em homologação, cobranças de R$ 0,01 a R$ 10,00 são confirmadas
   automaticamente pela Efí (com webhook); acima disso ficam `ATIVA`.
 - Com o deploy definido (nginx termina o TLS, Node só em 127.0.0.1), o

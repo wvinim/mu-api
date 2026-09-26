@@ -10,11 +10,13 @@
  * Recusa rodar se EFI_SANDBOX não for "true": nunca cria cobrança real.
  *
  * Uso:
- *   node scripts/efiHomologCheck.js [--env .env.homolog]           teste completo
- *   node scripts/efiHomologCheck.js [--env .env.homolog] --keys    lista chaves Pix (EVP)
- *   node scripts/efiHomologCheck.js [--env .env.homolog] --create-key
- *       cria uma chave aleatória (EVP) em homologação — use-a em EFI_PIX_KEY
+ *   node scripts/efiHomologCheck.js [--env .env.homolog]            teste completo
  *   node scripts/efiHomologCheck.js [--env .env.homolog] --webhook  mostra o webhook cadastrado
+ *
+ * Chave Pix em homologação: a Efí NÃO cria nem lista chaves nesse ambiente
+ * (os endpoints /v2/gn/evp só funcionam em produção). Basta pôr em
+ * EFI_PIX_KEY qualquer chave com formato válido — ex: a chave real da conta
+ * Efí, ou um UUID qualquer como chave aleatória fictícia.
  */
 const path = require('path');
 const dotenv = require('dotenv');
@@ -79,12 +81,7 @@ async function main() {
   }
   console.log(`Ambiente: HOMOLOGAÇÃO | certificado: ${env.efi.certificatePath} | chave Pix: ${env.efi.pixKey || '(vazia)'}\n`);
 
-  if (args.includes('--keys')) {
-    console.log(JSON.stringify(await rawClient().pixListEvp(), null, 2));
-  } else if (args.includes('--create-key')) {
-    const created = await rawClient().pixCreateEvp();
-    console.log(`Chave criada: ${created.chave}\nColoque em EFI_PIX_KEY no .env de homologação.`);
-  } else if (args.includes('--webhook')) {
+  if (args.includes('--webhook')) {
     console.log(JSON.stringify(await rawClient().pixDetailWebhook({ chave: env.efi.pixKey }), null, 2));
   } else {
     await fullCheck();
