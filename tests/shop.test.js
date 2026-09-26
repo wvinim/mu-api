@@ -36,6 +36,7 @@ const shopHistoryRepository = require('../src/db/shopHistoryRepository');
 const accountsRepository = require('../src/db/accountsRepository');
 const warehouseRepository = require('../src/db/warehouseRepository');
 const efiClient = require('../src/services/efiClient');
+const auditLog = require('../src/db/auditLogRepository');
 const tokenService = require('../src/services/tokenService');
 const warehouseService = require('../src/services/warehouseService');
 
@@ -480,28 +481,27 @@ describe('POST /api/v1/shop/payment/webhook/:secret', () => {
   it('credita Cash quando a cobrança é confirmada como CONCLUIDA e ainda não processada', async () => {
     efiClient.getChargeStatus.mockResolvedValue({ status: 'CONCLUIDA' });
     pixChargesRepository.findByTxId.mockResolvedValue({ AccountId: 'player1', CreditsAmount: 1000 });
-    pixChargesRepository.markPaid.mockResolvedValue(true);
-    accountsRepository.creditCash.mockResolvedValue();
+    pixChargesRepository.markPaidAndCredit.mockResolvedValue({ credited: true, accountId: 'player1', creditsAmount: 1000 });
 
     const res = await request(app)
       .post(`/api/v1/shop/payment/webhook/${WEBHOOK_SECRET}`)
       .send({ pix: [{ txid: 'abc123' }] });
 
     expect(res.status).toBe(200);
-    expect(accountsRepository.creditCash).toHaveBeenCalledWith('player1', 1000);
+    expect(pixChargesRepository.markPaidAndCredit).toHaveBeenCalledWith('abc123');
   });
 
   it('não credita de novo se o txid já foi processado (idempotência)', async () => {
     efiClient.getChargeStatus.mockResolvedValue({ status: 'CONCLUIDA' });
     pixChargesRepository.findByTxId.mockResolvedValue({ AccountId: 'player1', CreditsAmount: 1000 });
-    pixChargesRepository.markPaid.mockResolvedValue(false); // já estava pago
+    pixChargesRepository.markPaidAndCredit.mockResolvedValue({ credited: false }); // já estava pago
 
     const res = await request(app)
       .post(`/api/v1/shop/payment/webhook/${WEBHOOK_SECRET}`)
       .send({ pix: [{ txid: 'abc123' }] });
 
     expect(res.status).toBe(200);
-    expect(accountsRepository.creditCash).not.toHaveBeenCalled();
+    expect(auditLog.record).not.toHaveBeenCalledWith(expect.objectContaining({ eventType: 'shop.pix_payment_confirmed' }));
   });
 
   it('não credita se a reconsulta na Efí não confirma pagamento', async () => {
@@ -512,22 +512,20 @@ describe('POST /api/v1/shop/payment/webhook/:secret', () => {
       .send({ pix: [{ txid: 'abc123' }] });
 
     expect(res.status).toBe(200);
-    expect(pixChargesRepository.markPaid).not.toHaveBeenCalled();
-    expect(accountsRepository.creditCash).not.toHaveBeenCalled();
+    expect(pixChargesRepository.markPaidAndCredit).not.toHaveBeenCalled();
   });
 
   it('aceita o sufixo /pix que a Efí acrescenta à URL cadastrada', async () => {
     efiClient.getChargeStatus.mockResolvedValue({ status: 'CONCLUIDA' });
     pixChargesRepository.findByTxId.mockResolvedValue({ AccountId: 'player1', CreditsAmount: 1000 });
-    pixChargesRepository.markPaid.mockResolvedValue(true);
-    accountsRepository.creditCash.mockResolvedValue();
+    pixChargesRepository.markPaidAndCredit.mockResolvedValue({ credited: true, accountId: 'player1', creditsAmount: 1000 });
 
     const res = await request(app)
       .post(`/api/v1/shop/payment/webhook/${WEBHOOK_SECRET}/pix`)
       .send({ pix: [{ txid: 'abc123' }] });
 
     expect(res.status).toBe(200);
-    expect(accountsRepository.creditCash).toHaveBeenCalledWith('player1', 1000);
+    expect(pixChargesRepository.markPaidAndCredit).toHaveBeenCalledWith('abc123');
   });
 
   it('/pix com segredo incorreto também responde 404', async () => {

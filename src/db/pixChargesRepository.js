@@ -29,23 +29,58 @@ async function findByTxId(txid) {
 }
 
 /**
- * Marca como paga SOMENTE se ainda estava pendente — é isso que garante
- * idempotência caso a Efí reenvie o mesmo webhook (ou caso ele seja
- * processado duas vezes por qualquer motivo). Retorna true só quando
- * esta chamada foi quem de fato mudou o status (ou seja, quando é seguro
- * creditar Cash).
+ * Marca a cobrança como paga E credita o Cash na mesma transação.
+ *
+ * - Idempotência: só age se a cobrança ainda estava 'pending' — webhook
+ *   reenviado/processado duas vezes não credita de novo.
+ * - Atomicidade: antes eram dois comandos separados (marcar pago, depois
+ *   creditar); uma falha entre eles deixava a cobrança "paga" sem Cash, e
+ *   os reenvios da Efí não corrigiam (já não estava mais pending). Agora,
+ *   se o crédito falhar, nada é gravado, a API responde erro e a Efí
+ *   reenvia o webhook.
+ * - Conta inexistente em MEMB_INFO: THROW → rollback (a cobrança continua
+ *   pending e o erro aparece no log), nunca "paga sem crédito".
+ * - Sem JOIN com MEMB_INFO (evita conflito de collation — ver
+ *   docs/DB_NOTES.md): conta e créditos vão para variáveis.
+ *
+ * Retorna { credited: true, accountId, creditsAmount } quando esta chamada
+ * creditou, ou { credited: false } se já tinha sido processada.
  */
-async function markPaid(txid) {
+async function markPaidAndCredit(txid) {
   const pool = getPool();
   const result = await pool
     .request()
     .input('txid', sql.VarChar(35), txid)
     .query(`
+      SET XACT_ABORT ON;
+      BEGIN TRANSACTION;
+
+      DECLARE @accountId VARCHAR(10), @creditsAmount INT;
+
       UPDATE WebPixCharges
-      SET Status = 'paid', PaidAt = SYSUTCDATETIME()
-      WHERE TxId = @txid AND Status = 'pending'
+      SET Status = 'paid', PaidAt = SYSUTCDATETIME(),
+          @accountId = AccountId, @creditsAmount = CreditsAmount
+      WHERE TxId = @txid AND Status = 'pending';
+
+      IF @@ROWCOUNT = 1
+      BEGIN
+        UPDATE MEMB_INFO
+        SET Cash = Cash + @creditsAmount, modi_days = GETDATE()
+        WHERE memb___id = @accountId;
+
+        IF @@ROWCOUNT <> 1
+        BEGIN
+          THROW 50002, 'Conta da cobrança Pix não encontrada em MEMB_INFO', 1;
+        END
+      END
+
+      COMMIT TRANSACTION;
+      SELECT @accountId AS accountId, @creditsAmount AS creditsAmount;
     `);
-  return result.rowsAffected[0] > 0;
+  const row = result.recordset[0];
+  return row && row.accountId
+    ? { credited: true, accountId: row.accountId, creditsAmount: row.creditsAmount }
+    : { credited: false };
 }
 
-module.exports = { create, findByTxId, markPaid };
+module.exports = { create, findByTxId, markPaidAndCredit };

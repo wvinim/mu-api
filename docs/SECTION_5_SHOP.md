@@ -435,3 +435,10 @@ jogadores — decisão do usuário):
    `WebPixCharges`, pacote "Teste Pix" (desativar).
 6. Opcional: `access_log off;` (ou formato sem path) no `location` do
    webhook no nginx, para o segredo não ficar no access.log.
+
+**Crédito atômico (2026-09-26):** `processPixNotification` usava dois
+comandos separados (`markPaid`, depois `creditCash`) — falha entre eles
+deixava a cobrança "paga" sem Cash, e os reenvios da Efí não corrigiam.
+Substituído por `pixChargesRepository.markPaidAndCredit` (uma transação;
+conta inexistente → rollback e a cobrança segue pending). Revalidado em
+homologação com nova compra de teste.

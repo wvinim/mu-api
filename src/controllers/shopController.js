@@ -419,12 +419,12 @@ async function processPixNotification(txid) {
     return;
   }
 
-  const wasNewlyPaid = await pixChargesRepository.markPaid(txid);
-  if (!wasNewlyPaid) {
+  // Marca paga + credita Cash numa transação só (ver pixChargesRepository).
+  const { credited } = await pixChargesRepository.markPaidAndCredit(txid);
+  if (!credited) {
     return; // já processado antes (idempotência)
   }
 
-  await accountsRepository.creditCash(localCharge.AccountId, localCharge.CreditsAmount);
   await auditLog.record({
     accountId: localCharge.AccountId,
     username: localCharge.AccountId,
