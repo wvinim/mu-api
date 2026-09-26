@@ -8,8 +8,8 @@ let server;
 function start() {
   // Sobe o HTTP antes do banco: sem banco as rotas respondem 503 DB_UNAVAILABLE
   // (com CORS) em vez de o processo sair e o pm2/systemd religar em loop.
-  server = app.listen(env.port, () => {
-    logger.info(`API rodando em http://localhost:${env.port} (${env.nodeEnv})`);
+  server = app.listen(env.port, env.host, () => {
+    logger.info(`API rodando em http://${env.host}:${env.port} (${env.nodeEnv})`);
   });
   connectWithRetry();
 }

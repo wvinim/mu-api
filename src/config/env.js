@@ -39,6 +39,9 @@ const env = {
   nodeEnv,
   isProduction,
   port: int('PORT', 3000),
+  // Interface de escuta. Produção atrás do nginx: 127.0.0.1 (a porta do
+  // Node não fica acessível de fora, nem se o firewall falhar).
+  host: optional('HOST', '0.0.0.0'),
   // Nº de proxies reversos confiáveis na frente da API (nginx = 1). Sem isso,
   // atrás do nginx req.ip é sempre 127.0.0.1: rate limits por IP viram
   // globais e a auditoria perde o IP real. Deixe 0 se a API for acessada

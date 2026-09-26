@@ -41,8 +41,8 @@ original de rodar no Windows Server do gameserver):
   `https://mupro.vip`. O SQL Server continua no Windows do gameserver.
 - `.env` de produção precisa de `TRUST_PROXY=1` (nginx na frente), senão
   `req.ip` é sempre o do nginx — rate limits por IP viram globais e a
-  auditoria perde o IP real. A porta do Node não deve ficar exposta
-  publicamente (só o nginx acessa).
+  auditoria perde o IP real. E `HOST=127.0.0.1`, para a porta do Node
+  (3000) não ficar exposta — só o nginx acessa.
 - Processo gerenciado por **pm2**, com `--exp-backoff-restart-delay`
   (evita loop de restart travando a CPU se a API cair ao subir).
 - **O usuário executa os comandos no servidor** (via SSH) — dê instruções
