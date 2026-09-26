@@ -37,7 +37,8 @@ describe('pixChargesRepository.markPaidAndCredit', () => {
     expect(creditAt).toBeGreaterThan(markAt);
     expect(commitAt).toBeGreaterThan(creditAt);
     // Conta inexistente aborta (rollback) em vez de deixar "paga sem crédito".
-    expect(text).toMatch(/IF @@ROWCOUNT <> 1[\s\S]*THROW/);
+    // (ROLLBACK explícito: RAISERROR não aborta a transação sozinho.)
+    expect(text).toMatch(/IF @@ROWCOUNT <> 1\s*BEGIN[\s\S]*ROLLBACK TRANSACTION;\s*RAISERROR\([\s\S]*RETURN;/);
     // Sem JOIN com MEMB_INFO (conflito de collation — docs/DB_NOTES.md).
     expect(text).not.toMatch(/JOIN/i);
   });

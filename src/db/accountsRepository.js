@@ -98,7 +98,11 @@ async function createAccount({ username, plainPassword, email, passwordHash }) {
         @Resource = @lockResource, @LockMode = 'Exclusive', @LockOwner = 'Transaction', @LockTimeout = 5000;
       IF @lockResult < 0
       BEGIN
-        THROW 50001, 'Timeout ao obter lock de registro por e-mail', 1;
+        -- RAISERROR, não THROW: o banco do MU pode estar com compatibility
+        -- level < 110, onde THROW não existe (ver pixChargesRepository).
+        ROLLBACK TRANSACTION;
+        RAISERROR('Timeout ao obter lock de registro por e-mail', 16, 1);
+        RETURN;
       END
 
       IF EXISTS (SELECT 1 FROM MEMB_INFO WHERE mail_addr = @email)

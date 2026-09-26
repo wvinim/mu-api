@@ -38,7 +38,7 @@ async function findByTxId(txid) {
  *   os reenvios da Efí não corrigiam (já não estava mais pending). Agora,
  *   se o crédito falhar, nada é gravado, a API responde erro e a Efí
  *   reenvia o webhook.
- * - Conta inexistente em MEMB_INFO: THROW → rollback (a cobrança continua
+ * - Conta inexistente em MEMB_INFO: ROLLBACK + RAISERROR (a cobrança continua
  *   pending e o erro aparece no log), nunca "paga sem crédito".
  * - Sem JOIN com MEMB_INFO (evita conflito de collation — ver
  *   docs/DB_NOTES.md): conta e créditos vão para variáveis.
@@ -70,7 +70,13 @@ async function markPaidAndCredit(txid) {
 
         IF @@ROWCOUNT <> 1
         BEGIN
-          THROW 50002, 'Conta da cobrança Pix não encontrada em MEMB_INFO', 1;
+          -- RAISERROR em vez de THROW: THROW não existe com compatibility
+          -- level < 110 (o banco do MU recusou com "Incorrect syntax near
+          -- 'THROW'"). RAISERROR não aborta a transação sozinho, mesmo com
+          -- XACT_ABORT — por isso o ROLLBACK explícito antes.
+          ROLLBACK TRANSACTION;
+          RAISERROR('Conta da cobranca Pix nao encontrada em MEMB_INFO', 16, 1);
+          RETURN;
         END
       END
 
