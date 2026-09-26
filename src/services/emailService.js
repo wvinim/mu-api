@@ -1,3 +1,4 @@
+const fs = require('fs');
 const nodemailer = require('nodemailer');
 const env = require('../config/env');
 const logger = require('../utils/logger');
@@ -6,14 +7,30 @@ const { passwordResetEmailTemplate } = require('../emails/passwordResetEmail');
 
 let transporter = null;
 
+// Retorna a config DKIM do Nodemailer, ou undefined se não configurada.
+// Configuração parcial ou chave ilegível é erro de deploy — falha alto em vez
+// de enviar e-mail sem assinatura sem ninguém perceber.
+function buildDkimOptions() {
+  const { domainName, keySelector, privateKeyPath } = env.smtp.dkim;
+  if (!domainName && !keySelector && !privateKeyPath) return undefined;
+  if (!domainName || !keySelector || !privateKeyPath) {
+    throw new Error('DKIM parcialmente configurado: preencha DKIM_DOMAIN, DKIM_SELECTOR e DKIM_PRIVATE_KEY_PATH (ou deixe os três vazios)');
+  }
+  const privateKey = fs.readFileSync(privateKeyPath, 'utf8');
+  return { domainName, keySelector, privateKey };
+}
+
 function getTransporter() {
   if (!transporter) {
+    const dkim = buildDkimOptions();
     transporter = nodemailer.createTransport({
       host: env.smtp.host,
       port: env.smtp.port,
       secure: env.smtp.secure,
       auth: env.smtp.user ? { user: env.smtp.user, pass: env.smtp.password } : undefined,
+      dkim,
     });
+    logger.info({ dkim: dkim ? `${dkim.keySelector}._domainkey.${dkim.domainName}` : 'desativado' }, 'Transporte SMTP criado');
   }
   return transporter;
 }

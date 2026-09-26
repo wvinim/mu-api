@@ -64,6 +64,13 @@ const env = {
     user: optional('SMTP_USER', ''),
     password: optional('SMTP_PASSWORD', ''),
     from: optional('SMTP_FROM', ''),
+    // Assinatura DKIM feita pela própria API (o SMTP da Umbler não assina).
+    // Só é aplicada com as três variáveis preenchidas — ver docs/EMAIL_DKIM.md.
+    dkim: {
+      domainName: optional('DKIM_DOMAIN', ''),
+      keySelector: optional('DKIM_SELECTOR', ''),
+      privateKeyPath: optional('DKIM_PRIVATE_KEY_PATH', ''),
+    },
   },
 
   efi: {

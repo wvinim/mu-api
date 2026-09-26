@@ -13,7 +13,9 @@
     "dump-inventory": "node scripts/dumpInventorySlots.js",
     "dump-vip-status": "node scripts/dumpVipStatus.js",
     "dump-warehouse": "node scripts/dumpWarehouse.js",
-    "generate-item-dimensions": "node scripts/generateItemDimensions.js"
+    "generate-item-dimensions": "node scripts/generateItemDimensions.js",
+    "generate-dkim-key": "node scripts/generateDkimKey.js",
+    "check-dkim": "node scripts/checkDkim.js"
   },
   "engines": {
     "node": ">=18.0.0"
