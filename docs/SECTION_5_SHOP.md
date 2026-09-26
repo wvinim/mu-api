@@ -383,3 +383,23 @@ de escrever em cima de slot de equipamento.
 ## Próxima seção
 
 Seção 6 (Suporte/Tickets) não tem "pergunte antes" — posso seguir direto.
+
+## Adendo — Homologação Efí (2026-09-26)
+
+- **Bug corrigido antes do primeiro teste real**: a Efí acrescenta `/pix`
+  à URL de webhook cadastrada ao notificar (só a notificação de teste do
+  cadastro vai para a URL "pura"). A rota só aceitava
+  `/shop/payment/webhook/:secret` — toda confirmação de pagamento teria
+  dado 404 e nenhum Cash seria creditado. Agora aceita também
+  `/shop/payment/webhook/:secret/pix`.
+- `npm run efi-homolog-check -- --env .env.homolog`: testa credenciais,
+  certificado, criação de cobrança (R$ 0,01), QR Code e confirmação
+  automática da homologação, usando o mesmo `efiClient.js` da API.
+  **Não toca no banco.** Recusa rodar com `EFI_SANDBOX` diferente de
+  `true`. Opções: `--keys`, `--create-key` (chave EVP de homologação),
+  `--webhook`.
+- Em homologação, cobranças de R$ 0,01 a R$ 10,00 são confirmadas
+  automaticamente pela Efí (com webhook); acima disso ficam `ATIVA`.
+- Com o deploy definido (nginx termina o TLS, Node só em 127.0.0.1), o
+  mTLS do webhook passa a ser viável no nginx — ver plano no chat /
+  próximo adendo.

@@ -15,7 +15,13 @@ router.get('/shop/items/:id', validate(schemas.catalogIdParam, 'params'), contro
 
 // Webhook da Efí — sem requireAuth (não é chamado por um usuário logado),
 // protegido por segredo na URL. Ver docs/SECTION_5_SHOP.md.
-router.post('/shop/payment/webhook/:secret', verifyWebhookSecret, controller.paymentWebhook);
+// A Efí acrescenta "/pix" à URL cadastrada ao notificar (a URL "pura" só
+// recebe a notificação de teste do cadastro) — por isso as duas rotas.
+router.post(
+  ['/shop/payment/webhook/:secret', '/shop/payment/webhook/:secret/pix'],
+  verifyWebhookSecret,
+  controller.paymentWebhook,
+);
 
 // Autenticadas
 router.post('/shop/purchase', requireAuth, purchaseLimiter, validate(schemas.purchase), controller.purchase);

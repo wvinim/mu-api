@@ -515,4 +515,29 @@ describe('POST /api/v1/shop/payment/webhook/:secret', () => {
     expect(pixChargesRepository.markPaid).not.toHaveBeenCalled();
     expect(accountsRepository.creditCash).not.toHaveBeenCalled();
   });
+
+  it('aceita o sufixo /pix que a Efí acrescenta à URL cadastrada', async () => {
+    efiClient.getChargeStatus.mockResolvedValue({ status: 'CONCLUIDA' });
+    pixChargesRepository.findByTxId.mockResolvedValue({ AccountId: 'player1', CreditsAmount: 1000 });
+    pixChargesRepository.markPaid.mockResolvedValue(true);
+    accountsRepository.creditCash.mockResolvedValue();
+
+    const res = await request(app)
+      .post(`/api/v1/shop/payment/webhook/${WEBHOOK_SECRET}/pix`)
+      .send({ pix: [{ txid: 'abc123' }] });
+
+    expect(res.status).toBe(200);
+    expect(accountsRepository.creditCash).toHaveBeenCalledWith('player1', 1000);
+  });
+
+  it('/pix com segredo incorreto também responde 404', async () => {
+    const res = await request(app).post('/api/v1/shop/payment/webhook/segredo-errado/pix').send({ pix: [] });
+    expect(res.status).toBe(404);
+  });
+
+  it('responde 200 à notificação de teste do cadastro do webhook (sem pix)', async () => {
+    const res = await request(app).post(`/api/v1/shop/payment/webhook/${WEBHOOK_SECRET}`).send({ evento: 'teste_webhook' });
+    expect(res.status).toBe(200);
+    expect(efiClient.getChargeStatus).not.toHaveBeenCalled();
+  });
 });
