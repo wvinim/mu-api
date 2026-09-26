@@ -45,9 +45,36 @@ describe('POST /api/v1/auth/register', () => {
     expect(accountsRepository.createAccount).not.toHaveBeenCalled();
   });
 
+  it('rejeita e-mail já vinculado a outra conta com 409', async () => {
+    accountsRepository.findByUsername.mockResolvedValue(null);
+    accountsRepository.findAllByEmail.mockResolvedValue([makeAccount()]);
+
+    const res = await request(app)
+      .post('/api/v1/auth/register')
+      .send({ username: 'novo123', password: 'senha123', email: 'player1@example.com' });
+
+    expect(res.status).toBe(409);
+    expect(res.body.error.code).toBe('EMAIL_TAKEN');
+    expect(accountsRepository.createAccount).not.toHaveBeenCalled();
+  });
+
+  it('rejeita com 409 quando outro registro do mesmo e-mail vence a corrida', async () => {
+    accountsRepository.findByUsername.mockResolvedValue(null);
+    accountsRepository.findAllByEmail.mockResolvedValue([]);
+    accountsRepository.createAccount.mockResolvedValue({ created: false });
+
+    const res = await request(app)
+      .post('/api/v1/auth/register')
+      .send({ username: 'novo123', password: 'senha123', email: 'player1@example.com' });
+
+    expect(res.status).toBe(409);
+    expect(res.body.error.code).toBe('EMAIL_TAKEN');
+  });
+
   it('cria a conta e grava as duas colunas de senha (texto puro + hash)', async () => {
     accountsRepository.findByUsername.mockResolvedValue(null);
-    accountsRepository.createAccount.mockResolvedValue();
+    accountsRepository.findAllByEmail.mockResolvedValue([]);
+    accountsRepository.createAccount.mockResolvedValue({ created: true });
 
     const res = await request(app)
       .post('/api/v1/auth/register')

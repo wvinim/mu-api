@@ -25,11 +25,24 @@ async function register(req, res, next) {
       throw new AppError(409, 'USERNAME_TAKEN', 'Este username já está em uso.');
     }
 
+    // Checagem antecipada (evita o bcrypt à toa). A garantia de verdade,
+    // inclusive contra registros simultâneos, está no createAccount.
+    const sameEmail = await accountsRepository.findAllByEmail(email);
+    if (sameEmail.length > 0) {
+      await auditLog.record({ username, eventType: 'auth.register', success: false, ...meta, details: { reason: 'email_taken' } });
+      throw new AppError(409, 'EMAIL_TAKEN', 'Este e-mail já está vinculado a outra conta.');
+    }
+
     const passwordHash = await bcrypt.hash(password, BCRYPT_ROUNDS);
 
     try {
-      await accountsRepository.createAccount({ username, plainPassword: password, email, passwordHash });
+      const { created } = await accountsRepository.createAccount({ username, plainPassword: password, email, passwordHash });
+      if (!created) {
+        await auditLog.record({ username, eventType: 'auth.register', success: false, ...meta, details: { reason: 'email_taken' } });
+        throw new AppError(409, 'EMAIL_TAKEN', 'Este e-mail já está vinculado a outra conta.');
+      }
     } catch (err) {
+      if (err instanceof AppError) throw err;
       // Corrida entre o SELECT acima e o INSERT: PK (memb___id) já existe.
       if (err.number === 2627 || err.number === 2601) {
         throw new AppError(409, 'USERNAME_TAKEN', 'Este username já está em uso.');

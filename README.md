@@ -59,6 +59,7 @@ projeto e o escopo funcional.
 | `npm run test:watch`| Roda o Jest em modo watch                   |
 | `npm run dump-inventory -- <Nome>` | Diagnóstico só-leitura do `Inventory` de um personagem (bytes + grade 2D real) |
 | `npm run generate-item-dimensions` | Regenera `src/data/itemDimensions.json` a partir de `docs/inv/Item.txt` |
+| `npm run dump-duplicate-emails` | (só leitura) Lista e-mails compartilhados por mais de uma conta e a collation de `mail_addr` |
 | `npm run generate-dkim-key -- [caminho] [seletor]` | Gera chave DKIM e imprime o TXT para o DNS (ver `docs/EMAIL_DKIM.md`) |
 | `npm run check-dkim` | Confere se o TXT DKIM publicado bate com a chave do `.env` |
 

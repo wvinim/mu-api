@@ -69,22 +69,54 @@ async function findAllByEmail(email) {
  * estratégia híbrida definida no CLAUDE.md. memb_name não tem campo
  * próprio no formulário de registro (fora do escopo numerado) — decisão:
  * espelha o username.
+ *
+ * E-mail único por conta: mail_addr não tem índice único (e não dá para
+ * criar um com segurança — contas legadas com e-mail vazio/duplicado, e um
+ * índice filtrado exigiria SET options específicas em toda escrita do
+ * gameserver na tabela). A unicidade é garantida aqui: um applock por
+ * e-mail serializa registros concorrentes do mesmo endereço, e a checagem
+ * + INSERT rodam na mesma transação. O lock é só entre requisições da API
+ * — não bloqueia nada do gameserver.
+ * Retorna { created: false } se o e-mail já estiver em uso.
  */
 async function createAccount({ username, plainPassword, email, passwordHash }) {
   const pool = getPool();
-  await pool
+  const result = await pool
     .request()
     .input('username', sql.VarChar(10), username)
     .input('plainPassword', sql.VarChar(10), plainPassword)
     .input('displayName', sql.VarChar(10), username)
     .input('email', sql.VarChar(50), email)
     .input('passwordHash', sql.VarChar(255), passwordHash)
+    .input('lockResource', sql.NVarChar(255), `mu-api:register-email:${email.toLowerCase()}`)
     .query(`
-      INSERT INTO MEMB_INFO
-        (memb___id, memb__pwd, memb_name, mail_addr, appl_days, mail_chek, bloc_code, ctl1_code, Cash, Vip, WebPasswordHash)
-      VALUES
-        (@username, @plainPassword, @displayName, @email, GETDATE(), '0', '0', '0', 0, 0, @passwordHash)
+      SET XACT_ABORT ON;
+      BEGIN TRANSACTION;
+
+      DECLARE @lockResult INT;
+      EXEC @lockResult = sp_getapplock
+        @Resource = @lockResource, @LockMode = 'Exclusive', @LockOwner = 'Transaction', @LockTimeout = 5000;
+      IF @lockResult < 0
+      BEGIN
+        THROW 50001, 'Timeout ao obter lock de registro por e-mail', 1;
+      END
+
+      IF EXISTS (SELECT 1 FROM MEMB_INFO WHERE mail_addr = @email)
+      BEGIN
+        COMMIT TRANSACTION;
+        SELECT CAST(0 AS BIT) AS created;
+      END
+      ELSE
+      BEGIN
+        INSERT INTO MEMB_INFO
+          (memb___id, memb__pwd, memb_name, mail_addr, appl_days, mail_chek, bloc_code, ctl1_code, Cash, Vip, WebPasswordHash)
+        VALUES
+          (@username, @plainPassword, @displayName, @email, GETDATE(), '0', '0', '0', 0, 0, @passwordHash);
+        COMMIT TRANSACTION;
+        SELECT CAST(1 AS BIT) AS created;
+      END
     `);
+  return { created: Boolean(result.recordset[0].created) };
 }
 
 async function setEmailConfirmed(username) {

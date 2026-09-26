@@ -43,7 +43,7 @@ recebe 403).
 
 | Método | Rota | Body | Resposta 200/201 | Erros notáveis |
 |---|---|---|---|---|
-| POST | `/auth/register` | `{ username, password, email }` — username 4-10 alfanumérico/`_`, password 6-10 chars (limite do client do jogo) | 201 `{ message }` | 409 `USERNAME_TAKEN` |
+| POST | `/auth/register` | `{ username, password, email }` — username 4-10 alfanumérico/`_`, password 6-10 chars (limite do client do jogo) | 201 `{ message }` | 409 `USERNAME_TAKEN`, 409 `EMAIL_TAKEN` (e-mail já vinculado a outra conta) |
 | POST | `/auth/confirm-email` | `{ token }` | `{ message }` | token inválido/expirado |
 | POST | `/auth/resend-confirmation` | `{ email }` | `{ message }` — sempre a mesma mensagem, nunca revela se o e-mail existe | rate limit 3/hora |
 | POST | `/auth/login` | `{ username, password }` | `{ accessToken, refreshToken, expiresIn }` | 401 `INVALID_CREDENTIALS`, 403 `ACCOUNT_BANNED`, 403 `EMAIL_NOT_CONFIRMED`; rate limit 5/15min (IP e username) |

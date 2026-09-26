@@ -130,11 +130,15 @@ Server (sem precisar trocar de biblioteca). Ainda em aberto:
    usernames reais que devem ter acesso a rotas de staff/admin (ainda
    nenhuma rota admin foi construída — isso é usado a partir da Seção 7,
    mas o middleware já está pronto).
-3. **Opcional, não bloqueante**: considerar um índice único em
-   `mail_addr` se você quiser garantir que cada e-mail pertence a uma
-   única conta (hoje o schema permite duplicatas, o que degrada
-   forgot-password para "não faz nada" nesse caso raro). Só faço isso se
-   você aprovar — é mais uma migration revisável.
+3. ~~Índice único em `mail_addr`~~ — **resolvido na aplicação
+   (2026-09-26)**: o registro recusa e-mail já usado (`409 EMAIL_TAKEN`),
+   com `sp_getapplock` por e-mail + checagem + INSERT na mesma transação
+   para cobrir registros simultâneos (ver `accountsRepository.createAccount`).
+   Índice único descartado: contas legadas com e-mail vazio/duplicado
+   impediriam criá-lo, e um índice filtrado exigiria SET options
+   específicas em toda escrita do gameserver C++ em `MEMB_INFO`.
+   Duplicatas **anteriores** a isso: `npm run dump-duplicate-emails` (só
+   leitura) e resolver à mão.
 
 ## Próxima seção
 
