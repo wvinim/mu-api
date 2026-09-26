@@ -1,4 +1,4 @@
-# Seção 5 — Loja / Créditos (Efí) — concluída, não testada contra a API real
+# Seção 5 — Loja / Créditos (Efí) — concluída; Pix em produção desde 2026-09-26
 
 > `npm test` inicialmente falhava: 1) faltava rodar `npm install` depois
 > da dependência nova (`sdk-node-apis-efi`); 2) o rate limit de
@@ -420,7 +420,7 @@ jogadores — decisão do usuário):
   URL (primeiro sem certificado → 403 esperado, depois com → 200) e aceitou.
 - Compra real pelo site: webhook chegou em `.../webhook/<segredo>/pix` → 200.
 
-**Checklist para virar para produção (antes de abrir o servidor):**
+**Checklist para virar para produção** (itens 1–4 feitos em 2026-09-26 — ver adendo seguinte):
 1. `.env`: `EFI_SANDBOX=false`, Client ID/Secret de **Produção**,
    `EFI_CERTIFICATE_PATH` → `.p12` de **produção**, `EFI_PIX_KEY` → chave
    Pix real da conta Efí (escopos marcados também na aba Produção).
@@ -442,3 +442,20 @@ deixava a cobrança "paga" sem Cash, e os reenvios da Efí não corrigiam.
 Substituído por `pixChargesRepository.markPaidAndCredit` (uma transação;
 conta inexistente → rollback e a cobrança segue pending). Revalidado em
 homologação com nova compra de teste.
+
+## Adendo — Efí em produção (2026-09-26)
+
+Virada feita e validada com dinheiro real:
+- `.env`: `EFI_SANDBOX=false`, credenciais e `.p12` de produção, chave Pix
+  real da conta, **novo** `EFI_WEBHOOK_SECRET`.
+- nginx: `ssl_client_certificate /etc/nginx/efi/efi-chain-prod.crt`.
+- `npm run efi-webhook -- register https://api.mupro.vip` → Efí de produção
+  validou a URL (mTLS com a cadeia de produção + 200).
+- Pagamento real de R$ 0,01 (pacote `credit:4 "teste api"`) pago pelo app
+  do banco → confirmado na tela e Cash creditado.
+
+Ainda em aberto (itens 5 e 6 do checklist acima):
+- Desativar `credit:4 "teste api"` antes de abrir o servidor — em produção
+  ele vende 100 Cash por R$ 0,01 de verdade.
+- Limpar Cash das contas usadas nos testes.
+- Opcional: `access_log off;` no `location` do webhook no nginx.
