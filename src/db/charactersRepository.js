@@ -84,8 +84,11 @@ async function findPublicByName(name) {
 /**
  * Ranking paginado. Usa ROW_NUMBER() em vez de OFFSET/FETCH — ver
  * docs/DB_NOTES.md (banco em compatibility level anterior ao SQL 2012).
+ *
+ * `raceCode` é a base da raça (múltiplo de 16); o filtro pega a faixa
+ * [raceCode, raceCode + 16), ou seja, 1ª, 2ª e 3ª classe juntas.
  */
-async function findRanking({ page = 1, limit = 20, classCode } = {}) {
+async function findRanking({ page = 1, limit = 20, raceCode } = {}) {
   const pool = getPool();
   const firstRow = (page - 1) * limit + 1;
   const lastRow = page * limit;
@@ -96,9 +99,10 @@ async function findRanking({ page = 1, limit = 20, classCode } = {}) {
     .input('lastRow', sql.Int, lastRow);
 
   const filters = [];
-  if (classCode !== undefined) {
-    request.input('classCode', sql.TinyInt, classCode);
-    filters.push('Class = @classCode');
+  if (raceCode !== undefined) {
+    // Int, não TinyInt: raceCode + 16 pode passar de 255.
+    request.input('raceMin', sql.Int, raceCode).input('raceMax', sql.Int, raceCode + 16);
+    filters.push('Class >= @raceMin AND Class < @raceMax');
   }
   const whereClause = filters.length ? `WHERE ${filters.join(' AND ')}` : '';
 

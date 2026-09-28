@@ -10,10 +10,12 @@
   de privacidade/segurança (evitar expor localização em tempo real de
   jogadores ou ligar personagem a username de conta publicamente).
 - `GET /api/v1/characters/ranking` — paginado (`page`, `limit` até 100),
-  com filtro opcional `classCode`. Busca por nome de personagem foi
+  com filtro opcional `classCode`, interpretado como **raça inteira**
+  (`Class` na faixa `[classCode & 0xF0, +16)`, ex: 0 = DW/SM/GrM —
+  corrigido 2026-09-28, antes era igualdade exata). Busca por nome de personagem foi
   removida (decisão do usuário, 2026-09-20).
   Ordenado por `Resets DESC, cLevel DESC`. **Cacheado em memória**
-  (`RANKING_CACHE_TTL_SECONDS`, padrão 60s) por combinação de parâmetros
+  (`RANKING_CACHE_TTL_SECONDS`, padrão 180s) por página/limit/raça
   — evita bater no banco a cada request, conforme pedido no brief.
   Paginação via `ROW_NUMBER()` (não `OFFSET/FETCH` — ver
   `docs/DB_NOTES.md`, o banco não suporta essa sintaxe).

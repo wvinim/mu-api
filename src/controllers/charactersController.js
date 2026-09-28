@@ -21,11 +21,16 @@ async function getByName(req, res, next) {
 async function getRanking(req, res, next) {
   try {
     const { page, limit, classCode } = req.query;
-    const cacheKey = JSON.stringify({ page, limit, classCode });
+    // classCode filtra pela raça inteira (1ª/2ª/3ª classe): a base da raça
+    // é múltiplo de 16 e as evoluções somam +1/+2 (ex: 0/1/3 = DW/SM/GrM).
+    // Normalizar aqui faz ?classCode=0 e ?classCode=3 dividirem a mesma
+    // entrada de cache.
+    const raceCode = classCode === undefined ? undefined : classCode & 0xf0;
+    const cacheKey = JSON.stringify({ page, limit, raceCode });
 
     let result = rankingCache.get(cacheKey);
     if (!result) {
-      result = await charactersRepository.findRanking({ page, limit, classCode });
+      result = await charactersRepository.findRanking({ page, limit, raceCode });
       rankingCache.set(cacheKey, result);
     }
 

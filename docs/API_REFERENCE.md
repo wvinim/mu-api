@@ -101,7 +101,15 @@ Bless, gravado automaticamente na compra) — não usa `PUT /account/autopick`.
 | Método | Rota | Query/Params | Resposta |
 |---|---|---|---|
 | GET | `/characters/:name` | — | Perfil público: `{ name, level, classCode, experience, resets, resetsDay, resetsWeek, resetsMonth, strength, dexterity, vitality, energy, pkCount, pkLevel, leadership, createdAt, lastPlayedAt }`. **Nunca inclui** `money`, posição no mapa, `accountId`. 404 se não existir. |
-| GET | `/characters/ranking` | `?page&limit(máx 100)&classCode` | `{ page, limit, total, items }` — ordenado por `resets DESC, level DESC`. Cacheado ~60s no servidor. |
+| GET | `/characters/ranking` | `?page&limit(máx 100)&classCode` | `{ page, limit, total, items }` — ordenado por `resets DESC, level DESC`. `total` reflete o filtro. Cacheado ~180s no servidor (por página/limit/raça). |
+
+**Filtro `classCode` = raça inteira.** O ranking interpreta `classCode`
+como a raça: `?classCode=0` devolve Dark Wizard (0), Soul Master (1) e
+Grand Master (3) juntos. Internamente usa `classCode & 0xF0` (base da
+raça, múltiplo de 16) e filtra `Class` na faixa `[base, base+16)`.
+Qualquer código da raça funciona (`?classCode=3` = `?classCode=0`), mas
+o esperado é mandar a base: 0 DW, 16 DK, 32 Elf, 48 MG, 64 DL, 80 Summoner.
+Não aceita lista de códigos.
 
 `classCode` é o `tinyint` cru da coluna `Class` — **não decodificado**
 para nome de classe (ex: "Dark Knight"). Se precisar exibir nome, o
