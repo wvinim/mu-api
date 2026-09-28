@@ -37,6 +37,49 @@ O que o `mu_api` **não** consegue fazer, mesmo se a API for comprometida:
 Os scripts de diagnóstico em `scripts/dump*.js` leem `sys.columns`/`sys.indexes`
 e podem precisar ser rodados com um login de admin; não são usados pela API.
 
+## `sa` restrito ao localhost (trigger de logon)
+
+Aplicado em 2026-09-28, validado: a API conecta como `mu_api`, o `sa`
+conecta pela VPS e o client do jogo entra normalmente. O gameserver conecta
+como `sa` via TCP em `127.0.0.1`, que a trigger libera. Uma conexão remota
+como `sa` recebe *"Logon failed for login 'sa' due to trigger execution"*.
+
+```sql
+USE master;
+GO
+CREATE TRIGGER trg_sa_somente_local
+ON ALL SERVER
+FOR LOGON
+AS
+BEGIN
+  IF ORIGINAL_LOGIN() = N'sa'
+  BEGIN
+    DECLARE @host NVARCHAR(100);
+    SET @host = EVENTDATA().value('(/EVENT_INSTANCE/ClientHost)[1]', 'NVARCHAR(100)');
+    IF @host NOT IN (N'<local machine>', N'127.0.0.1', N'::1')
+      ROLLBACK;
+  END
+END
+GO
+```
+
+- A administração como `sa` passa a ser feita só na própria VPS (RDP).
+- Qualquer programa novo que use `sa` precisa rodar na VPS e conectar por
+  `localhost`/`127.0.0.1`, e não pelo IP público.
+- A trigger roda depois da checagem de senha, então não impede força bruta
+  (e a mensagem de erro revela quando a senha estava certa). O firewall
+  liberando a 1433 só para o IP da Oracle continua sendo a proteção
+  principal, e a senha do `sa` precisa continuar forte.
+
+Para desfazer: `DROP TRIGGER trg_sa_somente_local ON ALL SERVER;`
+
+Emergência (se ninguém conseguir conectar): a trigger não roda na conexão
+administrativa dedicada (DAC). Na VPS, em um prompt como administrador:
+
+```
+sqlcmd -S admin:localhost -E -Q "DROP TRIGGER trg_sa_somente_local ON ALL SERVER"
+```
+
 ## Quando o código mudar
 
 Todo repositório novo (ou query nova) que tocar uma tabela/coluna fora da

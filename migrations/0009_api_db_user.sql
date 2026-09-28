@@ -37,7 +37,9 @@ SET @password = N'TROQUE_ESTA_SENHA';
 IF @password = N'TROQUE_ESTA_SENHA'
 BEGIN
   RAISERROR('Defina @password antes de rodar o script.', 16, 1);
-  RETURN;
+  -- RETURN só encerraria este batch; os seguintes (após GO) rodariam mesmo
+  -- assim. NOEXEC ON faz o resto do script só compilar, sem executar.
+  SET NOEXEC ON;
 END
 
 IF NOT EXISTS (SELECT 1 FROM sys.server_principals WHERE name = N'mu_api')
@@ -117,4 +119,7 @@ SELECT r.name AS role_do_mu_api
 FROM sys.database_role_members m
 JOIN sys.database_principals r ON r.principal_id = m.role_principal_id
 WHERE m.member_principal_id = USER_ID(N'mu_api');  -- esperado: nenhuma linha
+GO
+
+SET NOEXEC OFF;
 GO
