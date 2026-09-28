@@ -305,7 +305,9 @@ async function findAllPaginated({ page = 1, limit = 20, search, banned } = {}) {
       cash, vip, createdAt
     FROM Ranked WHERE rank BETWEEN @firstRow AND @lastRow ORDER BY rank;
 
-    SELECT COUNT(*) AS total FROM MEMB_INFO ${whereClause};
+    -- COUNT(memb___id), não COUNT(*): COUNT(*) exige SELECT em todas as colunas e
+    -- o login mu_api tem DENY SELECT em memb__pwd (migration 0009).
+    SELECT COUNT(memb___id) AS total FROM MEMB_INFO ${whereClause};
   `);
 
   return { items: result.recordsets[0], total: result.recordsets[1][0].total };
