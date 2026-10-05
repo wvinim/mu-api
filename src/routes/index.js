@@ -7,7 +7,6 @@ const shopRoutes = require('./shop');
 const supportRoutes = require('./support');
 const adminRoutes = require('./admin');
 const serverRoutes = require('./server');
-const showcaseRoutes = require('./showcase');
 
 const router = Router();
 
@@ -19,6 +18,5 @@ router.use(shopRoutes);
 router.use(supportRoutes);
 router.use(adminRoutes);
 router.use(serverRoutes);
-router.use(showcaseRoutes);
 
 module.exports = router;
