@@ -49,3 +49,24 @@ describe('charactersRepository.findRanking', () => {
     expect(queries[0]).not.toMatch(/WHERE Class/);
   });
 });
+
+describe('charactersRepository.findPublicByName', () => {
+  it('seleciona só nome e resets (sem build, nível, experiência ou PvP)', async () => {
+    const queries = [];
+    const req = {
+      input: () => req,
+      query: jest.fn((text) => {
+        queries.push(text);
+        return Promise.resolve({ recordset: [{ name: 'Hero1', resets: 10 }] });
+      }),
+    };
+    getPool.mockReturnValue({ request: () => req });
+
+    const result = await charactersRepository.findPublicByName('Hero1');
+
+    expect(result).toEqual({ name: 'Hero1', resets: 10 });
+    expect(queries[0]).toMatch(/Name\s+AS name/);
+    expect(queries[0]).toMatch(/Resets\s+AS resets/);
+    expect(queries[0]).not.toMatch(/Strength|cLevel|Experience|PkCount|Class\b|Money|MapPos/);
+  });
+});

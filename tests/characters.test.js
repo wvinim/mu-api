@@ -19,8 +19,8 @@ describe('GET /api/v1/characters/:name', () => {
     expect(res.body.error.code).toBe('NOT_FOUND');
   });
 
-  it('retorna o perfil público do personagem, sem money/posição/accountId', async () => {
-    const publicProfile = { name: 'Hero1', level: 400, classCode: 22, resets: 10 };
+  it('retorna o perfil público do personagem (só nome e resets), sem money/posição/accountId', async () => {
+    const publicProfile = { name: 'Hero1', resets: 10 };
     charactersRepository.findPublicByName.mockResolvedValue(publicProfile);
 
     const res = await request(app).get('/api/v1/characters/Hero1');
