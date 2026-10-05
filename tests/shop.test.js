@@ -342,6 +342,22 @@ describe('POST /api/v1/shop/purchase — resgate de item (vai pro baú da conta,
     );
   });
 
+  it('rejeita quando o baú ativo é o do mercado (VaultID 200) SEM debitar créditos', async () => {
+    shopItemsRepository.findById.mockResolvedValue({ Id: 2, Name: 'Item', PriceCredits: 100, ItemGroup: 14, ItemIndex: 0, ItemLevel: 0, Quantity: 1, Active: true });
+    accountsRepository.isAccountOnline.mockResolvedValue(false);
+    warehouseRepository.ensureRowAndGetItems.mockResolvedValue({ items: Buffer.from(EMPTY_WAREHOUSE), vaultId: 200 });
+
+    const res = await request(app)
+      .post('/api/v1/shop/purchase')
+      .set('Authorization', authHeader())
+      .send({ catalogId: 'item:2' });
+
+    expect(res.status).toBe(409);
+    expect(res.body.error.code).toBe('WAREHOUSE_IS_SHOWCASE');
+    expect(accountsRepository.debitCash).not.toHaveBeenCalled();
+    expect(warehouseRepository.updateItems).not.toHaveBeenCalled();
+  });
+
   it('rejeita com baú cheio SEM debitar créditos (checagem é antes do débito)', async () => {
     shopItemsRepository.findById.mockResolvedValue({ Id: 2, Name: 'Item', PriceCredits: 100, ItemGroup: 14, ItemIndex: 0, ItemLevel: 0, Quantity: 1, Active: true });
     accountsRepository.isAccountOnline.mockResolvedValue(false);
@@ -453,6 +469,22 @@ describe('POST /api/v1/shop/purchase — resgate de pacote (bundle, vai pro baú
     expect(accountsRepository.creditCash).not.toHaveBeenCalled();
     expect(warehouseRepository.updateItems).not.toHaveBeenCalled();
     expect(bundleRedemptionsRepository.create).not.toHaveBeenCalled();
+  });
+
+  it('rejeita pacote quando o baú ativo é o do mercado (VaultID 200) SEM debitar créditos', async () => {
+    shopBundlesRepository.findById.mockResolvedValue(makeBundleFixture());
+    accountsRepository.isAccountOnline.mockResolvedValue(false);
+    warehouseRepository.ensureRowAndGetItems.mockResolvedValue({ items: Buffer.from(EMPTY_WAREHOUSE), vaultId: 200 });
+
+    const res = await request(app)
+      .post('/api/v1/shop/purchase')
+      .set('Authorization', authHeader())
+      .send({ catalogId: 'bundle:5' });
+
+    expect(res.status).toBe(409);
+    expect(res.body.error.code).toBe('WAREHOUSE_IS_SHOWCASE');
+    expect(accountsRepository.debitCash).not.toHaveBeenCalled();
+    expect(warehouseRepository.updateItems).not.toHaveBeenCalled();
   });
 });
 
