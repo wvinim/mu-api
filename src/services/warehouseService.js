@@ -15,23 +15,6 @@ const WAREHOUSE_HEIGHT = 15;
 const WAREHOUSE_SIZE = WAREHOUSE_WIDTH * WAREHOUSE_HEIGHT; // 120 slots = 1920 bytes
 const WAREHOUSE_START_SLOT = 0;
 
-/**
- * Baú do mercado (`/mercado` no jogo, mesma troca do `/bau`). Enquanto ele
- * é o baú ativo, a loja não grava nada no baú — senão o item comprado cairia
- * na vitrine pública. Ver docs/SECTION_10_MARKET.md.
- */
-const SHOWCASE_VAULT_ID = 200;
-
-function assertNotShowcaseVault(vaultId) {
-  if (vaultId === SHOWCASE_VAULT_ID) {
-    throw new AppError(
-      409,
-      'WAREHOUSE_IS_SHOWCASE',
-      'Seu baú ativo é o baú do mercado. Troque de baú com /bau no jogo antes de comprar.',
-    );
-  }
-}
-
 /** Buffer de baú vazio (120 slots de 0xFF) — usado ao criar a linha de uma conta que nunca abriu o baú no jogo. */
 function emptyItemsBuffer() {
   return Buffer.alloc(ITEM_DB_BYTE * WAREHOUSE_SIZE, 0xff);
@@ -122,8 +105,6 @@ module.exports = {
   WAREHOUSE_WIDTH,
   WAREHOUSE_HEIGHT,
   WAREHOUSE_START_SLOT,
-  SHOWCASE_VAULT_ID,
-  assertNotShowcaseVault,
   emptyItemsBuffer,
   buildWarehouseGrid,
   countEmptyWarehouseSlots,

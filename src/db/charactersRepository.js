@@ -60,7 +60,7 @@ const RANKING_COLUMNS = `
 
 // Perfil público por nome (página do personagem no site): só nome e resets.
 // Build, nível, experiência e PvP não são expostos aqui (decisão do usuário,
-// 2026-10-05) — o perfil existe para mostrar a vitrine do mercado.
+// 2026-10-05).
 const PROFILE_COLUMNS = `
   Name         AS name,
   Resets       AS resets
