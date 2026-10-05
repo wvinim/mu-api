@@ -48,28 +48,14 @@ async function findByAccountId(accountId) {
   return result.recordset;
 }
 
-// Versão pública (perfil por nome / ranking): nunca inclui Money, posição
-// no mapa (MapNumber/MapPosX/MapPosY/MapDir) nem AccountID — evita expor
-// localização em tempo real de outros jogadores e ligar character a
-// username de conta.
-const PUBLIC_CHARACTER_COLUMNS = `
+// Ranking público: só o que a tabela do site mostra. Build (atributos),
+// experiência, PvP e datas não são expostos (decisão do usuário,
+// 2026-10-05). Nunca inclui Money, posição no mapa nem AccountID.
+const RANKING_COLUMNS = `
   Name         AS name,
   cLevel       AS level,
   Class        AS classCode,
-  Experience   AS experience,
-  Resets       AS resets,
-  ResetsDay    AS resetsDay,
-  ResetsWeek   AS resetsWeek,
-  ResetsMonth  AS resetsMonth,
-  Strength     AS strength,
-  Dexterity    AS dexterity,
-  Vitality     AS vitality,
-  Energy       AS energy,
-  PkCount      AS pkCount,
-  PkLevel      AS pkLevel,
-  Leadership   AS leadership,
-  MDate        AS createdAt,
-  LDate        AS lastPlayedAt
+  Resets       AS resets
 `;
 
 // Perfil público por nome (página do personagem no site): só nome e resets.
@@ -117,7 +103,7 @@ async function findRanking({ page = 1, limit = 20, raceCode } = {}) {
   const result = await request.query(`
     WITH Ranked AS (
       SELECT
-        ${PUBLIC_CHARACTER_COLUMNS},
+        ${RANKING_COLUMNS},
         ROW_NUMBER() OVER (ORDER BY Resets DESC, cLevel DESC) AS rank
       FROM Character
       ${whereClause}

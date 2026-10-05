@@ -70,3 +70,18 @@ describe('charactersRepository.findPublicByName', () => {
     expect(queries[0]).not.toMatch(/Strength|cLevel|Experience|PkCount|Class\b|Money|MapPos/);
   });
 });
+
+describe('charactersRepository.findRanking — colunas', () => {
+  it('expõe só nome, nível, classe e resets (sem build, experiência ou PvP)', async () => {
+    const { queries } = mockPool();
+
+    await charactersRepository.findRanking({ page: 1, limit: 20 });
+
+    const select = queries[0].split('ROW_NUMBER()')[0];
+    expect(select).toMatch(/Name\s+AS name/);
+    expect(select).toMatch(/cLevel\s+AS level/);
+    expect(select).toMatch(/Class\s+AS classCode/);
+    expect(select).toMatch(/Resets\s+AS resets/);
+    expect(select).not.toMatch(/Strength|Dexterity|Vitality|Energy|Leadership|Experience|PkCount|PkLevel|Money|MapPos/);
+  });
+});
