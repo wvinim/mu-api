@@ -167,6 +167,7 @@ async function purchaseItem(req, res, id, username, meta) {
   }
 
   const { items: itemsBuffer, vaultId } = await warehouseRepository.ensureRowAndGetItems(username);
+  warehouseService.assertNotShowcaseVault(vaultId);
   if (warehouseService.findEmptyWarehouseSlot(itemsBuffer) === -1) {
     throw new AppError(409, 'WAREHOUSE_FULL', 'Baú cheio. Libere espaço antes de resgatar este item.');
   }
@@ -248,6 +249,7 @@ async function purchaseBundle(req, res, id, username, meta) {
 
   const componentSpecs = expandBundleComponents(bundle);
   const { items: itemsBuffer, vaultId } = await warehouseRepository.ensureRowAndGetItems(username);
+  warehouseService.assertNotShowcaseVault(vaultId);
   if (warehouseService.countEmptyWarehouseSlots(itemsBuffer) < componentSpecs.length) {
     throw new AppError(
       409,

@@ -204,6 +204,30 @@ funcionando como componente de um pacote.
 
 ---
 
+## Mercado / vitrine (`/showcase`)
+
+Vitrine = baú do mercado (`/mercado` no jogo, `VaultID` 200), lida **só
+quando guardada** em `Extwarehouse`. Sem preço: a troca é combinada por
+whisper no jogo. Ver `docs/SECTION_10_MARKET.md`.
+
+| Método | Rota | Resposta |
+|---|---|---|
+| GET | `/showcase/:name` | Pública. `{ character, online, storedAt, items: ShowcaseItem[] }` da vitrine cujo contato é `:name`. 404 `NOT_FOUND` se o personagem não é contato ou a vitrine nunca foi guardada. Cache de 60 s (exceto `online`) |
+| GET | `/showcase/me` 🔒 | `{ character, editing, storedAt, items }`. `editing: true` = o baú do mercado é o baú ativo no jogo (não aparece no site) |
+
+`ShowcaseItem`: `{ slot, x, y, group, index, known, name, category, width,
+height, classes, level, skill, luck, additionalOption, additionalOptionText,
+excellent: string[], ancient: { setName, staminaBonus } | null, harmony:
+{ name, level, value } | null, option380, durability, serial }`.
+`category` ∈ espada, machado, maca, lanca, arco, cajado, escudo, elmo,
+armadura, calca, luva, bota, asa, colar, anel, joia, outros.
+
+Loja: `POST /shop/purchase` de `item:*`/`bundle:*` responde **409
+`WAREHOUSE_IS_SHOWCASE`** (antes de debitar) quando o baú ativo é o do
+mercado.
+
+---
+
 ## Status do servidor (`/server`) — públicas, sem auth
 
 | Método | Rota | Resposta |
