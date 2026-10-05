@@ -100,7 +100,7 @@ Bless, gravado automaticamente na compra) — não usa `PUT /account/autopick`.
 
 | Método | Rota | Query/Params | Resposta |
 |---|---|---|---|
-| GET | `/characters/:name` | — | Perfil público: `{ name, level, classCode, experience, resets, resetsDay, resetsWeek, resetsMonth, strength, dexterity, vitality, energy, pkCount, pkLevel, leadership, createdAt, lastPlayedAt }`. **Nunca inclui** `money`, posição no mapa, `accountId`. 404 se não existir. |
+| GET | `/characters/:name` | — | Perfil público: `{ name, resets }` — só isso (desde 2026-10-05; build, nível, experiência e PvP não são expostos). A vitrine do mercado vem de `/showcase/:name`. 404 se não existir. |
 | GET | `/characters/ranking` | `?page&limit(máx 100)&classCode` | `{ page, limit, total, items }` — ordenado por `resets DESC, level DESC`. `total` reflete o filtro. Cacheado ~180s no servidor (por página/limit/raça). |
 
 **Filtro `classCode` = raça inteira.** O ranking interpreta `classCode`

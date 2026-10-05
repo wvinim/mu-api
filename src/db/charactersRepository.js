@@ -72,12 +72,20 @@ const PUBLIC_CHARACTER_COLUMNS = `
   LDate        AS lastPlayedAt
 `;
 
+// Perfil público por nome (página do personagem no site): só nome e resets.
+// Build, nível, experiência e PvP não são expostos aqui (decisão do usuário,
+// 2026-10-05) — o perfil existe para mostrar a vitrine do mercado.
+const PROFILE_COLUMNS = `
+  Name         AS name,
+  Resets       AS resets
+`;
+
 async function findPublicByName(name) {
   const pool = getPool();
   const result = await pool
     .request()
     .input('name', sql.VarChar(10), name)
-    .query(`SELECT ${PUBLIC_CHARACTER_COLUMNS} FROM Character WHERE Name = @name`);
+    .query(`SELECT ${PROFILE_COLUMNS} FROM Character WHERE Name = @name`);
   return result.recordset[0] || null;
 }
 
