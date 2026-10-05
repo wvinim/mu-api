@@ -40,10 +40,12 @@ BEGIN TRAN;
 DECLARE @acc VARCHAR(10), @novo INT;
 
 DECLARE contas CURSOR LOCAL FAST_FORWARD FOR
+    -- warehouse e Extwarehouse têm collations diferentes em AccountID:
+    -- normaliza para o padrão do banco antes do UNION.
     SELECT DISTINCT RTRIM(AccountID) FROM (
-        SELECT AccountID FROM warehouse    WITH (UPDLOCK, HOLDLOCK) WHERE VaultID = 200
+        SELECT AccountID COLLATE DATABASE_DEFAULT AS AccountID FROM warehouse    WITH (UPDLOCK, HOLDLOCK) WHERE VaultID = 200
         UNION
-        SELECT AccountID FROM Extwarehouse WITH (UPDLOCK, HOLDLOCK) WHERE VaultID = 200
+        SELECT AccountID COLLATE DATABASE_DEFAULT AS AccountID FROM Extwarehouse WITH (UPDLOCK, HOLDLOCK) WHERE VaultID = 200
     ) t;
 
 OPEN contas;
@@ -93,7 +95,7 @@ SELECT
     CASE WHEN r.NovoVaultID > CASE ISNULL(m.Vip, 0) WHEN 1 THEN 3 WHEN 2 THEN 6 WHEN 3 THEN 8 ELSE 2 END
          THEN 'FORA DO LIMITE - ajuste manual' ELSE 'ok (/bau ' + CAST(r.NovoVaultID AS VARCHAR(5)) + ')' END AS Situacao
 FROM @renumerados r
-LEFT JOIN MEMB_INFO m ON m.memb___id = r.AccountID
+LEFT JOIN MEMB_INFO m ON m.memb___id COLLATE DATABASE_DEFAULT = r.AccountID COLLATE DATABASE_DEFAULT
 ORDER BY r.AccountID;
 GO
 
