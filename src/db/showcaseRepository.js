@@ -1,5 +1,6 @@
 const { getPool, sql } = require('./pool');
 const { SHOWCASE_VAULT_ID } = require('../services/warehouseService');
+const { fromGameDbLocal } = require('../utils/gameDbTime');
 
 /**
  * Vitrine do mercado (/mercado no jogo). O site só lê a vitrine GUARDADA,
@@ -35,7 +36,8 @@ async function findStoredShowcase(accountId) {
     .input('vaultId', sql.Int, SHOWCASE_VAULT_ID)
     .query('SELECT TOP 1 Items, EndUseDate FROM Extwarehouse WHERE AccountID = @accountId AND VaultID = @vaultId');
   const row = result.recordset[0];
-  return row ? { items: row.Items, storedAt: row.EndUseDate } : null;
+  // EndUseDate vem do GETDATE() da MUDAR_BAU: horário de Brasília, não UTC.
+  return row ? { items: row.Items, storedAt: fromGameDbLocal(row.EndUseDate) } : null;
 }
 
 /** VaultID do baú ativo, ou null se a conta nunca abriu o baú. */

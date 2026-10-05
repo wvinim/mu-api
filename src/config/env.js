@@ -125,6 +125,9 @@ const env = {
   // única (mesma lógica do rate limit). TTL curto porque o dado muda
   // pouco, mas ranking em tempo real não é um requisito.
   rankingCacheTtlSeconds: int('RANKING_CACHE_TTL_SECONDS', 180),
+  // Fuso do relógio do SQL Server do jogo: colunas gravadas com GETDATE()
+  // (ex.: Extwarehouse.EndUseDate pela MUDAR_BAU) estão nesse horário local.
+  gameDbUtcOffset: optional('GAME_DB_UTC_OFFSET', '-03:00'),
 
   // Status do servidor (Seção 8) — cache curto porque o dado muda pouco
   // e a query roda a cada request sem cache. Metadados de /server/info
