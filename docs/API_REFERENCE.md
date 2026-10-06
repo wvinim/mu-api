@@ -100,7 +100,6 @@ Bless, gravado automaticamente na compra) — não usa `PUT /account/autopick`.
 
 | Método | Rota | Query/Params | Resposta |
 |---|---|---|---|
-| GET | `/characters/:name` | — | Perfil público: `{ name, resets }` — só isso (desde 2026-10-05; build, nível, experiência e PvP não são expostos). 404 se não existir. |
 | GET | `/characters/ranking` | `?page&limit(máx 100)&classCode` | `{ page, limit, total, items: [{ name, level, classCode, resets, rank }] }` — só isso, sem build/experiência/PvP (desde 2026-10-05); ordenado por `resets DESC, level DESC`. `total` reflete o filtro. Cacheado ~180s no servidor (por página/limit/raça). |
 
 **Filtro `classCode` = raça inteira.** O ranking interpreta `classCode`

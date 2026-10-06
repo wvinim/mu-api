@@ -10,26 +10,10 @@ beforeEach(() => {
 });
 
 describe('GET /api/v1/characters/:name', () => {
-  it('retorna 404 quando o personagem não existe', async () => {
-    charactersRepository.findPublicByName.mockResolvedValue(null);
-
-    const res = await request(app).get('/api/v1/characters/Ghost');
-
-    expect(res.status).toBe(404);
-    expect(res.body.error.code).toBe('NOT_FOUND');
-  });
-
-  it('retorna o perfil público do personagem (só nome e resets), sem money/posição/accountId', async () => {
-    const publicProfile = { name: 'Hero1', resets: 10 };
-    charactersRepository.findPublicByName.mockResolvedValue(publicProfile);
-
+  it('não existe mais (página do personagem removida em 2026-10-06)', async () => {
     const res = await request(app).get('/api/v1/characters/Hero1');
 
-    expect(res.status).toBe(200);
-    expect(res.body).toEqual(publicProfile);
-    expect(res.body.money).toBeUndefined();
-    expect(res.body.accountId).toBeUndefined();
-    expect(res.body.mapPosX).toBeUndefined();
+    expect(res.status).toBe(404);
   });
 });
 
