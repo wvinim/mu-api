@@ -58,23 +58,6 @@ const RANKING_COLUMNS = `
   Resets       AS resets
 `;
 
-// Perfil público por nome (página do personagem no site): só nome e resets.
-// Build, nível, experiência e PvP não são expostos aqui (decisão do usuário,
-// 2026-10-05).
-const PROFILE_COLUMNS = `
-  Name         AS name,
-  Resets       AS resets
-`;
-
-async function findPublicByName(name) {
-  const pool = getPool();
-  const result = await pool
-    .request()
-    .input('name', sql.VarChar(10), name)
-    .query(`SELECT ${PROFILE_COLUMNS} FROM Character WHERE Name = @name`);
-  return result.recordset[0] || null;
-}
-
 /**
  * Ranking paginado. Usa ROW_NUMBER() em vez de OFFSET/FETCH — ver
  * docs/DB_NOTES.md (banco em compatibility level anterior ao SQL 2012).
@@ -121,6 +104,5 @@ async function findRanking({ page = 1, limit = 20, raceCode } = {}) {
 
 module.exports = {
   findByAccountId,
-  findPublicByName,
   findRanking,
 };
