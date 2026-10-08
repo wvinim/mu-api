@@ -52,16 +52,10 @@ Adicionado em 2026-10-08. Contrato para o front em `docs/API_REFERENCE.md`
   não paga ou cancelada (mesma resposta nos três casos, para não revelar
   o estado), e 409 só para `GIFT_CODE_ALREADY_REDEEMED`.
 
-## Passos manuais pendentes
+## Status
 
-1. **Aplicar `migrations/0012_gift_codes.sql`**. Ela adiciona a coluna
-   `WebPixCharges.IsGift`, cria a tabela `WebGiftCodes` e dá o GRANT para
-   o `mu_api`. **Precisa ser aplicada antes do deploy desta versão**: o
-   `INSERT` em `WebPixCharges` agora usa `IsGift`, então sem a migration
-   a compra normal de gold também quebra.
-2. Opcional: `RATE_LIMIT_GIFT_REDEEM_MAX` e
-   `RATE_LIMIT_GIFT_REDEEM_WINDOW_MINUTES` no `.env` (o padrão é 10 por 60
-   minutos).
-3. Testar em produção: comprar um presente com o pacote de teste
-   (R$0,01), conferir o e-mail, resgatar com outra conta e ver o saldo e
-   o histórico das duas. Depois, cancelar uma chave pelo admin.
+- **Em produção desde 2026-10-08.** A migration 0012 foi aplicada e o
+  usuário confirmou que o fluxo funciona.
+- Opcional: ajustar `RATE_LIMIT_GIFT_REDEEM_MAX` e
+  `RATE_LIMIT_GIFT_REDEEM_WINDOW_MINUTES` no `.env` (o padrão é 10 por 60
+  minutos).

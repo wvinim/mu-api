@@ -459,3 +459,7 @@ Ainda em aberto (itens 5 e 6 do checklist acima):
   ele vende 100 Cash por R$ 0,01 de verdade.
 - Limpar Cash das contas usadas nos testes.
 - Opcional: `access_log off;` no `location` do webhook no nginx.
+
+## Extensões posteriores
+
+- **Gold de presente** (chaves de resgate, 2026-10-08): ver `docs/SECTION_10_GIFT_CODES.md`.
