@@ -1,7 +1,8 @@
 const { getPool, sql } = require('./pool');
 
 /**
- * Histórico unificado (compras de crédito + resgates de item) com
+ * Histórico unificado (compras de crédito/presente + resgates de item,
+ * pacote, VIP e chave de presente) com
  * paginação real sobre o conjunto combinado — não é "página de cada
  * tabela colada", é uma paginação de verdade via UNION ALL + ROW_NUMBER.
  */
@@ -12,7 +13,7 @@ async function findByAccount(accountId, { page = 1, limit = 20 } = {}) {
 
   const combinedCte = `
     SELECT
-      'credit_purchase' AS type,
+      CASE WHEN IsGift = 1 THEN 'gift_purchase' ELSE 'credit_purchase' END AS type,
       TxId AS reference,
       NULL AS itemName,
       AmountCents AS amountCents,
@@ -62,6 +63,20 @@ async function findByAccount(accountId, { page = 1, limit = 20 } = {}) {
     FROM WebVipPurchases r
     JOIN WebVipPlans p ON p.Id = r.PlanId
     WHERE r.AccountId = @accountId
+
+    UNION ALL
+
+    -- Resgate de chave de presente: a referência não expõe a chave inteira.
+    SELECT
+      'gift_redemption' AS type,
+      RIGHT(Code, 4) AS reference,
+      NULL AS itemName,
+      NULL AS amountCents,
+      CreditsAmount AS creditsAmount,
+      'completed' AS status,
+      RedeemedAt AS createdAt
+    FROM WebGiftCodes
+    WHERE RedeemedByAccountId = @accountId AND Status = 'redeemed'
   `;
 
   const result = await pool

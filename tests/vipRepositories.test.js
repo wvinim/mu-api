@@ -101,3 +101,19 @@ describe('shopHistoryRepository — inclui compras de VIP no histórico unificad
     expect(sqlText).toMatch(/JOIN WebVipPlans p ON p\.Id = r\.PlanId/);
   });
 });
+
+describe('shopHistoryRepository — gold de presente', () => {
+  it('marca compra de presente como gift_purchase e inclui resgates de chave sem expor a chave', async () => {
+    const query = jest.fn().mockResolvedValue({ recordsets: [[], [{ total: 0 }]] });
+    const request = { query, input: () => request };
+    getPool.mockReturnValue({ request: () => request });
+
+    await shopHistoryRepository.findByAccount('player1');
+
+    const sqlText = query.mock.calls[0][0];
+    expect(sqlText).toMatch(/CASE WHEN IsGift = 1 THEN 'gift_purchase' ELSE 'credit_purchase' END AS type/);
+    expect(sqlText).toMatch(/'gift_redemption' AS type/);
+    expect(sqlText).toMatch(/RIGHT\(Code, 4\) AS reference/);
+    expect(sqlText).toMatch(/WHERE RedeemedByAccountId = @accountId AND Status = 'redeemed'/);
+  });
+});

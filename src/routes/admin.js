@@ -61,6 +61,10 @@ router.delete(
   controller.deactivateCreditPackage,
 );
 
+// Chaves de gold de presente — ver docs/SECTION_10_GIFT_CODES.md.
+router.get('/admin/gift-codes', validate(schemas.giftCodesListQuery, 'query'), controller.listGiftCodes);
+router.post('/admin/gift-codes/:id/cancel', validate(schemas.giftCodeIdParam, 'params'), controller.cancelGiftCode);
+
 // Catálogo VIP é fixo (3 tiers, semeadas pela migration 0006) — só
 // permite editar preço/active de uma linha existente, não cria/remove.
 // Ver docs/SECTION_9_VIP.md.

@@ -7,10 +7,11 @@ const env = require('../config/env');
  * balancer, precisamos migrar para um store compartilhado (ex: Redis)
  * antes disso virar um problema de bypass entre instâncias.
  */
-function buildLimiter({ windowMinutes, max, keyGenerator, code, message }) {
+function buildLimiter({ windowMinutes, max, keyGenerator, code, message, skipSuccessfulRequests = false }) {
   return rateLimit({
     windowMs: windowMinutes * 60 * 1000,
     max,
+    skipSuccessfulRequests,
     standardHeaders: true,
     legacyHeaders: false,
     keyGenerator,
@@ -69,6 +70,26 @@ const ticketCreateLimiter = buildLimiter({
   message: 'Muitos tickets criados. Tente novamente mais tarde.',
 });
 
+// Força bruta de chave de presente: limita por conta E por IP (várias contas
+// do mesmo IP não somam tentativas extras). Resgates bem-sucedidos não contam.
+const giftRedeemAccountLimiter = buildLimiter({
+  windowMinutes: env.rateLimit.giftRedeemWindowMinutes,
+  max: env.rateLimit.giftRedeemMax,
+  keyGenerator: (req) => `gift-redeem:${req.user?.username || req.ip}`,
+  code: 'TOO_MANY_REQUESTS',
+  message: 'Muitas tentativas de resgate. Tente novamente mais tarde.',
+  skipSuccessfulRequests: true,
+});
+
+const giftRedeemIpLimiter = buildLimiter({
+  windowMinutes: env.rateLimit.giftRedeemWindowMinutes,
+  max: env.rateLimit.giftRedeemMax,
+  keyGenerator: (req) => `gift-redeem-ip:${req.ip}`,
+  code: 'TOO_MANY_REQUESTS',
+  message: 'Muitas tentativas de resgate. Tente novamente mais tarde.',
+  skipSuccessfulRequests: true,
+});
+
 module.exports = {
   loginIpLimiter,
   loginUsernameLimiter,
@@ -76,4 +97,6 @@ module.exports = {
   forgotPasswordLimiter,
   purchaseLimiter,
   ticketCreateLimiter,
+  giftRedeemAccountLimiter,
+  giftRedeemIpLimiter,
 };

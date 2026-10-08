@@ -3,7 +3,7 @@ const { Router } = require('express');
 const requireAuth = require('../middlewares/auth');
 const validate = require('../middlewares/validate');
 const verifyWebhookSecret = require('../middlewares/verifyWebhookSecret');
-const { purchaseLimiter } = require('../middlewares/rateLimiters');
+const { purchaseLimiter, giftRedeemAccountLimiter, giftRedeemIpLimiter } = require('../middlewares/rateLimiters');
 const schemas = require('../validators/shopValidators');
 const controller = require('../controllers/shopController');
 
@@ -27,5 +27,17 @@ router.post(
 router.post('/shop/purchase', requireAuth, purchaseLimiter, validate(schemas.purchase), controller.purchase);
 router.get('/shop/credits', requireAuth, controller.getCredits);
 router.get('/shop/history', requireAuth, validate(schemas.historyQuery, 'query'), controller.getHistory);
+router.get('/shop/charges/:txid', requireAuth, validate(schemas.txidParam, 'params'), controller.getCharge);
+
+// Gold de presente — ver docs/SECTION_10_GIFT_CODES.md.
+router.get('/shop/gift-codes', requireAuth, validate(schemas.historyQuery, 'query'), controller.getGiftCodes);
+router.post(
+  '/shop/gift-codes/redeem',
+  requireAuth,
+  giftRedeemIpLimiter,
+  giftRedeemAccountLimiter,
+  validate(schemas.redeemGiftCode),
+  controller.redeemGiftCode,
+);
 
 module.exports = router;
