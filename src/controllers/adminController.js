@@ -5,6 +5,8 @@ const shopItemsRepository = require('../db/shopItemsRepository');
 const shopBundlesRepository = require('../db/shopBundlesRepository');
 const creditPackagesRepository = require('../db/creditPackagesRepository');
 const vipPlansRepository = require('../db/vipPlansRepository');
+const giftCodesRepository = require('../db/giftCodesRepository');
+const giftCode = require('../utils/giftCode');
 const tokenService = require('../services/tokenService');
 const { getRole } = require('../services/roleService');
 
@@ -253,6 +255,47 @@ async function deactivateCreditPackage(req, res, next) {
   }
 }
 
+async function listGiftCodes(req, res, next) {
+  try {
+    const { page, limit, code, accountId, status } = req.query;
+    // Busca por chave aceita o que o admin colar (normaliza igual ao
+    // resgate); algo que nem parece chave não casa com nada.
+    const normalizedCode = code ? giftCode.normalize(code) : undefined;
+    if (code && !normalizedCode) return res.json({ page, limit, total: 0, items: [] });
+
+    const result = await giftCodesRepository.findAllAdmin({ page, limit, code: normalizedCode, accountId, status });
+    return res.json({ page, limit, total: result.total, items: result.items });
+  } catch (err) {
+    return next(err);
+  }
+}
+
+/**
+ * Cancela uma chave paga e ainda não resgatada (ex.: estorno do Pix).
+ * Não devolve dinheiro — estorno é feito fora (painel da Efí). Chave
+ * aguardando pagamento não pode ser cancelada: o webhook ainda vai liberá-la.
+ */
+async function cancelGiftCode(req, res, next) {
+  try {
+    const { id } = req.params;
+    const cancelled = await giftCodesRepository.cancel(id, req.user.username);
+    if (!cancelled) {
+      const status = await giftCodesRepository.findStatusById(id);
+      if (!status) throw new AppError(404, 'NOT_FOUND', 'Chave não encontrada.');
+      throw new AppError(409, 'GIFT_CODE_NOT_CANCELLABLE', 'Só chaves disponíveis (pagas e não resgatadas) podem ser canceladas.');
+    }
+    await logAdminAction(req, 'admin.gift_code_cancelled', {
+      giftCodeId: id,
+      codeHint: giftCode.hint(cancelled.code),
+      buyerAccountId: cancelled.buyerAccountId,
+      creditsAmount: cancelled.creditsAmount,
+    });
+    res.json({ message: 'Chave cancelada.' });
+  } catch (err) {
+    next(err);
+  }
+}
+
 module.exports = {
   listAccounts,
   banAccount,
@@ -273,4 +316,6 @@ module.exports = {
   createCreditPackage,
   updateCreditPackage,
   deactivateCreditPackage,
+  listGiftCodes,
+  cancelGiftCode,
 };

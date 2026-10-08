@@ -21,6 +21,8 @@ jest.mock('../src/db/accountsRepository');
 jest.mock('../src/db/warehouseRepository');
 jest.mock('../src/db/auditLogRepository');
 jest.mock('../src/services/efiClient');
+jest.mock('../src/db/giftCodesRepository');
+jest.mock('../src/services/emailService');
 
 const app = require('../src/app');
 const creditPackagesRepository = require('../src/db/creditPackagesRepository');
@@ -36,6 +38,8 @@ const shopHistoryRepository = require('../src/db/shopHistoryRepository');
 const accountsRepository = require('../src/db/accountsRepository');
 const warehouseRepository = require('../src/db/warehouseRepository');
 const efiClient = require('../src/services/efiClient');
+const giftCodesRepository = require('../src/db/giftCodesRepository');
+const emailService = require('../src/services/emailService');
 const auditLog = require('../src/db/auditLogRepository');
 const tokenService = require('../src/services/tokenService');
 const warehouseService = require('../src/services/warehouseService');
@@ -537,5 +541,203 @@ describe('POST /api/v1/shop/payment/webhook/:secret', () => {
     const res = await request(app).post(`/api/v1/shop/payment/webhook/${WEBHOOK_SECRET}`).send({ evento: 'teste_webhook' });
     expect(res.status).toBe(200);
     expect(efiClient.getChargeStatus).not.toHaveBeenCalled();
+  });
+});
+
+describe('gold de presente', () => {
+  const GIFT_CODE = 'MUPRO-ABCD-EFGH-JKMN-PQRS';
+
+  describe('POST /api/v1/shop/purchase com gift', () => {
+    it('cria cobrança de presente com chave, sem devolver a chave', async () => {
+      creditPackagesRepository.findById.mockResolvedValue({ Id: 1, Name: '1000', PriceCents: 1000, CreditsAmount: 1000, Active: true });
+      efiClient.createImmediateCharge.mockResolvedValue({ txid: 'abc123', pixCopiaECola: '000201', qrCodeImage: 'data:x' });
+      pixChargesRepository.create.mockResolvedValue();
+
+      const res = await request(app)
+        .post('/api/v1/shop/purchase')
+        .set('Authorization', authHeader())
+        .send({ catalogId: 'credit:1', gift: true });
+
+      expect(res.status).toBe(201);
+      expect(res.body).toEqual(expect.objectContaining({ type: 'pix_charge', txid: 'abc123', gift: true }));
+      const created = pixChargesRepository.create.mock.calls[0][0];
+      expect(created.giftCode).toMatch(/^MUPRO(-[2-9A-HJKMNP-Z]{4}){4}$/);
+      expect(JSON.stringify(res.body)).not.toContain(created.giftCode);
+      // Auditoria só com o final da chave.
+      const audit = auditLog.record.mock.calls.find(([e]) => e.eventType === 'shop.pix_charge_created')[0];
+      expect(audit.details).toEqual(expect.objectContaining({ gift: true, codeHint: created.giftCode.slice(-4) }));
+      expect(JSON.stringify(audit)).not.toContain(created.giftCode);
+    });
+
+    it('compra para si continua sem chave (gift=false)', async () => {
+      creditPackagesRepository.findById.mockResolvedValue({ Id: 1, Name: '1000', PriceCents: 1000, CreditsAmount: 1000, Active: true });
+      efiClient.createImmediateCharge.mockResolvedValue({ txid: 'abc123', pixCopiaECola: '000201', qrCodeImage: 'data:x' });
+
+      const res = await request(app).post('/api/v1/shop/purchase').set('Authorization', authHeader()).send({ catalogId: 'credit:1' });
+
+      expect(res.status).toBe(201);
+      expect(res.body.gift).toBe(false);
+      expect(pixChargesRepository.create.mock.calls[0][0].giftCode).toBeNull();
+    });
+
+    it('recusa presente fora de pacote de gold', async () => {
+      const res = await request(app)
+        .post('/api/v1/shop/purchase')
+        .set('Authorization', authHeader())
+        .send({ catalogId: 'vip:1', gift: true });
+
+      expect(res.status).toBe(400);
+      expect(res.body.error.code).toBe('GIFT_NOT_SUPPORTED');
+      expect(vipPlansRepository.findById).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('webhook de cobrança de presente', () => {
+    beforeEach(() => {
+      efiClient.getChargeStatus.mockResolvedValue({ status: 'CONCLUIDA' });
+      pixChargesRepository.findByTxId.mockResolvedValue({ Id: 9, AccountId: 'player1', CreditsAmount: 1000, IsGift: true });
+      pixChargesRepository.markPaidAndCredit.mockResolvedValue({ credited: true, accountId: 'player1', creditsAmount: 1000, isGift: true });
+      giftCodesRepository.findByPixChargeId.mockResolvedValue({ Id: 3, Code: GIFT_CODE, CreditsAmount: 1000, Status: 'available' });
+      accountsRepository.findByUsername.mockResolvedValue({ username: 'player1', email: 'p1@example.com' });
+      emailService.sendGiftCodeEmail.mockResolvedValue();
+    });
+
+    it('libera a chave e manda o e-mail para o comprador', async () => {
+      const res = await request(app)
+        .post(`/api/v1/shop/payment/webhook/${WEBHOOK_SECRET}`)
+        .send({ pix: [{ txid: 'abc123' }] });
+
+      expect(res.status).toBe(200);
+      expect(emailService.sendGiftCodeEmail).toHaveBeenCalledWith('p1@example.com', { code: GIFT_CODE, creditsAmount: 1000 });
+      expect(auditLog.record).toHaveBeenCalledWith(
+        expect.objectContaining({ eventType: 'shop.gift_code_paid', details: expect.objectContaining({ codeHint: 'PQRS' }) }),
+      );
+      expect(auditLog.record).not.toHaveBeenCalledWith(expect.objectContaining({ eventType: 'shop.pix_payment_confirmed' }));
+    });
+
+    it('falha de SMTP não derruba o webhook (chave já liberada)', async () => {
+      emailService.sendGiftCodeEmail.mockRejectedValue(new Error('smtp down'));
+
+      const res = await request(app)
+        .post(`/api/v1/shop/payment/webhook/${WEBHOOK_SECRET}`)
+        .send({ pix: [{ txid: 'abc123' }] });
+
+      expect(res.status).toBe(200);
+    });
+
+    it('webhook repetido não reenvia e-mail', async () => {
+      pixChargesRepository.markPaidAndCredit.mockResolvedValue({ credited: false });
+
+      await request(app).post(`/api/v1/shop/payment/webhook/${WEBHOOK_SECRET}`).send({ pix: [{ txid: 'abc123' }] });
+
+      expect(emailService.sendGiftCodeEmail).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('GET /api/v1/shop/charges/:txid', () => {
+    const TXID = 'a'.repeat(30);
+
+    it('presente pago devolve a chave ao dono', async () => {
+      pixChargesRepository.findByTxId.mockResolvedValue({
+        Id: 9, TxId: TXID, AccountId: 'player1', Status: 'paid', IsGift: true, AmountCents: 1000, CreditsAmount: 1000,
+      });
+      giftCodesRepository.findByPixChargeId.mockResolvedValue({ Code: GIFT_CODE, Status: 'available' });
+
+      const res = await request(app).get(`/api/v1/shop/charges/${TXID}`).set('Authorization', authHeader());
+
+      expect(res.status).toBe(200);
+      expect(res.body).toEqual(expect.objectContaining({ status: 'paid', gift: true, giftCode: { code: GIFT_CODE, status: 'available' } }));
+    });
+
+    it('presente pendente não devolve chave', async () => {
+      pixChargesRepository.findByTxId.mockResolvedValue({ Id: 9, TxId: TXID, AccountId: 'player1', Status: 'pending', IsGift: true });
+
+      const res = await request(app).get(`/api/v1/shop/charges/${TXID}`).set('Authorization', authHeader());
+
+      expect(res.status).toBe(200);
+      expect(res.body.giftCode).toBeNull();
+      expect(giftCodesRepository.findByPixChargeId).not.toHaveBeenCalled();
+    });
+
+    it('cobrança de outra conta responde 404', async () => {
+      pixChargesRepository.findByTxId.mockResolvedValue({ Id: 9, TxId: TXID, AccountId: 'outro', Status: 'paid', IsGift: true });
+
+      const res = await request(app).get(`/api/v1/shop/charges/${TXID}`).set('Authorization', authHeader());
+
+      expect(res.status).toBe(404);
+      expect(giftCodesRepository.findByPixChargeId).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('GET /api/v1/shop/gift-codes', () => {
+    it('lista as chaves do comprador com a janela de expiração da cobrança', async () => {
+      giftCodesRepository.findByBuyer.mockResolvedValue({ items: [{ id: 1, code: GIFT_CODE, status: 'available' }], total: 1 });
+
+      const res = await request(app).get('/api/v1/shop/gift-codes').set('Authorization', authHeader());
+
+      expect(res.status).toBe(200);
+      expect(res.body).toEqual({ page: 1, limit: 20, total: 1, items: [{ id: 1, code: GIFT_CODE, status: 'available' }] });
+      expect(giftCodesRepository.findByBuyer).toHaveBeenCalledWith(
+        'player1',
+        expect.objectContaining({ awaitingWindowSeconds: expect.any(Number) }),
+      );
+    });
+  });
+
+  describe('POST /api/v1/shop/gift-codes/redeem', () => {
+    it('resgata normalizando o que foi digitado', async () => {
+      giftCodesRepository.redeem.mockResolvedValue({ redeemed: true, id: 3, creditsAmount: 1000 });
+
+      const res = await request(app)
+        .post('/api/v1/shop/gift-codes/redeem')
+        .set('Authorization', authHeader('player2'))
+        .send({ code: ' abcd-efgh-jkmn-pqrs ' });
+
+      expect(res.status).toBe(200);
+      expect(res.body).toEqual({ type: 'gift_code_redeemed', creditsAmount: 1000 });
+      expect(giftCodesRepository.redeem).toHaveBeenCalledWith(GIFT_CODE, 'player2');
+    });
+
+    it('chave já resgatada → 409', async () => {
+      giftCodesRepository.redeem.mockResolvedValue({ redeemed: false });
+      giftCodesRepository.findStatusByCode.mockResolvedValue('redeemed');
+
+      const res = await request(app)
+        .post('/api/v1/shop/gift-codes/redeem')
+        .set('Authorization', authHeader('player2'))
+        .send({ code: GIFT_CODE });
+
+      expect(res.status).toBe(409);
+      expect(res.body.error.code).toBe('GIFT_CODE_ALREADY_REDEEMED');
+    });
+
+    it.each(['awaiting_payment', 'cancelled', null])('chave %s → 404 GIFT_CODE_INVALID', async (status) => {
+      giftCodesRepository.redeem.mockResolvedValue({ redeemed: false });
+      giftCodesRepository.findStatusByCode.mockResolvedValue(status);
+
+      const res = await request(app)
+        .post('/api/v1/shop/gift-codes/redeem')
+        .set('Authorization', authHeader('player2'))
+        .send({ code: GIFT_CODE });
+
+      expect(res.status).toBe(404);
+      expect(res.body.error.code).toBe('GIFT_CODE_INVALID');
+      expect(auditLog.record).toHaveBeenCalledWith(expect.objectContaining({ eventType: 'shop.gift_code_redeemed', success: false }));
+    });
+
+    it('texto que nem parece chave não consulta o banco', async () => {
+      const res = await request(app)
+        .post('/api/v1/shop/gift-codes/redeem')
+        .set('Authorization', authHeader('player2'))
+        .send({ code: 'qualquer coisa' });
+
+      expect(res.status).toBe(404);
+      expect(giftCodesRepository.redeem).not.toHaveBeenCalled();
+    });
+
+    it('exige login', async () => {
+      const res = await request(app).post('/api/v1/shop/gift-codes/redeem').send({ code: GIFT_CODE });
+      expect(res.status).toBe(401);
+    });
   });
 });

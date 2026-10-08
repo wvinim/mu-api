@@ -10,6 +10,7 @@ jest.mock('../src/db/shopBundlesRepository');
 jest.mock('../src/db/creditPackagesRepository');
 jest.mock('../src/db/vipPlansRepository');
 jest.mock('../src/db/refreshTokensRepository');
+jest.mock('../src/db/giftCodesRepository');
 
 const app = require('../src/app');
 const accountsRepository = require('../src/db/accountsRepository');
@@ -18,6 +19,8 @@ const shopBundlesRepository = require('../src/db/shopBundlesRepository');
 const creditPackagesRepository = require('../src/db/creditPackagesRepository');
 const vipPlansRepository = require('../src/db/vipPlansRepository');
 const refreshTokensRepository = require('../src/db/refreshTokensRepository');
+const giftCodesRepository = require('../src/db/giftCodesRepository');
+const auditLogRepository = require('../src/db/auditLogRepository');
 const tokenService = require('../src/services/tokenService');
 
 function authHeader(username) {
@@ -302,5 +305,69 @@ describe('CRUD de pacotes de crédito', () => {
       .send({ name: '1000 Créditos', priceCents: 1000, creditsAmount: 1000 });
     expect(res.status).toBe(201);
     expect(res.body.id).toBe(3);
+  });
+});
+
+describe('/admin/gift-codes', () => {
+  it('lista normalizando a chave buscada', async () => {
+    giftCodesRepository.findAllAdmin.mockResolvedValue({ items: [], total: 0 });
+
+    const res = await request(app)
+      .get('/api/v1/admin/gift-codes')
+      .query({ code: 'abcd efgh jkmn pqrs', status: 'available' })
+      .set('Authorization', authHeader('adminuser'));
+
+    expect(res.status).toBe(200);
+    expect(giftCodesRepository.findAllAdmin).toHaveBeenCalledWith(
+      expect.objectContaining({ code: 'MUPRO-ABCD-EFGH-JKMN-PQRS', status: 'available' }),
+    );
+  });
+
+  it('busca por algo que nem parece chave devolve vazio sem consultar o banco', async () => {
+    const res = await request(app)
+      .get('/api/v1/admin/gift-codes')
+      .query({ code: 'xyz' })
+      .set('Authorization', authHeader('adminuser'));
+
+    expect(res.status).toBe(200);
+    expect(res.body.items).toEqual([]);
+    expect(giftCodesRepository.findAllAdmin).not.toHaveBeenCalled();
+  });
+
+  it('jogador comum não lista', async () => {
+    const res = await request(app).get('/api/v1/admin/gift-codes').set('Authorization', authHeader('player1'));
+    expect(res.status).toBe(403);
+  });
+
+  it('cancela chave disponível e audita só o final da chave', async () => {
+    giftCodesRepository.cancel.mockResolvedValue({ buyerAccountId: 'player1', creditsAmount: 500, code: 'MUPRO-ABCD-EFGH-JKMN-PQRS' });
+
+    const res = await request(app).post('/api/v1/admin/gift-codes/7/cancel').set('Authorization', authHeader('adminuser'));
+
+    expect(res.status).toBe(200);
+    expect(giftCodesRepository.cancel).toHaveBeenCalledWith(7, 'adminuser');
+    const audit = auditLogRepository.record.mock.calls[0][0];
+    expect(audit).toEqual(expect.objectContaining({ eventType: 'admin.gift_code_cancelled' }));
+    expect(audit.details.codeHint).toBe('PQRS');
+    expect(JSON.stringify(audit)).not.toContain('MUPRO-ABCD');
+  });
+
+  it('chave não cancelável → 409', async () => {
+    giftCodesRepository.cancel.mockResolvedValue(null);
+    giftCodesRepository.findStatusById.mockResolvedValue('redeemed');
+
+    const res = await request(app).post('/api/v1/admin/gift-codes/7/cancel').set('Authorization', authHeader('adminuser'));
+
+    expect(res.status).toBe(409);
+    expect(res.body.error.code).toBe('GIFT_CODE_NOT_CANCELLABLE');
+  });
+
+  it('chave inexistente → 404', async () => {
+    giftCodesRepository.cancel.mockResolvedValue(null);
+    giftCodesRepository.findStatusById.mockResolvedValue(null);
+
+    const res = await request(app).post('/api/v1/admin/gift-codes/7/cancel').set('Authorization', authHeader('adminuser'));
+
+    expect(res.status).toBe(404);
   });
 });

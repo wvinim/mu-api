@@ -125,9 +125,12 @@ inventário).
 |---|---|---|---|---|
 | GET | `/shop/items` | não | — | `{ items: [...] }` — catálogo único misturando pacotes de crédito, itens resgatáveis e **pacotes de itens (bundles)**, diferenciados por `kind` |
 | GET | `/shop/items/:id` | não | `id` = `credit:<n>`, `item:<n>` ou `bundle:<n>` | uma entrada do catálogo, 404 se inativo/inexistente |
-| POST | `/shop/purchase` | 🔒 | `{ catalogId }` — mesmo body pra todo tipo de compra, nenhuma recebe `characterName` (ver abaixo) | ver abaixo |
+| POST | `/shop/purchase` | 🔒 | `{ catalogId, gift? }` — mesmo body pra todo tipo de compra, nenhuma recebe `characterName`; `gift: true` só com `credit:*` (ver "Gold de presente") | ver abaixo |
 | GET | `/shop/credits` | 🔒 | — | `{ cash }` |
-| GET | `/shop/history` | 🔒 | `?page&limit` | `{ page, limit, total, items }` — unifica compras de crédito + resgates de item + resgates de pacote + compras de VIP (`type: "vip_purchase"`) |
+| GET | `/shop/history` | 🔒 | `?page&limit` | `{ page, limit, total, items }` — unifica compras de crédito (`credit_purchase`) + compras de presente (`gift_purchase`) + resgates de item + resgates de pacote + compras de VIP (`vip_purchase`) + resgates de chave de presente (`gift_redemption`, `reference` = 4 últimos caracteres da chave) |
+| GET | `/shop/charges/:txid` | 🔒 | — | status de uma cobrança Pix **da própria conta** (ver "Gold de presente"). 404 se não existe ou é de outra conta |
+| GET | `/shop/gift-codes` | 🔒 | `?page&limit` | `{ page, limit, total, items }` — chaves de presente compradas pela conta |
+| POST | `/shop/gift-codes/redeem` | 🔒 | `{ code }` | `{ type: "gift_code_redeemed", creditsAmount }` |
 
 **`catalogId`** sempre no formato `"credit:<id>"` (pacote Pix→Cash),
 `"item:<id>"` (item avulso resgatável, gasta Cash), `"bundle:<id>"`
@@ -149,7 +152,7 @@ Uma entrada `kind: "item_bundle"` de `/shop/items` traz
 comprador o que ele está levando (ex: `[{ name: "Jewel Pack", quantity: 10 }, { name: "Kundun Box", quantity: 10 }]`).
 
 Resposta de `POST /shop/purchase`:
-- Se `catalogId` é `credit:*` → **201** `{ type: "pix_charge", txid, pixCopiaECola, qrCodeImage, amountCents, creditsAmount }`. O front-end mostra o QR code / copia-e-cola Pix; o crédito de `cash` só acontece depois, via webhook confirmado pela Efí (assíncrono — o front-end precisa fazer polling em `/shop/credits` ou `/shop/history` até o saldo mudar, não há WebSocket/push).
+- Se `catalogId` é `credit:*` → **201** `{ type: "pix_charge", txid, pixCopiaECola, qrCodeImage, amountCents, creditsAmount, gift }`. O front-end mostra o QR code / copia-e-cola Pix; o crédito de `cash` (ou a liberação da chave, se `gift`) só acontece depois, via webhook confirmado pela Efí (assíncrono — o front-end faz polling em `GET /shop/charges/:txid` até `status === "paid"`, não há WebSocket/push). `gift: true` com outro tipo de `catalogId` → **400** `GIFT_NOT_SUPPORTED`.
 - Se `catalogId` é `item:*` → **201** `{ type: "item_redeemed", item, slot }` — `slot` é uma posição no **baú da conta** (warehouse), 0 a 119, não mais na mochila do personagem. Erros: 402 `INSUFFICIENT_CREDITS`, 404 se item não existe/inativo, 409 `CHARACTER_ONLINE` se a conta está logada no jogo neste momento, 409 `WAREHOUSE_FULL` se não há espaço livre de verdade no baú (a checagem entende o tamanho real de cada item já presente — um item 2x2 ocupa 4 células, não 1 — não só conta bytes vazios no array), 409 `WAREHOUSE_UNKNOWN_ITEM` se o baú tiver algum item que não reconhecemos (não sabemos o footprint dele com segurança, então a API recusa em vez de arriscar) — nesses 409 e no 402 o Cash **não é debitado** (checagem acontece antes do débito, front-end não precisa se preocupar com estorno aqui). Se a conta nunca abriu o baú no jogo, a API cria a linha automaticamente (não é erro).
 - Se `catalogId` é `bundle:*` → **201** `{ type: "bundle_redeemed", bundle, slots: [...] }` — um slot do baú por unidade de cada item do pacote. Mesmos erros do resgate de item avulso (402/404/409 `CHARACTER_ONLINE`/`WAREHOUSE_FULL`/`WAREHOUSE_UNKNOWN_ITEM`, o `WAREHOUSE_FULL` aqui é quando não há espaço pra **todos** os itens do pacote de uma vez); em nenhum desses casos o Cash é debitado.
 - Se `catalogId` é `vip:*` → **sem** `characterName`. **201** `{ type: "vip_purchased", tier, vipStartDate, vipEndDate }`. Erros: 402 `INSUFFICIENT_CREDITS`, 404 se o plano não existe/está inativo. A tier sempre passa a ser a do plano comprado (dá pra trocar de tier "no meio" da validade). Regra de soma de dias (mudou em 2026-09-17, ver abaixo): **upgrade não soma, renovação/downgrade soma**. Comprar Super Vip (tier 2) grava automaticamente o autopick fixo (Jewel of Soul + Jewel of Bless) — ver seção `/account/autopick` acima.
@@ -163,6 +166,45 @@ Resposta de `POST /shop/purchase`:
 
 `GET /shop/payment/webhook/:secret` **não é para o front-end** — é
 chamado pela Efí diretamente.
+
+### Gold de presente (chaves) — adicionado em 2026-10-08
+
+Só pacotes de gold (`credit:*`). Quem compra paga o Pix e recebe uma
+**chave** (`MUPRO-XXXX-XXXX-XXXX-XXXX`) em vez do gold; qualquer conta
+logada (inclusive a do próprio comprador) resgata a chave e recebe o gold.
+Chave não expira e só pode ser resgatada uma vez.
+
+1. `POST /shop/purchase { catalogId: "credit:3", gift: true }` → 201
+   `{ type: "pix_charge", ..., gift: true }`. **A chave não vem aqui** —
+   só existe para o usuário depois do pagamento.
+2. Polling em `GET /shop/charges/:txid` (vale também para compra normal):
+   ```json
+   { "txid": "...", "status": "pending", "gift": true, "amountCents": 1000,
+     "creditsAmount": 1000, "createdAt": "...", "paidAt": null, "giftCode": null }
+   ```
+   Depois do pagamento: `"status": "paid"` e, se `gift`,
+   `"giftCode": { "code": "MUPRO-ABCD-EFGH-JKMN-PQRS", "status": "available" }`.
+   Compra normal paga: `status: "paid"`, `giftCode: null` (aí atualizar o saldo).
+   `status` da cobrança: `pending` | `paid` | `expired` | `failed`.
+3. A chave também é enviada por e-mail ao comprador e fica listada em
+   `GET /shop/gift-codes`:
+   ```json
+   { "page": 1, "limit": 20, "total": 2, "items": [
+     { "id": 5, "code": null, "creditsAmount": 1000, "status": "awaiting_payment",
+       "createdAt": "...", "paidAt": null, "redeemedAt": null },
+     { "id": 4, "code": "MUPRO-ABCD-EFGH-JKMN-PQRS", "creditsAmount": 500, "status": "redeemed",
+       "createdAt": "...", "paidAt": "...", "redeemedAt": "..." } ] }
+   ```
+   `status`: `awaiting_payment` (Pix ainda não pago — `code` vem `null`;
+   some da lista quando a cobrança expira), `available`, `redeemed`,
+   `cancelled` (cancelada pelo admin). **Não** informa quem resgatou.
+4. `POST /shop/gift-codes/redeem { code }` — aceita maiúsculas/minúsculas,
+   espaços e com/sem o prefixo `MUPRO-`. 200
+   `{ type: "gift_code_redeemed", creditsAmount }` (o gold já está no saldo;
+   atualizar o usuário). Erros: **404** `GIFT_CODE_INVALID` (inexistente,
+   não paga ou cancelada — mesma resposta), **409**
+   `GIFT_CODE_ALREADY_REDEEMED`, **429** `TOO_MANY_REQUESTS` (10 tentativas
+   **com erro** por hora, por conta e por IP; resgates certos não contam).
 
 ---
 
@@ -194,6 +236,8 @@ chamado pela Efí diretamente.
 | GET/POST | `/admin/shop/credit-packages` | POST: `{ name, priceCents, creditsAmount, active? }` | igual ao padrão acima |
 | PATCH/DELETE | `/admin/shop/credit-packages/:id` | PATCH: subconjunto dos campos | igual ao padrão acima |
 | GET | `/admin/shop/vip-plans` | — | `{ items: [{ id, tier, name, priceCredits, durationDays, active, createdAt }] }` — sempre 3 linhas (uma por tier) |
+| GET | `/admin/gift-codes` | `?page&limit&code&accountId&status` — `code` aceita o mesmo formato frouxo do resgate; `accountId` casa com comprador **ou** quem resgatou | `{ page, limit, total, items }` — item: `{ id, code, buyerAccountId, creditsAmount, status, txid, amountCents, createdAt, paidAt, redeemedByAccountId, redeemedAt, cancelledBy, cancelledAt }` |
+| POST | `/admin/gift-codes/:id/cancel` | — | `{ message }`. Só chave `available`; senão **409** `GIFT_CODE_NOT_CANCELLABLE` (404 se não existe). Não estorna dinheiro — estorno é no painel da Efí |
 | PATCH | `/admin/shop/vip-plans/:id` | `{ priceCredits?, active? }` — **só esses 2 campos**, `tier`/`name`/`durationDays` não são editáveis | `{ message }` |
 
 `shopItemId` em `/admin/shop/bundles` referencia um item já cadastrado em

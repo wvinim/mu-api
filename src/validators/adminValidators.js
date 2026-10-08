@@ -18,6 +18,18 @@ const logsListQuery = Joi.object({
   eventType: Joi.string().max(50),
 });
 
+const giftCodesListQuery = Joi.object({
+  page: Joi.number().integer().min(1).default(1),
+  limit: Joi.number().integer().min(1).max(100).default(20),
+  code: Joi.string().trim().max(64),
+  accountId: Joi.string().max(10),
+  status: Joi.string().valid('awaiting_payment', 'available', 'redeemed', 'cancelled'),
+});
+
+const giftCodeIdParam = Joi.object({
+  id: Joi.number().integer().min(1).required(),
+});
+
 const shopItemIdParam = Joi.object({
   id: Joi.number().integer().min(1).required(),
 });
@@ -106,6 +118,8 @@ module.exports = {
   accountIdParam,
   accountsListQuery,
   logsListQuery,
+  giftCodesListQuery,
+  giftCodeIdParam,
   shopItemIdParam,
   createShopItem,
   updateShopItem,

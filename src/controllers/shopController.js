@@ -3,6 +3,7 @@ const creditPackagesRepository = require('../db/creditPackagesRepository');
 const shopItemsRepository = require('../db/shopItemsRepository');
 const shopBundlesRepository = require('../db/shopBundlesRepository');
 const pixChargesRepository = require('../db/pixChargesRepository');
+const giftCodesRepository = require('../db/giftCodesRepository');
 const itemRedemptionsRepository = require('../db/itemRedemptionsRepository');
 const bundleRedemptionsRepository = require('../db/bundleRedemptionsRepository');
 const vipPlansRepository = require('../db/vipPlansRepository');
@@ -13,10 +14,13 @@ const accountsRepository = require('../db/accountsRepository');
 const warehouseRepository = require('../db/warehouseRepository');
 const auditLog = require('../db/auditLogRepository');
 const efiClient = require('../services/efiClient');
+const emailService = require('../services/emailService');
 const warehouseService = require('../services/warehouseService');
 const itemSlotCodec = require('../services/itemSlotCodec');
 const vipAutopickCatalog = require('../services/vipAutopickCatalog');
 const logger = require('../utils/logger');
+const giftCode = require('../utils/giftCode');
+const env = require('../config/env');
 
 const SUPER_VIP_TIER = 2;
 
@@ -120,21 +124,29 @@ async function getItemById(req, res, next) {
   }
 }
 
-async function purchaseCreditPackage(req, res, id, username, meta) {
+/**
+ * `gift: true` = presente: a cobrança gera uma chave (aguardando pagamento)
+ * em vez de creditar o comprador. A chave NÃO volta nesta resposta — só
+ * depois que o webhook confirma o Pix (GET /shop/charges/:txid,
+ * GET /shop/gift-codes e e-mail). Ver docs/SECTION_10_GIFT_CODES.md.
+ */
+async function purchaseCreditPackage(req, res, id, username, meta, gift) {
   const pkg = await creditPackagesRepository.findById(id);
   if (!pkg || !pkg.Active) throw new AppError(404, 'NOT_FOUND', 'Pacote de créditos não encontrado.');
 
   const charge = await efiClient.createImmediateCharge({
     amountCents: pkg.PriceCents,
-    description: `Créditos ${pkg.Name} - conta ${username}`,
+    description: `Créditos ${pkg.Name}${gift ? ' - presente' : ''} - conta ${username}`,
   });
 
+  const code = gift ? giftCode.generate() : null;
   await pixChargesRepository.create({
     accountId: username,
     packageId: pkg.Id,
     txid: charge.txid,
     amountCents: pkg.PriceCents,
     creditsAmount: pkg.CreditsAmount,
+    giftCode: code,
   });
 
   await auditLog.record({
@@ -143,7 +155,12 @@ async function purchaseCreditPackage(req, res, id, username, meta) {
     eventType: 'shop.pix_charge_created',
     success: true,
     ...meta,
-    details: { txid: charge.txid, packageId: pkg.Id, amountCents: pkg.PriceCents },
+    details: {
+      txid: charge.txid,
+      packageId: pkg.Id,
+      amountCents: pkg.PriceCents,
+      ...(gift && { gift: true, codeHint: giftCode.hint(code) }),
+    },
   });
 
   res.status(201).json({
@@ -153,6 +170,7 @@ async function purchaseCreditPackage(req, res, id, username, meta) {
     qrCodeImage: charge.qrCodeImage,
     amountCents: pkg.PriceCents,
     creditsAmount: pkg.CreditsAmount,
+    gift,
   });
 }
 
@@ -361,13 +379,17 @@ async function purchaseVipPlan(req, res, id, username, meta) {
 
 async function purchase(req, res, next) {
   try {
-    const { catalogId } = req.body;
+    const { catalogId, gift } = req.body;
     const { kind, id } = parseCatalogId(catalogId);
     const username = req.user.username;
     const meta = requestMeta(req);
 
+    if (gift && kind !== 'credit') {
+      throw new AppError(400, 'GIFT_NOT_SUPPORTED', 'Só pacotes de gold podem ser comprados como presente.');
+    }
+
     if (kind === 'credit') {
-      await purchaseCreditPackage(req, res, id, username, meta);
+      await purchaseCreditPackage(req, res, id, username, meta, Boolean(gift));
     } else if (kind === 'bundle') {
       await purchaseBundle(req, res, id, username, meta);
     } else if (kind === 'vip') {
@@ -425,13 +447,134 @@ async function processPixNotification(txid) {
     return; // já processado antes (idempotência)
   }
 
+  if (!localCharge.IsGift) {
+    await auditLog.record({
+      accountId: localCharge.AccountId,
+      username: localCharge.AccountId,
+      eventType: 'shop.pix_payment_confirmed',
+      success: true,
+      details: { txid, creditsAmount: localCharge.CreditsAmount },
+    });
+    return;
+  }
+
+  const gift = await giftCodesRepository.findByPixChargeId(localCharge.Id);
   await auditLog.record({
     accountId: localCharge.AccountId,
     username: localCharge.AccountId,
-    eventType: 'shop.pix_payment_confirmed',
+    eventType: 'shop.gift_code_paid',
     success: true,
-    details: { txid, creditsAmount: localCharge.CreditsAmount },
+    details: { txid, creditsAmount: localCharge.CreditsAmount, codeHint: gift ? giftCode.hint(gift.Code) : null },
   });
+  await sendGiftCodeEmailSafely(localCharge.AccountId, gift);
+}
+
+/**
+ * O presente já foi liberado (transação commitada) — falha de SMTP não pode
+ * virar erro do webhook (a Efí reenviaria, mas a cobrança já não está
+ * pending e o e-mail nunca sairia). Só loga; a chave continua em "Meus
+ * presentes".
+ */
+async function sendGiftCodeEmailSafely(accountId, gift) {
+  if (!gift) return;
+  try {
+    const account = await accountsRepository.findByUsername(accountId);
+    if (!account?.email) return;
+    await emailService.sendGiftCodeEmail(account.email, { code: gift.Code, creditsAmount: gift.CreditsAmount });
+  } catch (err) {
+    logger.error({ err, accountId, giftCodeId: gift.Id }, 'Falha ao enviar e-mail da chave de presente');
+  }
+}
+
+/**
+ * Status de uma cobrança do próprio usuário — o front faz polling aqui
+ * enquanto mostra o QR. Cobrança de outra conta responde 404 (não revela
+ * que o txid existe). Presente pago devolve a chave.
+ */
+async function getCharge(req, res, next) {
+  try {
+    const charge = await pixChargesRepository.findByTxId(req.params.txid);
+    if (!charge || charge.AccountId !== req.user.username) {
+      throw new AppError(404, 'NOT_FOUND', 'Cobrança não encontrada.');
+    }
+
+    const body = {
+      txid: charge.TxId,
+      status: charge.Status,
+      gift: Boolean(charge.IsGift),
+      amountCents: charge.AmountCents,
+      creditsAmount: charge.CreditsAmount,
+      createdAt: charge.CreatedAt,
+      paidAt: charge.PaidAt,
+      giftCode: null,
+    };
+    if (charge.IsGift && charge.Status === 'paid') {
+      const gift = await giftCodesRepository.findByPixChargeId(charge.Id);
+      if (gift) body.giftCode = { code: gift.Code, status: gift.Status };
+    }
+    res.json(body);
+  } catch (err) {
+    next(err);
+  }
+}
+
+async function getGiftCodes(req, res, next) {
+  try {
+    const { page, limit } = req.query;
+    const { items, total } = await giftCodesRepository.findByBuyer(req.user.username, {
+      page,
+      limit,
+      awaitingWindowSeconds: env.efi.chargeExpirationSeconds,
+    });
+    res.json({ page, limit, total, items });
+  } catch (err) {
+    next(err);
+  }
+}
+
+/**
+ * Resgate de chave: qualquer conta logada, inclusive a do próprio
+ * comprador. Credita o Cash na mesma transação que marca a chave como
+ * resgatada (ver giftCodesRepository.redeem).
+ */
+async function redeemGiftCode(req, res, next) {
+  const username = req.user.username;
+  const meta = requestMeta(req);
+  try {
+    const code = giftCode.normalize(req.body.code);
+    const result = code ? await giftCodesRepository.redeem(code, username) : { redeemed: false };
+
+    if (!result.redeemed) {
+      const status = code ? await giftCodesRepository.findStatusByCode(code) : null;
+      await auditLog.record({
+        accountId: username,
+        username,
+        eventType: 'shop.gift_code_redeemed',
+        success: false,
+        ...meta,
+        details: { codeHint: code ? giftCode.hint(code) : null, status },
+      });
+      if (status === 'redeemed') {
+        throw new AppError(409, 'GIFT_CODE_ALREADY_REDEEMED', 'Esta chave já foi resgatada.');
+      }
+      // awaiting_payment / cancelled / inexistente: mesma resposta — não dá
+      // pista do estado de uma chave que a pessoa não deveria ter.
+      throw new AppError(404, 'GIFT_CODE_INVALID', 'Chave inválida.');
+    }
+
+    await auditLog.record({
+      accountId: username,
+      username,
+      eventType: 'shop.gift_code_redeemed',
+      success: true,
+      ...meta,
+      details: { giftCodeId: result.id, codeHint: giftCode.hint(code), creditsAmount: result.creditsAmount },
+    });
+
+    res.json({ type: 'gift_code_redeemed', creditsAmount: result.creditsAmount });
+  } catch (err) {
+    next(err);
+  }
 }
 
 async function paymentWebhook(req, res, next) {
@@ -447,4 +590,14 @@ async function paymentWebhook(req, res, next) {
   }
 }
 
-module.exports = { getItems, getItemById, purchase, getCredits, getHistory, paymentWebhook };
+module.exports = {
+  getItems,
+  getItemById,
+  purchase,
+  getCredits,
+  getHistory,
+  getCharge,
+  getGiftCodes,
+  redeemGiftCode,
+  paymentWebhook,
+};

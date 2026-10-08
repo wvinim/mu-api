@@ -112,6 +112,10 @@ const env = {
     purchaseWindowSeconds: int('RATE_LIMIT_PURCHASE_WINDOW_SECONDS', 3),
     ticketCreateMax: int('RATE_LIMIT_TICKET_CREATE_MAX', 5),
     ticketCreateWindowMinutes: int('RATE_LIMIT_TICKET_CREATE_WINDOW_MINUTES', 60),
+    // Só tentativas que FALHAM contam (chave inválida/já usada) — trava
+    // força bruta de chaves de presente sem atrapalhar quem resgata várias.
+    giftRedeemMax: int('RATE_LIMIT_GIFT_REDEEM_MAX', 10),
+    giftRedeemWindowMinutes: int('RATE_LIMIT_GIFT_REDEEM_WINDOW_MINUTES', 60),
   },
 
   // App/site URL usada para montar os links de confirm-email e reset-password

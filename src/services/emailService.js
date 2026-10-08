@@ -4,6 +4,7 @@ const env = require('../config/env');
 const logger = require('../utils/logger');
 const { confirmationEmailTemplate } = require('../emails/confirmationEmail');
 const { passwordResetEmailTemplate } = require('../emails/passwordResetEmail');
+const { giftCodeEmailTemplate } = require('../emails/giftCodeEmail');
 
 let transporter = null;
 
@@ -63,4 +64,12 @@ async function sendPasswordResetEmail(to, token) {
   });
 }
 
-module.exports = { sendConfirmationEmail, sendPasswordResetEmail };
+async function sendGiftCodeEmail(to, { code, creditsAmount }) {
+  await sendMail({
+    to,
+    subject: 'Sua chave de presente — MU PRO',
+    html: giftCodeEmailTemplate({ code, creditsAmount, redeemUrl: `${env.appUrl}/loja/creditos` }),
+  });
+}
+
+module.exports = { sendConfirmationEmail, sendPasswordResetEmail, sendGiftCodeEmail };
