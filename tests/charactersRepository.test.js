@@ -36,17 +36,19 @@ describe('charactersRepository.findRanking', () => {
     const sqlText = queries[0];
     expect(sqlText).not.toMatch(/Class = @/);
     // Aparece duas vezes: no CTE do ranking e no COUNT do total.
-    expect(sqlText.match(/WHERE Class >= @raceMin AND Class < @raceMax/g)).toHaveLength(2);
+    expect(sqlText.match(/WHERE HideFromRanking = 0 AND Class >= @raceMin AND Class < @raceMax/g)).toHaveLength(2);
     expect(sqlText).toMatch(/ORDER BY Resets DESC, cLevel DESC/);
   });
 
-  it('sem filtro não tem WHERE', async () => {
+  it('sem filtro de raça só esconde os marcados com HideFromRanking', async () => {
     const { inputs, queries } = mockPool();
 
     await charactersRepository.findRanking({ page: 1, limit: 20 });
 
     expect(inputs.raceMin).toBeUndefined();
-    expect(queries[0]).not.toMatch(/WHERE Class/);
+    expect(queries[0]).not.toMatch(/Class >= @raceMin/);
+    // No ranking e no COUNT do total.
+    expect(queries[0].match(/WHERE HideFromRanking = 0[\s;]/g)).toHaveLength(2);
   });
 });
 

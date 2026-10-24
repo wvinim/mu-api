@@ -50,3 +50,15 @@ pedido. O schema passado não tem tabela de guild.
 Seguindo a ordem do brief, a próxima é a Seção 5 (Loja/Créditos — Efí),
 que tem perguntas obrigatórias (credenciais de sandbox, link da
 documentação da Efí) antes de eu poder codar qualquer coisa.
+
+## Adendo (2026-10-24): esconder personagem do ranking
+
+- Coluna nova `Character.HideFromRanking` (BIT NOT NULL, padrão 0) em
+  `migrations/0013_character_hide_from_ranking.sql`. O ranking e o `total`
+  filtram `HideFromRanking = 0`.
+- O valor é alterado manualmente no banco (`UPDATE ... SET HideFromRanking = 1
+  WHERE Name = '...'`). Não há rota de admin para isso.
+- **Passo manual seu:** rodar a checagem comentada no fim da migration,
+  aplicar a migration **antes** do deploy desta mudança (sem a coluna, o
+  ranking dá erro de SQL) e avisar quando aplicou.
+
