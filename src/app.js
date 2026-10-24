@@ -8,6 +8,7 @@ const logger = require('./utils/logger');
 const routes = require('./routes');
 const healthRoutes = require('./routes/health');
 const notFound = require('./middlewares/notFound');
+const { scannerGuard } = require('./middlewares/scannerGuard');
 const errorHandler = require('./middlewares/errorHandler');
 
 const app = express();
@@ -15,6 +16,9 @@ const app = express();
 if (env.trustProxy > 0) {
   app.set('trust proxy', env.trustProxy);
 }
+
+// Antes do logger: IP bloqueado não gera linha de log.
+app.use(scannerGuard.middleware);
 
 app.use(helmet());
 
