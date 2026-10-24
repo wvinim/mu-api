@@ -75,13 +75,15 @@ async function findRanking({ page = 1, limit = 20, raceCode } = {}) {
     .input('firstRow', sql.Int, firstRow)
     .input('lastRow', sql.Int, lastRow);
 
-  const filters = [];
+  // HideFromRanking (migration 0013): personagens marcados ficam fora do
+  // ranking e do total.
+  const filters = ['HideFromRanking = 0'];
   if (raceCode !== undefined) {
     // Int, não TinyInt: raceCode + 16 pode passar de 255.
     request.input('raceMin', sql.Int, raceCode).input('raceMax', sql.Int, raceCode + 16);
     filters.push('Class >= @raceMin AND Class < @raceMax');
   }
-  const whereClause = filters.length ? `WHERE ${filters.join(' AND ')}` : '';
+  const whereClause = `WHERE ${filters.join(' AND ')}`;
 
   const result = await request.query(`
     WITH Ranked AS (

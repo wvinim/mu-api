@@ -112,7 +112,7 @@ Bless, gravado automaticamente na compra) — não usa `PUT /account/autopick`.
 
 | Método | Rota | Query/Params | Resposta |
 |---|---|---|---|
-| GET | `/characters/ranking` | `?page&limit(máx 100)&classCode` | `{ page, limit, total, items: [{ name, level, classCode, resets, rank }] }` — só isso, sem build/experiência/PvP (desde 2026-10-05); ordenado por `resets DESC, level DESC`. `total` reflete o filtro. Cacheado ~180s no servidor (por página/limit/raça). |
+| GET | `/characters/ranking` | `?page&limit(máx 100)&classCode` | `{ page, limit, total, items: [{ name, level, classCode, resets, rank }] }` — só isso, sem build/experiência/PvP (desde 2026-10-05); ordenado por `resets DESC, level DESC`. `total` reflete o filtro. Cacheado ~180s no servidor (por página/limit/raça). Personagens marcados no banco como ocultos (staff/GM) não aparecem nem contam no `total` (desde 2026-10-24). |
 
 **Filtro `classCode` = raça inteira.** O ranking interpreta `classCode`
 como a raça: `?classCode=0` devolve Dark Wizard (0), Soul Master (1) e
