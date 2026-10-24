@@ -123,12 +123,37 @@ async function createAccount({ username, plainPassword, email, passwordHash }) {
   return { created: Boolean(result.recordset[0].created) };
 }
 
-async function setEmailConfirmed(username) {
+/**
+ * Marca o e-mail como confirmado e, se `bonus` vier, concede o bônus do
+ * beta no MESMO UPDATE. O filtro `mail_chek <> '1'` garante que só a
+ * transição pendente→confirmado aplica o bônus: duas requisições
+ * concorrentes com o mesmo token (ou uma conta já confirmada) não creditam
+ * duas vezes. O VIP é gravado do zero (sem somar dias) porque a conta
+ * ainda não podia logar nem comprar nada antes de confirmar o e-mail.
+ * Retorna { confirmed: false } quando a conta já estava confirmada.
+ */
+async function setEmailConfirmed(username, bonus = null) {
   const pool = getPool();
-  await pool
-    .request()
-    .input('username', sql.VarChar(10), username)
-    .query("UPDATE MEMB_INFO SET mail_chek = '1', modi_days = GETDATE() WHERE memb___id = @username");
+  const request = pool.request().input('username', sql.VarChar(10), username);
+
+  const sets = ["mail_chek = '1'", 'modi_days = GETDATE()'];
+  if (bonus && bonus.cash > 0) {
+    request.input('bonusCash', sql.Int, bonus.cash);
+    sets.push('Cash = ISNULL(Cash, 0) + @bonusCash');
+  }
+  if (bonus && bonus.vipTier > 0) {
+    request.input('bonusVipTier', sql.Int, bonus.vipTier).input('bonusVipDays', sql.Int, bonus.vipDays);
+    sets.push('Vip = @bonusVipTier', 'VipStartDate = GETDATE()', 'VipEndDate = DATEADD(day, @bonusVipDays, GETDATE())');
+  }
+
+  const result = await request.query(`
+    UPDATE MEMB_INFO
+    SET ${sets.join(', ')}
+    OUTPUT INSERTED.Cash AS cash, INSERTED.Vip AS vip, INSERTED.VipEndDate AS vipEndDate
+    WHERE memb___id = @username AND (mail_chek IS NULL OR mail_chek <> '1')
+  `);
+  const row = result.recordset[0];
+  return row ? { confirmed: true, ...row } : { confirmed: false };
 }
 
 /**

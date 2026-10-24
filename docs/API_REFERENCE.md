@@ -49,7 +49,7 @@ recebe 403).
 | Método | Rota | Body | Resposta 200/201 | Erros notáveis |
 |---|---|---|---|---|
 | POST | `/auth/register` | `{ username, password, email }` — username 4-10 alfanumérico/`_`, password 6-10 chars (limite do client do jogo) | 201 `{ message }` | 409 `USERNAME_TAKEN`, 409 `EMAIL_TAKEN` (e-mail já vinculado a outra conta) |
-| POST | `/auth/confirm-email` | `{ token }` | `{ message }` | token inválido/expirado |
+| POST | `/auth/confirm-email` | `{ token }` | `{ message, betaBonus }` — `betaBonus` é `null` ou `{ cash, vipTier, vipEndDate }` quando a confirmação concedeu o bônus do beta aberto (ver abaixo) | token inválido/expirado |
 | POST | `/auth/resend-confirmation` | `{ email }` | `{ message }` — sempre a mesma mensagem, nunca revela se o e-mail existe | rate limit 3/hora |
 | POST | `/auth/login` | `{ username, password }` | `{ accessToken, refreshToken, expiresIn }` | 401 `INVALID_CREDENTIALS`, 403 `ACCOUNT_BANNED`, 403 `EMAIL_NOT_CONFIRMED`; rate limit 5/15min (IP e username) |
 | POST | `/auth/refresh-token` | `{ refreshToken }` | `{ accessToken, refreshToken, expiresIn }` — **refresh token é rotativo (uso único)**: o antigo é invalidado, use sempre o novo devolvido | 401 se inválido/revogado/expirado |
@@ -57,6 +57,13 @@ recebe 403).
 | POST | `/auth/forgot-password` | `{ email }` | `{ message }` — mesma resposta sempre | rate limit 3/hora |
 | POST | `/auth/reset-password` | `{ token, password }` | `{ message }` | token de uso único, TTL 1h |
 | POST | `/auth/change-password` 🔒 | `{ currentPassword, newPassword }` | `{ message }` — **invalida todos os refresh tokens ativos**, é preciso logar de novo | 401 `INVALID_CURRENT_PASSWORD` |
+
+**Bônus do beta aberto (adicionado em 2026-10-24):** contas que confirmam o
+e-mail antes do lançamento (30/10/2026) recebem uma única vez Cash + VIP.
+Exemplo de resposta do `confirm-email`:
+`{ "message": "E-mail confirmado com sucesso.", "betaBonus": { "cash": 500, "vipTier": 3, "vipEndDate": "2026-11-24T15:00:00.000Z" } }`.
+Depois do lançamento, ou se a conta já estava confirmada, `betaBonus` é `null`.
+`vipTier` 3 = Mega Vip: o jogador escolhe o autopick em `PUT /account/autopick`.
 
 `accessToken` expira em 15min (`expiresIn` no formato `"15m"`),
 `refreshToken` em 7 dias. Front-end precisa implementar o fluxo de

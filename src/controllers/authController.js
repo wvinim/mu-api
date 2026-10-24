@@ -6,6 +6,7 @@ const accountsRepository = require('../db/accountsRepository');
 const auditLog = require('../db/auditLogRepository');
 const tokenService = require('../services/tokenService');
 const emailService = require('../services/emailService');
+const betaBonus = require('../services/betaBonus');
 const logger = require('../utils/logger');
 
 const BCRYPT_ROUNDS = 12;
@@ -70,10 +71,26 @@ async function register(req, res, next) {
 async function confirmEmail(req, res, next) {
   try {
     const { token } = req.body;
+    const meta = requestMeta(req);
     const accountId = await tokenService.consumeAccountToken(token, 'email_confirm');
-    await accountsRepository.setEmailConfirmed(accountId);
-    await auditLog.record({ accountId, username: accountId, eventType: 'auth.email_confirmed', success: true, ...requestMeta(req) });
-    res.json({ message: 'E-mail confirmado com sucesso.' });
+    const bonus = betaBonus.current();
+    const result = await accountsRepository.setEmailConfirmed(accountId, bonus);
+    await auditLog.record({ accountId, username: accountId, eventType: 'auth.email_confirmed', success: true, ...meta });
+
+    let grantedBonus = null;
+    if (result.confirmed && bonus) {
+      grantedBonus = { cash: bonus.cash, vipTier: bonus.vipTier, vipEndDate: bonus.vipTier > 0 ? result.vipEndDate : null };
+      await auditLog.record({
+        accountId,
+        username: accountId,
+        eventType: 'account.beta_bonus',
+        success: true,
+        ...meta,
+        details: { cash: bonus.cash, vipTier: bonus.vipTier, vipDays: bonus.vipDays },
+      });
+    }
+
+    res.json({ message: 'E-mail confirmado com sucesso.', betaBonus: grantedBonus });
   } catch (err) {
     next(err);
   }
