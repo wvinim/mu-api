@@ -25,6 +25,11 @@ de confiar cegamente nele.
   Obs: um `502` **sem corpo JSON** (e que o navegador reporta como erro de
   CORS) significa que o processo da API em si não está respondendo — é
   problema de infra, não do front.
+- **`403 IP_BLOCKED`**: qualquer rota pode devolver isso quando o IP foi
+  bloqueado temporariamente por comportamento de scanner (muitas rotas
+  inexistentes, ou caminhos como `/.env`/`.php`). O bloqueio padrão dura
+  60 min. O front não deve chamar rotas que não existem em loop. Basta
+  mostrar "acesso bloqueado temporariamente", sem deslogar.
 - **CORS**: em dev aceita qualquer origin (`credentials: true`). Em
   produção será restrito — ver CLAUDE.md do backend.
 - Rotas paginadas sempre devolvem `{ page, limit, total, items }`.

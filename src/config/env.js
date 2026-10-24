@@ -118,6 +118,18 @@ const env = {
     giftRedeemWindowMinutes: int('RATE_LIMIT_GIFT_REDEEM_WINDOW_MINUTES', 60),
   },
 
+  // Bloqueio de scanners por IP (src/middlewares/scannerGuard.js).
+  scannerGuard: {
+    enabled: bool('SCANNER_GUARD_ENABLED', true),
+    maxStrikes: int('SCANNER_GUARD_MAX_STRIKES', 10),
+    windowMinutes: int('SCANNER_GUARD_WINDOW_MINUTES', 10),
+    banMinutes: int('SCANNER_GUARD_BAN_MINUTES', 60),
+    allowlist: optional('SCANNER_GUARD_ALLOWLIST', '')
+      .split(',')
+      .map((ip) => ip.trim())
+      .filter(Boolean),
+  },
+
   // App/site URL usada para montar os links de confirm-email e reset-password
   // nos e-mails enviados (ex: https://seudominio.com/confirmar-email?token=...).
   appUrl: optional('APP_URL', 'http://localhost:5173'),
