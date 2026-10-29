@@ -296,18 +296,13 @@ async function debitCash(username, amount) {
 }
 
 /** Listagem paginada para o painel de administração. */
-const ADMIN_LIST_HIDDEN_EMAIL = 'wvinim+2@gmail.com';
-
 async function findAllPaginated({ page = 1, limit = 20, search, banned } = {}) {
   const pool = getPool();
   const firstRow = (page - 1) * limit + 1;
   const lastRow = page * limit;
   const request = pool.request().input('firstRow', sql.Int, firstRow).input('lastRow', sql.Int, lastRow);
 
-  // Contas escondidas da listagem do admin. `IS NULL OR` porque `<>` contra
-  // NULL descartaria as contas sem e-mail.
-  request.input('hiddenEmail', sql.VarChar(50), ADMIN_LIST_HIDDEN_EMAIL);
-  const filters = ['(mail_addr IS NULL OR mail_addr <> @hiddenEmail)'];
+  const filters = [];
   if (search) {
     request.input('search', sql.VarChar(50), `%${search}%`);
     filters.push('(memb___id LIKE @search OR mail_addr LIKE @search)');
@@ -316,7 +311,7 @@ async function findAllPaginated({ page = 1, limit = 20, search, banned } = {}) {
     request.input('banFlag', sql.Char(1), banned ? '1' : '0');
     filters.push('bloc_code = @banFlag');
   }
-  const whereClause = `WHERE ${filters.join(' AND ')}`;
+  const whereClause = filters.length ? `WHERE ${filters.join(' AND ')}` : '';
 
   const result = await request.query(`
     WITH Ranked AS (
