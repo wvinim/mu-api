@@ -59,10 +59,10 @@ recebe 403).
 | POST | `/auth/change-password` 🔒 | `{ currentPassword, newPassword }` | `{ message }` — **invalida todos os refresh tokens ativos**, é preciso logar de novo | 401 `INVALID_CURRENT_PASSWORD` |
 
 **Bônus de boas-vindas (desde 2026-10-30, substitui o bônus do beta):** toda
-conta que confirma o e-mail recebe uma única vez **Mega Vip por 7 dias, sem
+conta que confirma o e-mail recebe uma única vez **Mega Vip por 3 dias, sem
 Cash**. O campo continua se chamando `betaBonus` por compatibilidade.
 Exemplo de resposta do `confirm-email`:
-`{ "message": "E-mail confirmado com sucesso.", "betaBonus": { "cash": 0, "vipTier": 3, "vipEndDate": "2026-11-06T15:00:00.000Z" } }`.
+`{ "message": "E-mail confirmado com sucesso.", "betaBonus": { "cash": 0, "vipTier": 3, "vipEndDate": "2026-11-02T15:00:00.000Z" } }`.
 Se a conta já estava confirmada, `betaBonus` é `null`.
 `vipTier` 3 = Mega Vip: o jogador escolhe o autopick em `PUT /account/autopick`.
 

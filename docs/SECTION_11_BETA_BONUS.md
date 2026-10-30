@@ -46,3 +46,5 @@ deixaram de existir (pode apagar do `.env` de produção; se ficarem lá, são
 ignoradas). A concessão continua atômica no mesmo `UPDATE` de `mail_chek`.
 O evento de auditoria agora é `account.welcome_bonus`. Na resposta do
 `confirm-email` o campo continua `betaBonus` (compatibilidade com o frontend).
+
+**2026-10-30 (depois):** duração reduzida de 7 para **3 dias** de Mega Vip.
