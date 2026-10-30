@@ -134,6 +134,18 @@ const env = {
   // nos e-mails enviados (ex: https://seudominio.com/confirmar-email?token=...).
   appUrl: optional('APP_URL', 'http://localhost:5173'),
 
+  // URL pública da própria API (ex: https://api.mupro.vip), usada no link de
+  // descadastro dos e-mails de divulgação. Sem ela, campanhas não disparam.
+  apiPublicUrl: optional('API_PUBLIC_URL', ''),
+
+  // Campanhas de e-mail de divulgação (services/emailCampaignService.js).
+  // Pausa entre um e-mail e outro para não estourar o limite de envio do SMTP
+  // (Umbler); o envio para sozinho após N falhas seguidas (SMTP bloqueou).
+  emailCampaign: {
+    delayMs: int('EMAIL_CAMPAIGN_DELAY_MS', 2000),
+    maxConsecutiveFailures: int('EMAIL_CAMPAIGN_MAX_CONSECUTIVE_FAILURES', 5),
+  },
+
   emailTokenTtlHours: int('EMAIL_CONFIRM_TOKEN_TTL_HOURS', 24),
   passwordResetTokenTtlHours: int('PASSWORD_RESET_TOKEN_TTL_HOURS', 1),
 

@@ -5,6 +5,7 @@ const requireRole = require('../middlewares/requireRole');
 const validate = require('../middlewares/validate');
 const schemas = require('../validators/adminValidators');
 const controller = require('../controllers/adminController');
+const emailCampaignsController = require('../controllers/emailCampaignsController');
 
 const router = Router();
 
@@ -75,5 +76,18 @@ router.patch(
   validate(schemas.updateVipPlan),
   controller.updateVipPlan,
 );
+
+// Campanhas de e-mail de divulgação — ver docs/SECTION_12_EMAIL_CAMPAIGNS.md.
+const campaignKey = validate(schemas.emailCampaignKeyParam, 'params');
+router.get('/admin/email-campaigns', emailCampaignsController.listCampaigns);
+router.get('/admin/email-campaigns/:key', campaignKey, emailCampaignsController.getCampaign);
+router.post(
+  '/admin/email-campaigns/:key/test',
+  campaignKey,
+  validate(schemas.sendEmailCampaignTest),
+  emailCampaignsController.sendTest,
+);
+router.post('/admin/email-campaigns/:key/send', campaignKey, emailCampaignsController.startCampaign);
+router.post('/admin/email-campaigns/:key/cancel', campaignKey, emailCampaignsController.cancelCampaign);
 
 module.exports = router;

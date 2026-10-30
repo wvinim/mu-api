@@ -114,7 +114,18 @@ const setAccountVip = Joi.object({
     .when('tier', { is: 0, then: Joi.forbidden(), otherwise: Joi.required() }),
 });
 
+const emailCampaignKeyParam = Joi.object({
+  key: Joi.string().max(40).required(),
+});
+
+// Sem `to`, o teste vai para o e-mail da conta do admin logado.
+const sendEmailCampaignTest = Joi.object({
+  to: Joi.string().trim().email().max(50),
+});
+
 module.exports = {
+  emailCampaignKeyParam,
+  sendEmailCampaignTest,
   accountIdParam,
   accountsListQuery,
   logsListQuery,

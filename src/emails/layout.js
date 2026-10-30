@@ -122,4 +122,4 @@ function renderEmailLayout({ preheader = '', title, bodyHtml, ctaText, ctaUrl, f
 </html>`;
 }
 
-module.exports = { renderEmailLayout, COLORS };
+module.exports = { renderEmailLayout, COLORS, escapeHtml };

@@ -252,11 +252,27 @@ Chave não expira e só pode ser resgatada uma vez.
 | GET | `/admin/gift-codes` | `?page&limit&code&accountId&status` — `code` aceita o mesmo formato frouxo do resgate; `accountId` casa com comprador **ou** quem resgatou | `{ page, limit, total, items }` — item: `{ id, code, buyerAccountId, creditsAmount, status, txid, amountCents, createdAt, paidAt, redeemedByAccountId, redeemedAt, cancelledBy, cancelledAt }` |
 | POST | `/admin/gift-codes/:id/cancel` | — | `{ message }`. Só chave `available`; senão **409** `GIFT_CODE_NOT_CANCELLABLE` (404 se não existe). Não estorna dinheiro — estorno é no painel da Efí |
 | PATCH | `/admin/shop/vip-plans/:id` | `{ priceCredits?, active? }` — **só esses 2 campos**, `tier`/`name`/`durationDays` não são editáveis | `{ message }` |
+| GET | `/admin/email-campaigns` | — | `{ items }` — um item por campanha disponível, no formato abaixo |
+| GET | `/admin/email-campaigns/:key` | — | `{ key, subject, totals: { sent, failed }, pending, job }` — `pending` = quantos receberiam num envio agora; `job` = envio em andamento ou o último desde o restart (`null` se nenhum): `{ status: running\|finished\|cancelled\|aborted, startedBy, startedAt, finishedAt, total, sent, failed, error, cancelRequested }`. 404 se a chave não existe |
+| POST | `/admin/email-campaigns/:key/test` | `{ to? }` — sem `to`, vai para o e-mail da conta do admin | `{ message }`. Assunto com `[TESTE]`, não grava envio. **503** `SMTP_NOT_CONFIGURED` / `API_PUBLIC_URL_NOT_CONFIGURED` |
+| POST | `/admin/email-campaigns/:key/send` | — | **202** `{ message, job }` — envia em segundo plano só para quem ainda não recebeu. **409** `CAMPAIGN_ALREADY_RUNNING`; mesmos 503 do teste |
+| POST | `/admin/email-campaigns/:key/cancel` | — | `{ message }` — para depois do e-mail atual. **409** `CAMPAIGN_NOT_RUNNING` |
 
 `shopItemId` em `/admin/shop/bundles` referencia um item já cadastrado em
 `/admin/shop/items` — pra vender só dentro do pacote (não avulso), marque
 esse item com `active: false`; ele some do catálogo avulso mas continua
 funcionando como componente de um pacote.
+
+---
+
+## Descadastro de e-mails (`/email`) — público, sem auth
+
+| Método | Rota | Query | Resposta |
+|---|---|---|---|
+| GET | `/email/unsubscribe` | `?email&token` (vêm prontos no link do e-mail) | Página HTML com botão de confirmação. Não descadastra. 400 (HTML) se o token não confere |
+| POST | `/email/unsubscribe` | mesma query | Página HTML "Pronto!". Também atende o descadastro com um clique do Gmail/Yahoo (`List-Unsubscribe-Post`) |
+
+Campanhas: ver `docs/SECTION_12_EMAIL_CAMPAIGNS.md`. Campanha disponível hoje: `inauguracao`.
 
 ---
 

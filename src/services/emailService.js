@@ -36,14 +36,18 @@ function getTransporter() {
   return transporter;
 }
 
-async function sendMail({ to, subject, html }) {
-  if (!env.smtp.host) {
+function isSmtpConfigured() {
+  return Boolean(env.smtp.host);
+}
+
+async function sendMail({ to, subject, html, text, headers }) {
+  if (!isSmtpConfigured()) {
     // Sem SMTP configurado (ex: dev local) — não falha o fluxo, só loga.
     logger.warn({ to, subject }, 'SMTP não configurado — e-mail não enviado (apenas logado)');
     logger.debug({ html }, 'Conteúdo do e-mail que seria enviado');
     return;
   }
-  await getTransporter().sendMail({ from: env.smtp.from, to, subject, html });
+  await getTransporter().sendMail({ from: env.smtp.from, to, subject, html, text, headers });
 }
 
 async function sendConfirmationEmail(to, token) {
@@ -72,4 +76,28 @@ async function sendGiftCodeEmail(to, { code, creditsAmount }) {
   });
 }
 
-module.exports = { sendConfirmationEmail, sendPasswordResetEmail, sendGiftCodeEmail };
+/**
+ * E-mail de divulgação (ver services/emailCampaignService.js). Leva versão em
+ * texto puro e os cabeçalhos de descadastro com um clique (RFC 8058), que o
+ * Gmail e o Yahoo exigem de envio em massa.
+ */
+async function sendCampaignEmail(to, { subject, html, text, unsubscribeUrl }) {
+  await sendMail({
+    to,
+    subject,
+    html,
+    text,
+    headers: {
+      'List-Unsubscribe': `<${unsubscribeUrl}>`,
+      'List-Unsubscribe-Post': 'List-Unsubscribe=One-Click',
+    },
+  });
+}
+
+module.exports = {
+  isSmtpConfigured,
+  sendConfirmationEmail,
+  sendPasswordResetEmail,
+  sendGiftCodeEmail,
+  sendCampaignEmail,
+};
