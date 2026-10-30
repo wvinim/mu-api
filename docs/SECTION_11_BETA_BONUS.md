@@ -35,3 +35,14 @@ contas em massa para farmar Cash. Desliga sozinho em `BETA_BONUS_ENDS_AT`.
    bônus. Se quiser dar para elas, o VIP pode ser concedido pelo admin
    (`POST /admin/accounts/:id/vip`). Para o Cash não existe rota de admin,
    então seria preciso um script.
+
+---
+
+## Atualização 2026-10-30 — vira bônus de boas-vindas fixo
+A janela do beta foi removida. Agora **toda** conta que confirma o e-mail
+recebe uma vez **Mega Vip (tier 3) por 7 dias, sem Cash**. Os valores são
+fixos em `src/services/welcomeBonus.js`, e as env vars `BETA_BONUS_*`
+deixaram de existir (pode apagar do `.env` de produção; se ficarem lá, são
+ignoradas). A concessão continua atômica no mesmo `UPDATE` de `mail_chek`.
+O evento de auditoria agora é `account.welcome_bonus`. Na resposta do
+`confirm-email` o campo continua `betaBonus` (compatibilidade com o frontend).

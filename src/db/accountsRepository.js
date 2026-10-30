@@ -124,8 +124,8 @@ async function createAccount({ username, plainPassword, email, passwordHash }) {
 }
 
 /**
- * Marca o e-mail como confirmado e, se `bonus` vier, concede o bônus do
- * beta no MESMO UPDATE. O filtro `mail_chek <> '1'` garante que só a
+ * Marca o e-mail como confirmado e, se `bonus` vier, concede o bônus de
+ * boas-vindas no MESMO UPDATE. O filtro `mail_chek <> '1'` garante que só a
  * transição pendente→confirmado aplica o bônus: duas requisições
  * concorrentes com o mesmo token (ou uma conta já confirmada) não creditam
  * duas vezes. O VIP é gravado do zero (sem somar dias) porque a conta

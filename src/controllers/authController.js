@@ -6,7 +6,7 @@ const accountsRepository = require('../db/accountsRepository');
 const auditLog = require('../db/auditLogRepository');
 const tokenService = require('../services/tokenService');
 const emailService = require('../services/emailService');
-const betaBonus = require('../services/betaBonus');
+const { WELCOME_BONUS } = require('../services/welcomeBonus');
 const logger = require('../utils/logger');
 
 const BCRYPT_ROUNDS = 12;
@@ -73,17 +73,18 @@ async function confirmEmail(req, res, next) {
     const { token } = req.body;
     const meta = requestMeta(req);
     const accountId = await tokenService.consumeAccountToken(token, 'email_confirm');
-    const bonus = betaBonus.current();
+    const bonus = WELCOME_BONUS;
     const result = await accountsRepository.setEmailConfirmed(accountId, bonus);
     await auditLog.record({ accountId, username: accountId, eventType: 'auth.email_confirmed', success: true, ...meta });
 
+    // O campo da resposta continua `betaBonus` para não quebrar o frontend.
     let grantedBonus = null;
-    if (result.confirmed && bonus) {
-      grantedBonus = { cash: bonus.cash, vipTier: bonus.vipTier, vipEndDate: bonus.vipTier > 0 ? result.vipEndDate : null };
+    if (result.confirmed) {
+      grantedBonus = { cash: bonus.cash, vipTier: bonus.vipTier, vipEndDate: result.vipEndDate };
       await auditLog.record({
         accountId,
         username: accountId,
-        eventType: 'account.beta_bonus',
+        eventType: 'account.welcome_bonus',
         success: true,
         ...meta,
         details: { cash: bonus.cash, vipTier: bonus.vipTier, vipDays: bonus.vipDays },

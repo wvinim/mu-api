@@ -22,16 +22,6 @@ function bool(name, fallback) {
   return value.toLowerCase() === 'true';
 }
 
-function date(name) {
-  const value = process.env[name];
-  if (value === undefined || value === '') return null;
-  const parsed = new Date(value);
-  if (Number.isNaN(parsed.getTime())) {
-    throw new Error(`Variável de ambiente ${name} precisa ser uma data ISO válida (ex: 2026-10-30T00:00:00-03:00)`);
-  }
-  return parsed;
-}
-
 function int(name, fallback) {
   const value = process.env[name];
   if (value === undefined || value === '') return fallback;
@@ -143,15 +133,6 @@ const env = {
   // App/site URL usada para montar os links de confirm-email e reset-password
   // nos e-mails enviados (ex: https://seudominio.com/confirmar-email?token=...).
   appUrl: optional('APP_URL', 'http://localhost:5173'),
-
-  // Bônus do beta aberto, concedido na confirmação de e-mail até endsAt
-  // (src/services/betaBonus.js). Sem BETA_BONUS_ENDS_AT, fica desligado.
-  betaBonus: {
-    endsAt: date('BETA_BONUS_ENDS_AT'),
-    cash: int('BETA_BONUS_CASH', 0),
-    vipTier: int('BETA_BONUS_VIP_TIER', 0),
-    vipDays: int('BETA_BONUS_VIP_DAYS', 0),
-  },
 
   emailTokenTtlHours: int('EMAIL_CONFIRM_TOKEN_TTL_HOURS', 24),
   passwordResetTokenTtlHours: int('PASSWORD_RESET_TOKEN_TTL_HOURS', 1),

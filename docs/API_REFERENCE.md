@@ -58,11 +58,12 @@ recebe 403).
 | POST | `/auth/reset-password` | `{ token, password }` | `{ message }` | token de uso único, TTL 1h |
 | POST | `/auth/change-password` 🔒 | `{ currentPassword, newPassword }` | `{ message }` — **invalida todos os refresh tokens ativos**, é preciso logar de novo | 401 `INVALID_CURRENT_PASSWORD` |
 
-**Bônus do beta aberto (adicionado em 2026-10-24):** contas que confirmam o
-e-mail antes do lançamento (30/10/2026) recebem uma única vez Cash + VIP.
+**Bônus de boas-vindas (desde 2026-10-30, substitui o bônus do beta):** toda
+conta que confirma o e-mail recebe uma única vez **Mega Vip por 7 dias, sem
+Cash**. O campo continua se chamando `betaBonus` por compatibilidade.
 Exemplo de resposta do `confirm-email`:
-`{ "message": "E-mail confirmado com sucesso.", "betaBonus": { "cash": 500, "vipTier": 3, "vipEndDate": "2026-11-24T15:00:00.000Z" } }`.
-Depois do lançamento, ou se a conta já estava confirmada, `betaBonus` é `null`.
+`{ "message": "E-mail confirmado com sucesso.", "betaBonus": { "cash": 0, "vipTier": 3, "vipEndDate": "2026-11-06T15:00:00.000Z" } }`.
+Se a conta já estava confirmada, `betaBonus` é `null`.
 `vipTier` 3 = Mega Vip: o jogador escolhe o autopick em `PUT /account/autopick`.
 
 `accessToken` expira em 15min (`expiresIn` no formato `"15m"`),
