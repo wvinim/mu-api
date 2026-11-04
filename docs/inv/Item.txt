@@ -23,8 +23,8 @@
 20	0	22	1	4      	   1	 1       0	"Knight Blade"  			140	107	115	35	90	0	0	0	116	38	0	0	0	1	0	2	0	0	0
 21	0	56	2	4      	   1	 1       0	"Dark Reign Blade"  			140	115	142	40	100	0	115	0	116	53	9	0	0	1	0	0	0	1	0
 22	0	22	1	4      	   1	 1       0	"Bone Blade"  				147	122	135	40	95	0	0	380	100	35	0	0	0	0	0	2	0	0	0
-23	0	56	1	4      	   1	 1       0	"Explosion Blade"  			147	127	155	45	110	0	134	380	98	48	7	0	0	0	0	0	0	1	0
-24	0	22	1	4      	   1	 1       0	"Daybreak"  				115	182	218	40	90	0	0	0	192	30	0	0	0	0	0	2	0	0	0
+23	0	56	2	4      	   1	 1       0	"Explosion Blade"  			147	127	155	45	110	0	134	380	98	48	7	0	0	0	0	0	0	1	0
+24	0	22	2	4      	   1	 1       0	"Daybreak"  				115	182	218	40	90	0	0	0	192	30	0	0	0	0	0	2	0	0	0
 25	0	56	2	4      	   1	 1       0	"Sword Dancer"  			115	109	136	40	90	0	108	0	136	57	9	0	0	0	0	0	0	1	0
 31	0	56	2	4      	   1	 1       0	"Rune Blade"  				100	104	130	35	93	0	104	0	135	62	9	0	0	3	0	0	0	1	0
 end
@@ -134,8 +134,8 @@ end
 11	1	18	2	2      	   1	 1       0	"Serpent Shield"  			45	12	45	48	0	130	0	0	0	0	4	0	1	1	1	1
 12	1	18	2	2      	   1	 1       0	"Bronze Shield"  			54	13	54	52	0	140	0	0	0	0	4	0	1	0	1	0
 13	1	18	2	2      	   1	 1       0	"Dragon Shield"  			60	14	60	60	0	120	40	0	0	0	4	0	1	0	1	0
-14	1	0	2	2      	   1	 1       0	"Legendary Shield"  			48	7	48	50	0	90	25	0	0	0	4	1	0	1	1	0
-15	1	0	2	2      	   1	 1       0	"Grand Soul Shield"  			74	12	55	55	0	70	23	0	0	0	4	2	0	0	0	0
+14	1	0	2	3      	   1	 1       0	"Legendary Shield"  			48	7	48	50	0	90	25	0	0	0	4	1	0	1	1	0
+15	1	0	2	3      	   1	 1       0	"Grand Soul Shield"  			74	12	55	55	0	70	23	0	0	0	4	2	0	0	0	0
 16	1	0	2	2      	   1	 1       0	"Elemental Shield"  			66	11	28	51	0	30	60	30	0	0	4	0	0	2	0	0
 end
 
@@ -179,13 +179,13 @@ end
 8
 //Index	Slot	Skill	X	Y	Serial	Opt	Drop	Nombre                                  Lvl	Def	DefRate	Dur	ReqLvl	Str	Agi	Ene	Vit	Com	Tipo	DwSmGm	DkBkBm	FeMeHe	MgDm	DlLe
 0	3	0	2	2      	   1	 1       0	"Bronze Armor"  			18	14	0	34	0	80	20	0	0	0	4	0	1	0	1	1
-1	3	0	2	2      	   1	 1       0	"Dragon Armor"  			59	37	0	68	0	120	30	0	0	0	4	0	1	0	1	0
+1	3	0	2	3      	   1	 1       0	"Dragon Armor"  			59	37	0	68	0	120	30	0	0	0	4	0	1	0	1	0
 2	3	0	2	2      	   1	 1       0	"Pad Armor"  				10	7	0	28	0	30	0	0	0	0	4	1	0	0	1	0
 3	3	0	2	2      	   1	 1       0	"Legendary Armor"  			56	22	0	42	0	40	0	0	0	0	4	1	0	0	1	0
 4	3	0	2	2      	   1	 1       0	"Bone Armor"  				22	13	0	30	0	40	0	0	0	0	4	1	0	0	1	0
-5	3	0	2	2      	   1	 1       0	"Leather Armor"  			10	10	0	30	0	80	0	0	0	0	4	0	1	0	1	1
+5	3	0	2	3      	   1	 1       0	"Leather Armor"  			10	10	0	30	0	80	0	0	0	0	4	0	1	0	1	1
 6	3	0	2	2      	   1	 1       0	"Scale Armor"  				28	18	0	40	0	110	0	0	0	0	4	0	1	0	1	1
-7	3	0	2	2      	   1	 1       0	"Sphinx Armor"  			38	17	0	36	0	40	0	0	0	0	4	1	0	0	1	0
+7	3	0	2	3      	   1	 1       0	"Sphinx Armor"  			38	17	0	36	0	40	0	0	0	0	4	1	0	0	1	0
 8	3	0	2	2      	   1	 1       0	"Brass Armor"  				38	22	0	44	0	100	30	0	0	0	4	0	1	0	1	0
 9	3	0	2	2      	   1	 1       0	"Plate Armor"  				48	30	0	50	0	130	0	0	0	0	4	0	1	0	1	0
 10	3	0	2	2      	   1	 1       0	"Vine Armor"  				10	8	0	22	0	30	60	0	0	0	4	0	0	1	0	0
@@ -193,30 +193,30 @@ end
 12	3	0	2	2      	   1	 1       0	"Wind Armor"  				32	16	0	32	0	30	80	0	0	0	4	0	0	1	0	0
 13	3	0	2	2      	   1	 1       0	"Spirit Armor"  			44	21	0	38	0	40	80	0	0	0	4	0	0	1	0	0
 14	3	0	2	2      	   1	 1       0	"Guardian Armor"  			57	29	0	45	0	40	80	0	0	0	4	0	0	1	0	0
-15	3	0	2	2      	   1	 1       0	"Storm Crow Armor"  			80	44	0	80	0	150	70	0	0	0	4	0	0	0	1	0
-16	3	0	2	2      	   1	 1       0	"Black Dragon Armor"  			90	48	0	74	0	170	60	0	0	0	4	0	1	0	0	0
-17	3	0	2	2      	   1	 1       0	"Dark Phoenix Armor"  			100	63	0	80	0	214	65	0	0	0	4	0	2	0	0	0
-18	3	0	2	2      	   1	 1       0	"Grand Soul Armor"  			91	33	0	67	0	59	20	0	0	0	4	2	0	0	0	0
+15	3	0	2	3      	   1	 1       0	"Storm Crow Armor"  			80	44	0	80	0	150	70	0	0	0	4	0	0	0	1	0
+16	3	0	2	3      	   1	 1       0	"Black Dragon Armor"  			90	48	0	74	0	170	60	0	0	0	4	0	1	0	0	0
+17	3	0	2	3      	   1	 1       0	"Dark Phoenix Armor"  			100	63	0	80	0	214	65	0	0	0	4	0	2	0	0	0
+18	3	0	2	3      	   1	 1       0	"Grand Soul Armor"  			91	33	0	67	0	59	20	0	0	0	4	2	0	0	0	0
 19	3	0	2	2      	   1	 1       0	"Divine Armor"  			92	44	0	74	0	50	110	0	0	0	4	0	0	2	0	0
-20	3	0	2	2      	   1	 1       0	"Thunder Hawk Armor"  			107	60	0	82	0	170	70	0	0	0	4	0	0	0	1	0
-21	3	0	2	2      	   1	 1       0	"Great Dragon Armor"  			126	75	0	86	0	200	58	0	0	0	4	0	2	0	0	0
-22	3	0	2	2      	   1	 1       0	"Dark Soul Armor"  			122	43	0	75	0	55	18	0	0	0	4	2	0	0	0	0
-23	3	0	2	2      	   1	 1       0	"Hurricane Armor"  			128	73	0	90	0	162	66	0	0	0	4	0	0	0	1	0
+20	3	0	2	3      	   1	 1       0	"Thunder Hawk Armor"  			107	60	0	82	0	170	70	0	0	0	4	0	0	0	1	0
+21	3	0	2	3      	   1	 1       0	"Great Dragon Armor"  			126	75	0	86	0	200	58	0	0	0	4	0	2	0	0	0
+22	3	0	2	3      	   1	 1       0	"Dark Soul Armor"  			122	43	0	75	0	55	18	0	0	0	4	2	0	0	0	0
+23	3	0	2	3      	   1	 1       0	"Hurricane Armor"  			128	73	0	90	0	162	66	0	0	0	4	0	0	0	1	0
 24	3	0	2	2      	   1	 1       0	"Red Sprit Armor"  			109	55	0	80	0	52	115	0	0	0	4	0	0	2	0	0
-25	3	0	2	2      	   1	 1       0	"Light Plate Armor"  			62	25	0	42	0	70	20	0	0	0	4	0	0	0	0	1
-26	3	0	2	2      	   1	 1       0	"Adamantine Armor"  			78	36	0	56	0	77	21	0	0	0	4	0	0	0	0	1
-27	3	0	2	2      	   1	 1       0	"Dark Steel Armor"  			96	43	0	70	0	84	22	0	0	0	4	0	0	0	0	1
-28	3	0	2	2      	   1	 1       0	"Dark Master Armor"  			117	51	0	78	0	80	21	0	0	0	4	0	0	0	0	1
-29	3	0	2	2      	   1	 1       0	"Dragon Knight Armor"  			140	88	0	90	380	170	60	0	0	0	0	0	2	0	0	0
-30	3	0	2	2      	   1	 1       0	"Venom Mist Armor"  			146	57	0	86	380	44	15	0	0	0	0	2	0	0	0	0
-31	3	0	2	2      	   1	 1       0	"Sylphid Ray Armor"  			146	68	0	86	380	38	80	0	0	0	0	0	0	2	0	0
-32	3	0	2	2      	   1	 1       0	"Volcano Armor"  			147	86	0	95	380	145	60	0	0	0	0	0	0	0	1	0
-33	3	0	2	2      	   1	 1       0	"Sunlight Armor"  			147	64	0	82	380	62	16	0	0	0	0	0	0	0	0	1
-34	3	0	2	2      	   1	 1       0	"Ashcrow Armor"  			75	108	0	72	0	160	50	0	0	0	0	0	1	0	0	0
-35	3	0	2	2      	   1	 1       0	"Eclipse Armor"  			75	77	0	54	0	53	12	0	0	0	0	1	0	0	0	0
-36	3	0	2	2      	   1	 1       0	"Iris Armor"  				75	88	0	59	0	50	70	0	0	0	0	0	0	1	0	0
-37	3	0	2	2      	   1	 1       0	"Valiant Armor"  			105	106	0	81	0	155	50	0	0	0	0	0	0	0	1	0
-38	3	0	2	2      	   1	 1       0	"Glorious Armor"  			105	84	0	74	0	80	21	0	0	0	0	0	0	0	0	1
+25	3	0	2	3      	   1	 1       0	"Light Plate Armor"  			62	25	0	42	0	70	20	0	0	0	4	0	0	0	0	1
+26	3	0	2	3      	   1	 1       0	"Adamantine Armor"  			78	36	0	56	0	77	21	0	0	0	4	0	0	0	0	1
+27	3	0	2	3      	   1	 1       0	"Dark Steel Armor"  			96	43	0	70	0	84	22	0	0	0	4	0	0	0	0	1
+28	3	0	2	3      	   1	 1       0	"Dark Master Armor"  			117	51	0	78	0	80	21	0	0	0	4	0	0	0	0	1
+29	3	0	2	3      	   1	 1       0	"Dragon Knight Armor"  			140	88	0	90	380	170	60	0	0	0	0	0	2	0	0	0
+30	3	0	2	3      	   1	 1       0	"Venom Mist Armor"  			146	57	0	86	380	44	15	0	0	0	0	2	0	0	0	0
+31	3	0	2	3      	   1	 1       0	"Sylphid Ray Armor"  			146	68	0	86	380	38	80	0	0	0	0	0	0	2	0	0
+32	3	0	2	3      	   1	 1       0	"Volcano Armor"  			147	86	0	95	380	145	60	0	0	0	0	0	0	0	1	0
+33	3	0	2	3      	   1	 1       0	"Sunlight Armor"  			147	64	0	82	380	62	16	0	0	0	0	0	0	0	0	1
+34	3	0	2	3      	   1	 1       0	"Ashcrow Armor"  			75	108	0	72	0	160	50	0	0	0	0	0	1	0	0	0
+35	3	0	2	3      	   1	 1       0	"Eclipse Armor"  			75	77	0	54	0	53	12	0	0	0	0	1	0	0	0	0
+36	3	0	2	3      	   1	 1       0	"Iris Armor"  				75	88	0	59	0	50	70	0	0	0	0	0	0	1	0	0
+37	3	0	2	3      	   1	 1       0	"Valiant Armor"  			105	106	0	81	0	155	50	0	0	0	0	0	0	0	1	0
+38	3	0	2	3      	   1	 1       0	"Glorious Armor"  			105	84	0	74	0	80	21	0	0	0	0	0	0	0	0	1
 end
 9
 //Index	Slot	Skill	X	Y	Serial	Opt	Drop	Nombre                                  Lvl	Def	DefRate	Dur	ReqLvl	Str	Agi	Ene	Vit	Com	Tipo	DwSmGm	DkBkBm	FeMeHe	MgDm	DlLe
@@ -464,7 +464,7 @@ end
 12	-1	0	1	1      	   1	 1       0	"Heart"  				0	0
 13	-1	0	1	1      	   1	 1       1	"Jewel of Bless"  			150	25
 14	-1	0	1	1      	   1	 1       1	"Jewel of Soul"  			150	30
-15	-1	0	1	1      	   0	 1       1	"Zen"  					0	0
+15	-1	0	1	1      	   0	 1       0	"Zen"  					0	0
 16	-1	0	1	1      	   1	 1       1	"Jewel of Life"  			0	72
 17	-1	0	1	1      	   1	 1       1	"Devil's Eye"  				0	1
 18	-1	0	1	1      	   1	 1       1	"Devil's Key"  				0	1
@@ -492,7 +492,7 @@ end
 42	-1	0	1	1      	   1	 1       0	"Jewel of Harmony"  			150	25
 43	-1	0	1	1      	   1	 1       0	"Lower refining stone"  		150	25
 44	-1	0	1	1      	   1	 1       0	"Higher refining stone"  		150	25
-45	-1	0	1	1      	   1	 1       1	"Halloween Pumpkin"  			0	1
+45	-1	0	1	1      	   1	 1       0	"Halloween Pumpkin"  			0	1
 46	-1	0	1	2      	   1	 1       0	"Jack O'Lantern Blessing Scroll"  	0	0
 47	-1	0	1	2      	   1	 1       0	"Jack O'Lantern Rage Scroll"  		0	0
 48	-1	0	1	2      	   1	 1       0	"Jack O'Lantern Scream Scroll"  	0	0

@@ -29,7 +29,7 @@ describe('assertRedeemableAsSimpleItem', () => {
 describe('buildOccupancyGrid — genérico, parametrizado por startSlot/width/height', () => {
   it('funciona igual pra uma faixa pequena (mochila) e uma grande (baú), mesma lógica de footprint', () => {
     const buffer = Buffer.alloc(16 * 20, 0xff);
-    codec.makeSimpleItemSlot({ itemGroup: 8, itemIndex: 26 }).copy(buffer, 0); // 2x2, âncora no slot 0
+    codec.makeSimpleItemSlot({ itemGroup: 7, itemIndex: 26 }).copy(buffer, 0); // 2x2, âncora no slot 0
 
     const { occupied, unknownItems } = codec.buildOccupancyGrid(buffer, { startSlot: 0, width: 5, height: 4 });
     expect(unknownItems).toHaveLength(0);

@@ -115,12 +115,12 @@
     "name": "Bone Blade"
   },
   "0:23": {
-    "width": 1,
+    "width": 2,
     "height": 4,
     "name": "Explosion Blade"
   },
   "0:24": {
-    "width": 1,
+    "width": 2,
     "height": 4,
     "name": "Daybreak"
   },
@@ -576,12 +576,12 @@
   },
   "6:14": {
     "width": 2,
-    "height": 2,
+    "height": 3,
     "name": "Legendary Shield"
   },
   "6:15": {
     "width": 2,
-    "height": 2,
+    "height": 3,
     "name": "Grand Soul Shield"
   },
   "6:16": {
@@ -766,7 +766,7 @@
   },
   "8:1": {
     "width": 2,
-    "height": 2,
+    "height": 3,
     "name": "Dragon Armor"
   },
   "8:2": {
@@ -786,7 +786,7 @@
   },
   "8:5": {
     "width": 2,
-    "height": 2,
+    "height": 3,
     "name": "Leather Armor"
   },
   "8:6": {
@@ -796,7 +796,7 @@
   },
   "8:7": {
     "width": 2,
-    "height": 2,
+    "height": 3,
     "name": "Sphinx Armor"
   },
   "8:8": {
@@ -836,22 +836,22 @@
   },
   "8:15": {
     "width": 2,
-    "height": 2,
+    "height": 3,
     "name": "Storm Crow Armor"
   },
   "8:16": {
     "width": 2,
-    "height": 2,
+    "height": 3,
     "name": "Black Dragon Armor"
   },
   "8:17": {
     "width": 2,
-    "height": 2,
+    "height": 3,
     "name": "Dark Phoenix Armor"
   },
   "8:18": {
     "width": 2,
-    "height": 2,
+    "height": 3,
     "name": "Grand Soul Armor"
   },
   "8:19": {
@@ -861,22 +861,22 @@
   },
   "8:20": {
     "width": 2,
-    "height": 2,
+    "height": 3,
     "name": "Thunder Hawk Armor"
   },
   "8:21": {
     "width": 2,
-    "height": 2,
+    "height": 3,
     "name": "Great Dragon Armor"
   },
   "8:22": {
     "width": 2,
-    "height": 2,
+    "height": 3,
     "name": "Dark Soul Armor"
   },
   "8:23": {
     "width": 2,
-    "height": 2,
+    "height": 3,
     "name": "Hurricane Armor"
   },
   "8:24": {
@@ -886,72 +886,72 @@
   },
   "8:25": {
     "width": 2,
-    "height": 2,
+    "height": 3,
     "name": "Light Plate Armor"
   },
   "8:26": {
     "width": 2,
-    "height": 2,
+    "height": 3,
     "name": "Adamantine Armor"
   },
   "8:27": {
     "width": 2,
-    "height": 2,
+    "height": 3,
     "name": "Dark Steel Armor"
   },
   "8:28": {
     "width": 2,
-    "height": 2,
+    "height": 3,
     "name": "Dark Master Armor"
   },
   "8:29": {
     "width": 2,
-    "height": 2,
+    "height": 3,
     "name": "Dragon Knight Armor"
   },
   "8:30": {
     "width": 2,
-    "height": 2,
+    "height": 3,
     "name": "Venom Mist Armor"
   },
   "8:31": {
     "width": 2,
-    "height": 2,
+    "height": 3,
     "name": "Sylphid Ray Armor"
   },
   "8:32": {
     "width": 2,
-    "height": 2,
+    "height": 3,
     "name": "Volcano Armor"
   },
   "8:33": {
     "width": 2,
-    "height": 2,
+    "height": 3,
     "name": "Sunlight Armor"
   },
   "8:34": {
     "width": 2,
-    "height": 2,
+    "height": 3,
     "name": "Ashcrow Armor"
   },
   "8:35": {
     "width": 2,
-    "height": 2,
+    "height": 3,
     "name": "Eclipse Armor"
   },
   "8:36": {
     "width": 2,
-    "height": 2,
+    "height": 3,
     "name": "Iris Armor"
   },
   "8:37": {
     "width": 2,
-    "height": 2,
+    "height": 3,
     "name": "Valiant Armor"
   },
   "8:38": {
     "width": 2,
-    "height": 2,
+    "height": 3,
     "name": "Glorious Armor"
   },
   "9:0": {
