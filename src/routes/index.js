@@ -8,6 +8,7 @@ const supportRoutes = require('./support');
 const adminRoutes = require('./admin');
 const serverRoutes = require('./server');
 const emailRoutes = require('./email');
+const campaignsRoutes = require('./campaigns');
 
 const router = Router();
 
@@ -20,5 +21,6 @@ router.use(supportRoutes);
 router.use(adminRoutes);
 router.use(serverRoutes);
 router.use(emailRoutes);
+router.use(campaignsRoutes);
 
 module.exports = router;

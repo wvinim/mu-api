@@ -48,7 +48,7 @@ recebe 403).
 
 | Método | Rota | Body | Resposta 200/201 | Erros notáveis |
 |---|---|---|---|---|
-| POST | `/auth/register` | `{ username, password, email }` — username 4-10 alfanumérico/`_`, password 6-10 chars (limite do client do jogo) | 201 `{ message }` | 409 `USERNAME_TAKEN`, 409 `EMAIL_TAKEN` (e-mail já vinculado a outra conta) |
+| POST | `/auth/register` | `{ username, password, email, ref?, visitorId? }` — username 4-10 alfanumérico/`_`, password 6-10 chars (limite do client do jogo). `ref`/`visitorId` opcionais: link de campanha `/bonus/<codigo>` (ver Campanhas); `ref` inválido ou de campanha removida é ignorado, nunca impede o registro | 201 `{ message }` | 409 `USERNAME_TAKEN`, 409 `EMAIL_TAKEN` (e-mail já vinculado a outra conta) |
 | POST | `/auth/confirm-email` | `{ token }` | `{ message, betaBonus }` — `betaBonus` é `null` ou `{ cash, vipTier, vipEndDate }` quando a confirmação concedeu o bônus do beta aberto (ver abaixo) | token inválido/expirado |
 | POST | `/auth/resend-confirmation` | `{ email }` | `{ message }` — sempre a mesma mensagem, nunca revela se o e-mail existe | rate limit 3/hora |
 | POST | `/auth/login` | `{ username, password }` | `{ accessToken, refreshToken, expiresIn }` | 401 `INVALID_CREDENTIALS`, 403 `ACCOUNT_BANNED`, 403 `EMAIL_NOT_CONFIRMED`; rate limit 5/15min (IP e username) |
@@ -70,6 +70,19 @@ Se a conta já estava confirmada, `betaBonus` é `null`.
 `refreshToken` em 7 dias. Front-end precisa implementar o fluxo de
 refresh automático (ex: interceptor que tenta `/auth/refresh-token` no
 primeiro 401 e refaz a request original).
+
+---
+
+## Campanhas (links `/bonus/<codigo>`)
+
+| Método | Rota | Body | Resposta | Erros |
+|---|---|---|---|---|
+| POST | `/campaigns/visit` | `{ code, visitorId }` — `code` `[a-z0-9_-]{2,30}` (normalizado para minúsculo), `visitorId` UUID gerado e guardado pelo navegador | `{ recorded }` — `false` se esse navegador já tinha visitado essa campanha | 404 `CAMPAIGN_NOT_FOUND` (campanha não cadastrada), 400 `VALIDATION_ERROR`, 429 (10/min por IP) |
+
+Campanhas são cadastradas direto no banco (`WebCampaigns`). O front chama
+`/campaigns/visit` ao abrir `mupro.vip/bonus/<codigo>`, guarda o código (último
+clique) e envia `ref` + `visitorId` no `/auth/register`. Detalhes em
+`docs/SECTION_13_CAMPAIGN_LINKS.md` do mu-api.
 
 ---
 

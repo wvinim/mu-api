@@ -3,6 +3,8 @@ const bcrypt = require('bcrypt');
 const env = require('../config/env');
 const AppError = require('../utils/AppError');
 const accountsRepository = require('../db/accountsRepository');
+const campaignsRepository = require('../db/campaignsRepository');
+const { CAMPAIGN_CODE_PATTERN } = require('../validators/campaignValidators');
 const auditLog = require('../db/auditLogRepository');
 const tokenService = require('../services/tokenService');
 const emailService = require('../services/emailService');
@@ -15,9 +17,46 @@ function requestMeta(req) {
   return { ipAddress: req.ip, userAgent: req.headers['user-agent'] };
 }
 
+const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/;
+
+/** Código de campanha normalizado, ou null se ausente/fora do padrão. */
+function normalizeRef(ref) {
+  if (typeof ref !== 'string') return null;
+  const code = ref.trim().toLowerCase();
+  return CAMPAIGN_CODE_PATTERN.test(code) ? code : null;
+}
+
+function normalizeVisitorId(visitorId) {
+  if (typeof visitorId !== 'string') return null;
+  const id = visitorId.trim().toLowerCase();
+  return UUID_PATTERN.test(id) ? id : null;
+}
+
+/**
+ * Atribui a conta recém-criada à campanha do link /bonus/. Roda depois do
+ * commit da conta e nunca derruba o registro: se falhar, só loga (a conta
+ * já existe, perde-se apenas a atribuição).
+ */
+async function recordReferral({ username, ref, visitorId, ip }) {
+  const code = normalizeRef(ref);
+  if (!code) return null;
+  try {
+    const recorded = await campaignsRepository.recordReferral({
+      username,
+      code,
+      visitorId: normalizeVisitorId(visitorId),
+      ip,
+    });
+    return recorded ? code : null;
+  } catch (err) {
+    logger.error({ err, username, ref: code }, 'Falha ao gravar a campanha de origem da conta');
+    return null;
+  }
+}
+
 async function register(req, res, next) {
   try {
-    const { username, password, email } = req.body;
+    const { username, password, email, ref, visitorId } = req.body;
     const meta = requestMeta(req);
 
     const existing = await accountsRepository.findByUsername(username);
@@ -58,7 +97,16 @@ async function register(req, res, next) {
       logger.error({ err, username }, 'Falha ao enviar e-mail de confirmação no registro');
     }
 
-    await auditLog.record({ accountId: username, username, eventType: 'auth.register', success: true, ...meta });
+    const campaign = await recordReferral({ username, ref, visitorId, ip: req.ip });
+
+    await auditLog.record({
+      accountId: username,
+      username,
+      eventType: 'auth.register',
+      success: true,
+      ...meta,
+      ...(campaign ? { details: { campaign } } : {}),
+    });
 
     res.status(201).json({
       message: 'Conta criada. Verifique seu e-mail para confirmar o cadastro antes de fazer login.',

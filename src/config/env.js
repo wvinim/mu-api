@@ -116,6 +116,9 @@ const env = {
     // força bruta de chaves de presente sem atrapalhar quem resgata várias.
     giftRedeemMax: int('RATE_LIMIT_GIFT_REDEEM_MAX', 10),
     giftRedeemWindowMinutes: int('RATE_LIMIT_GIFT_REDEEM_WINDOW_MINUTES', 60),
+    // POST /campaigns/visit (links mupro.vip/bonus/<codigo>), por IP.
+    campaignVisitMax: int('RATE_LIMIT_CAMPAIGN_VISIT_MAX', 10),
+    campaignVisitWindowMinutes: int('RATE_LIMIT_CAMPAIGN_VISIT_WINDOW_MINUTES', 1),
   },
 
   // Bloqueio de scanners por IP (src/middlewares/scannerGuard.js).

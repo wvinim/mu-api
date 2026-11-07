@@ -18,6 +18,11 @@ const register = Joi.object({
   username: username.required(),
   password: password.required(),
   email: email.required(),
+  // Link de campanha (mupro.vip/bonus/<codigo>), enviado pelo front sem
+  // aparecer no formulário. Validação frouxa de propósito: um código
+  // inválido é ignorado no controller, nunca impede a criação da conta.
+  ref: Joi.string().max(100).allow('', null),
+  visitorId: Joi.string().max(100).allow('', null),
 });
 
 const confirmEmail = Joi.object({

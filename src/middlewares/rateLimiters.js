@@ -90,6 +90,16 @@ const giftRedeemIpLimiter = buildLimiter({
   skipSuccessfulRequests: true,
 });
 
+// Visitas de link de campanha: impede que um IP encha WebCampaignVisits
+// gerando VisitorIds novos.
+const campaignVisitLimiter = buildLimiter({
+  windowMinutes: env.rateLimit.campaignVisitWindowMinutes,
+  max: env.rateLimit.campaignVisitMax,
+  keyGenerator: (req) => `campaign-visit:${req.ip}`,
+  code: 'TOO_MANY_REQUESTS',
+  message: 'Muitas requisições. Tente novamente mais tarde.',
+});
+
 module.exports = {
   loginIpLimiter,
   loginUsernameLimiter,
@@ -99,4 +109,5 @@ module.exports = {
   ticketCreateLimiter,
   giftRedeemAccountLimiter,
   giftRedeemIpLimiter,
+  campaignVisitLimiter,
 };
