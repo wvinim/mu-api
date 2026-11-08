@@ -163,13 +163,13 @@ describe('PUT /api/v1/account/autopick', () => {
     expect(autopickRepository.replaceAll).not.toHaveBeenCalled();
   });
 
-  it('rejeita mais de 12 itens (tamanho da lista fechada)', async () => {
+  it('rejeita mais itens que o tamanho da lista fechada (15)', async () => {
     accountsRepository.findByUsername.mockResolvedValue(makeAccount({ vip: 3 }));
 
     const res = await request(app)
       .put('/api/v1/account/autopick')
       .set('Authorization', authHeader())
-      .send({ items: Array.from({ length: 13 }, () => ({ itemGroup: 14, itemIndex: 13, itemLevel: 0 })) });
+      .send({ items: Array.from({ length: 16 }, () => ({ itemGroup: 14, itemIndex: 13, itemLevel: 0 })) });
 
     expect(res.status).toBe(400);
   });

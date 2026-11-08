@@ -18,7 +18,7 @@ nessas colunas pela primeira vez.
   `Jewel of Bless` ao cair no chão) — controlado pelo gameserver, mas a
   API grava os 2 itens fixos em `MEMB_AUTOPICK_ITEMS` na compra.
 - **Mega Vip**: autopick configurável — o usuário escolhe quais itens
-  quer coletar automaticamente, de uma lista fechada de 12 (ver tabela
+  quer coletar automaticamente, de uma lista fechada de 15 (ver tabela
   abaixo). A API valida a seleção contra essa lista e grava em
   `MEMB_AUTOPICK_ITEMS`.
 
@@ -35,7 +35,7 @@ nessas colunas pela primeira vez.
 3. **Super Vip grava autopick fixo**: a compra do plano tier 2 insere
    (idempotente, sem duplicar/apagar seleção de Mega Vip pré-existente)
    as 2 linhas fixas em `MEMB_AUTOPICK_ITEMS`.
-4. **Sem limite de seleção pro Mega Vip** — pode marcar os 12 itens da
+4. **Sem limite de seleção pro Mega Vip** — pode marcar os 15 itens da
    lista de uma vez.
 5. **`MEMB_AUTOPICK_ITEMS` já existe em produção** (criada pelo usuário
    fora desta API, schema colado em `docs/VIP_SYSTEM.md`) — **não** há
@@ -90,6 +90,14 @@ Tabela final, canônica em `src/services/vipAutopickCatalog.js` /
 | Box of Kundun +4 | 14 | 11 | 11 |
 | Box of Kundun +5 | 14 | 11 | 12 |
 | Loch's Feather | 13 | 14 | 0 |
+| Jewel of Creation | 14 | 22 | 0 |
+| Spirit of Dark Horse | 13 | 31 | 0 |
+| Spirit of Dark Raven | 13 | 31 | 1 |
+
+Jewel of Creation (14/22) e "Spirit" (13/31) conferidos no `Item.txt`. Os
+dois Spirits do Dark Lord são o mesmo item com o level indicando a
+variante (0 = Dark Horse, 1 = Dark Raven, padrão do MU) — **ainda não
+testado no MuMaker/jogo**.
 
 **Preço de cada tier** (confirmado com o usuário, semeado pela migration):
 Vip = 60 Cash, Super Vip = 120 Cash, Mega Vip = 240 Cash — todos 30 dias.

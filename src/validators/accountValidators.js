@@ -1,4 +1,5 @@
 const Joi = require('joi');
+const AUTOPICK_OPTIONS = require('../data/vipAutopickOptions.json');
 
 // memb_name é varchar(10) na tabela de contas.
 const updateProfile = Joi.object({
@@ -23,7 +24,8 @@ const updateAutopick = Joi.object({
   // .unique() sem argumento compara por igualdade profunda do objeto
   // inteiro — bloqueia entradas duplicadas (mesmo grupo+índice+level),
   // não itens com o mesmo grupo (ex: duas jóias do grupo 14 são válidas).
-  items: Joi.array().items(autopickItem).max(12).unique().required(),
+  // Máximo = tamanho da lista fechada (dá pra marcar todos).
+  items: Joi.array().items(autopickItem).max(AUTOPICK_OPTIONS.length).unique().required(),
 });
 
 module.exports = { updateProfile, securityLogQuery, updateAutopick };

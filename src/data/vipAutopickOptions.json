@@ -10,5 +10,8 @@
   { "key": "kundun_box_3", "name": "Box of Kundun +3", "itemGroup": 14, "itemIndex": 11, "itemLevel": 10 },
   { "key": "kundun_box_4", "name": "Box of Kundun +4", "itemGroup": 14, "itemIndex": 11, "itemLevel": 11 },
   { "key": "kundun_box_5", "name": "Box of Kundun +5", "itemGroup": 14, "itemIndex": 11, "itemLevel": 12 },
-  { "key": "lochs_feather", "name": "Loch's Feather", "itemGroup": 13, "itemIndex": 14, "itemLevel": 0 }
+  { "key": "lochs_feather", "name": "Loch's Feather", "itemGroup": 13, "itemIndex": 14, "itemLevel": 0 },
+  { "key": "jewel_of_creation", "name": "Jewel of Creation", "itemGroup": 14, "itemIndex": 22, "itemLevel": 0 },
+  { "key": "spirit_dark_horse", "name": "Spirit of Dark Horse", "itemGroup": 13, "itemIndex": 31, "itemLevel": 0 },
+  { "key": "spirit_dark_raven", "name": "Spirit of Dark Raven", "itemGroup": 13, "itemIndex": 31, "itemLevel": 1 }
 ]

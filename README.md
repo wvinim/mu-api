@@ -144,7 +144,7 @@ detalhes da estratégia híbrida de senha (client do jogo vs. login do site).
       pedida via `docs/VIP_SYSTEM.md`) — ver `docs/SECTION_9_VIP.md`.
       Compra de plano VIP (Cash → `MEMB_INFO.Vip`/`VipStartDate`/`VipEndDate`),
       autopick do Super Vip (fixo) e Mega Vip (configurável, lista fechada
-      de 12 itens, gravado em `MEMB_AUTOPICK_ITEMS`), admin de
+      de 15 itens, gravado em `MEMB_AUTOPICK_ITEMS`), admin de
       concessão/revogação manual. **Não testada** contra o banco real
       ainda. Requer aplicar `migrations/0006_vip_plans.sql`.
 
