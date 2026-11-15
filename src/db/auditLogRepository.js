@@ -16,7 +16,7 @@ async function record({ accountId, username, eventType, success = true, ipAddres
       .input('eventType', sql.VarChar(50), eventType)
       .input('success', sql.Bit, success)
       .input('ipAddress', sql.VarChar(45), ipAddress || null)
-      .input('userAgent', sql.VarChar(255), userAgent || null)
+      .input('userAgent', sql.VarChar(255), userAgent ? userAgent.slice(0, 255) : null)
       .input('details', sql.NVarChar(sql.MAX), details ? JSON.stringify(details) : null)
       .query(`
         INSERT INTO WebAuditLog (AccountId, Username, EventType, Success, IpAddress, UserAgent, Details)

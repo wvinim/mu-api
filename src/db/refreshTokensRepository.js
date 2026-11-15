@@ -8,7 +8,7 @@ async function create({ accountId, tokenHash, expiresAt, createdByIp, userAgent 
     .input('tokenHash', sql.Char(64), tokenHash)
     .input('expiresAt', sql.DateTime2, expiresAt)
     .input('createdByIp', sql.VarChar(45), createdByIp || null)
-    .input('userAgent', sql.VarChar(255), userAgent || null)
+    .input('userAgent', sql.VarChar(255), userAgent ? userAgent.slice(0, 255) : null)
     .query(`
       INSERT INTO WebRefreshTokens (AccountId, TokenHash, ExpiresAt, CreatedByIp, UserAgent)
       VALUES (@accountId, @tokenHash, @expiresAt, @createdByIp, @userAgent)
