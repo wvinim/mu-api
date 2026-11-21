@@ -6,14 +6,15 @@ const { escapeHtml } = require('../layout');
  * Arte do topo publicada no site (public/img/email-tudo-que-faltava.jpg do
  * mu-front). Fonte de referência do layout: mu-front/docs/emails/tudo-que-faltava.html.
  *
- * Público: só e-mail confirmado, sem as contas de teste.
+ * Público (igual à consulta do admin): todas as contas com e-mail, confirmado
+ * ou não e banidas ou não, menos as contas de teste.
  */
 
-const subject = '🔥 Agora tem app mobile, AFK, party com senha e autoreset no MU PRO';
+const subject = ({ name }) => `Olá, ${name}! 🔥 Agora tem app mobile, AFK, party com senha e autoreset no MU PRO`;
 
 const audience = Object.freeze({
-  confirmedEmailOnly: true,
-  excludeAccounts: Object.freeze(['texunbosum', 'testebeta', 'teste001']),
+  includeBanned: true,
+  excludeAccounts: Object.freeze(['testebeta', 'teste001']),
 });
 
 function renderHtml({ name, unsubscribeUrl, appUrl }) {

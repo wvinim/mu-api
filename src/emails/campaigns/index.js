@@ -3,9 +3,9 @@
  * A chave vira o CampaignKey em WebEmailCampaignSends (máx. 40 caracteres):
  * nunca renomeie uma chave já enviada, senão quem já recebeu recebe de novo.
  *
- * Cada campanha: { subject, renderHtml({ name, unsubscribeUrl, appUrl }),
+ * Cada campanha: { subject (texto ou ({ name }) => texto), renderHtml({ name, unsubscribeUrl, appUrl }),
  * renderText(mesmos campos), audience? }. `audience` (opcional) restringe
- * os destinatários: { confirmedEmailOnly, excludeAccounts }.
+ * os destinatários: { includeBanned, confirmedEmailOnly, excludeAccounts }.
  */
 const CAMPAIGNS = Object.freeze({
   inauguracao: require('./launchWeekEmail'),

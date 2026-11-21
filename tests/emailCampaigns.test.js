@@ -85,25 +85,25 @@ describe('destinatários pendentes', () => {
 });
 
 describe('público da campanha tudo-que-faltava', () => {
-  it('só e-mail confirmado e sem as contas de teste', async () => {
+  it('todas as contas com e-mail (confirmado ou não, banidas inclusive), menos as de teste', async () => {
     emailCampaignsRepository.findRecipientAccounts.mockResolvedValue([
-      { username: 'ok1', displayName: 'Ok', email: 'ok@x.com', emailConfirmedFlag: '1' },
-      { username: 'pend', displayName: 'P', email: 'pend@x.com', emailConfirmedFlag: '0' },
-      { username: 'nulo', displayName: 'N', email: 'nulo@x.com', emailConfirmedFlag: null },
-      { username: 'TesteBeta', displayName: 'T', email: 'beta@x.com', emailConfirmedFlag: '1' },
-      { username: 'teste001', displayName: 'T', email: 't1@x.com', emailConfirmedFlag: '1' },
-      { username: 'texunbosum', displayName: 'T', email: 'tx@x.com', emailConfirmedFlag: '1' },
+      { username: 'ok1', displayName: 'Ok', email: 'ok@x.com', emailConfirmedFlag: '1', banFlag: '0' },
+      { username: 'pend', displayName: 'P', email: 'pend@x.com', emailConfirmedFlag: '0', banFlag: '0' },
+      { username: 'ban', displayName: 'B', email: 'ban@x.com', emailConfirmedFlag: '1', banFlag: '1' },
+      { username: 'texunbosum', displayName: 'X', email: 'tx@x.com', emailConfirmedFlag: '1', banFlag: '0' },
+      { username: 'TesteBeta', displayName: 'T', email: 'beta@x.com', emailConfirmedFlag: '1', banFlag: '0' },
+      { username: 'teste001', displayName: 'T', email: 't1@x.com', emailConfirmedFlag: '1', banFlag: '0' },
     ]);
 
     const recipients = await emailCampaignService.findPendingRecipients('tudo-que-faltava');
 
-    expect(recipients).toEqual([{ email: 'ok@x.com', accountId: 'ok1', name: 'Ok' }]);
+    expect(recipients.map((r) => r.accountId)).toEqual(['ok1', 'pend', 'ban', 'texunbosum']);
   });
 
-  it('conta excluída não "segura" o e-mail para outra conta confirmada com o mesmo endereço', async () => {
+  it('conta de teste não "segura" o e-mail para outra conta com o mesmo endereço', async () => {
     emailCampaignsRepository.findRecipientAccounts.mockResolvedValue([
-      { username: 'pend', displayName: 'P', email: 'mesmo@x.com', emailConfirmedFlag: '0' },
-      { username: 'ok1', displayName: 'Ok', email: 'mesmo@x.com', emailConfirmedFlag: '1' },
+      { username: 'teste001', displayName: 'T', email: 'mesmo@x.com', emailConfirmedFlag: '1', banFlag: '0' },
+      { username: 'ok1', displayName: 'Ok', email: 'mesmo@x.com', emailConfirmedFlag: '1', banFlag: '0' },
     ]);
 
     const recipients = await emailCampaignService.findPendingRecipients('tudo-que-faltava');
@@ -111,14 +111,34 @@ describe('público da campanha tudo-que-faltava', () => {
     expect(recipients).toEqual([{ email: 'mesmo@x.com', accountId: 'ok1', name: 'Ok' }]);
   });
 
-  it('a inauguração continua sem filtro de confirmação', async () => {
+  it('sem audience (inauguração), banidas continuam de fora e não confirmadas entram', async () => {
     emailCampaignsRepository.findRecipientAccounts.mockResolvedValue([
-      { username: 'pend', displayName: 'P', email: 'pend@x.com', emailConfirmedFlag: '0' },
+      { username: 'pend', displayName: 'P', email: 'pend@x.com', emailConfirmedFlag: '0', banFlag: '0' },
+      { username: 'ban', displayName: 'B', email: 'ban@x.com', emailConfirmedFlag: '1', banFlag: '1' },
     ]);
 
     const recipients = await emailCampaignService.findPendingRecipients('inauguracao');
 
-    expect(recipients).toHaveLength(1);
+    expect(recipients.map((r) => r.accountId)).toEqual(['pend']);
+  });
+});
+
+describe('assunto com o nome do jogador', () => {
+  it('tudo-que-faltava começa com "Olá, <nome>!" no envio', async () => {
+    emailCampaignsRepository.findRecipientAccounts.mockResolvedValue([
+      { username: 'ok1', displayName: 'Fulano', email: 'ok@x.com', emailConfirmedFlag: '1', banFlag: '0' },
+    ]);
+
+    await request(app).post('/api/v1/admin/email-campaigns/tudo-que-faltava/send').set('Authorization', authHeader('adminuser'));
+    await waitForJob('tudo-que-faltava');
+
+    const [, message] = emailService.sendCampaignEmail.mock.calls[0];
+    expect(message.subject).toBe('Olá, Fulano! 🔥 Agora tem app mobile, AFK, party com senha e autoreset no MU PRO');
+  });
+
+  it('o status mostra o assunto com {nome}', async () => {
+    const res = await request(app).get('/api/v1/admin/email-campaigns/tudo-que-faltava').set('Authorization', authHeader('adminuser'));
+    expect(res.body.data?.subject ?? res.body.subject).toMatch(/^Olá, \{nome\}! /);
   });
 });
 

@@ -10,15 +10,15 @@ const { getPool, sql } = require('./pool');
  */
 
 /**
- * Contas não banidas com e-mail preenchido (confirmado ou não). O filtro de
- * público de cada campanha (ex.: só e-mail confirmado) é aplicado no service.
+ * Contas com e-mail preenchido (confirmado ou não, banidas ou não). O filtro
+ * de público (por padrão, sem banidas) é aplicado no service.
  */
 async function findRecipientAccounts() {
   const pool = getPool();
   const result = await pool.request().query(`
-    SELECT memb___id AS username, memb_name AS displayName, mail_addr AS email, mail_chek AS emailConfirmedFlag
+    SELECT memb___id AS username, memb_name AS displayName, mail_addr AS email, mail_chek AS emailConfirmedFlag, bloc_code AS banFlag
     FROM MEMB_INFO
-    WHERE bloc_code = '0' AND mail_addr IS NOT NULL AND LTRIM(RTRIM(mail_addr)) <> ''
+    WHERE mail_addr IS NOT NULL AND LTRIM(RTRIM(mail_addr)) <> ''
     ORDER BY appl_days ASC
   `);
   return result.recordset;

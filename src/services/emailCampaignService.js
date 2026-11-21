@@ -60,11 +60,21 @@ function requireSendingConfigured() {
   }
 }
 
+/**
+ * Assunto da campanha: texto fixo ou função ({ name }) => texto. Quebras de
+ * linha do nome viram espaço (o assunto é cabeçalho do e-mail).
+ */
+function renderSubject(campaign, name) {
+  if (typeof campaign.subject !== 'function') return campaign.subject;
+  const safeName = String(name ?? '').replace(/[\r\n]+/g, ' ').trim();
+  return campaign.subject({ name: safeName });
+}
+
 function renderFor(campaign, { email, name }) {
   const unsubscribeUrl = buildUnsubscribeUrl(email);
   const fields = { name, unsubscribeUrl, appUrl: env.appUrl };
   return {
-    subject: campaign.subject,
+    subject: renderSubject(campaign, name),
     html: campaign.renderHtml(fields),
     text: campaign.renderText(fields),
     unsubscribeUrl,
@@ -72,12 +82,15 @@ function renderFor(campaign, { email, name }) {
 }
 
 /**
- * Público opcional da campanha (`audience` no módulo dela):
+ * Público da campanha (`audience` opcional no módulo dela). Por padrão,
+ * contas banidas (bloc_code = '1') ficam de fora.
+ * - includeBanned: inclui também as contas banidas;
  * - confirmedEmailOnly: só contas com e-mail confirmado (mail_chek = '1');
  * - excludeAccounts: usernames que nunca recebem (contas de teste etc.),
  *   sem diferenciar maiúsculas, como o banco.
  */
 function matchesAudience(account, audience = {}) {
+  if (!audience.includeBanned && String(account.banFlag ?? '').trim() === '1') return false;
   if (audience.confirmedEmailOnly && String(account.emailConfirmedFlag ?? '').trim() !== '1') return false;
   if (audience.excludeAccounts?.length) {
     const username = String(account.username).trim().toLowerCase();
@@ -215,7 +228,7 @@ async function getCampaignStatus(campaignKey) {
   ]);
   return {
     key: campaignKey,
-    subject: campaign.subject,
+    subject: renderSubject(campaign, '{nome}'),
     totals,
     pending: pending.length,
     job: publicJob(jobs.get(campaignKey)),
