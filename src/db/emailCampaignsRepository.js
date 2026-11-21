@@ -9,11 +9,14 @@ const { getPool, sql } = require('./pool');
  * cada lista é lida separada e o cruzamento é feito no service.
  */
 
-/** Contas não banidas com e-mail preenchido (confirmado ou não). */
+/**
+ * Contas não banidas com e-mail preenchido (confirmado ou não). O filtro de
+ * público de cada campanha (ex.: só e-mail confirmado) é aplicado no service.
+ */
 async function findRecipientAccounts() {
   const pool = getPool();
   const result = await pool.request().query(`
-    SELECT memb___id AS username, memb_name AS displayName, mail_addr AS email
+    SELECT memb___id AS username, memb_name AS displayName, mail_addr AS email, mail_chek AS emailConfirmedFlag
     FROM MEMB_INFO
     WHERE bloc_code = '0' AND mail_addr IS NOT NULL AND LTRIM(RTRIM(mail_addr)) <> ''
     ORDER BY appl_days ASC

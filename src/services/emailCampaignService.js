@@ -72,11 +72,27 @@ function renderFor(campaign, { email, name }) {
 }
 
 /**
- * Destinatários pendentes: contas não banidas com e-mail, um envio por
- * e-mail (contas antigas podem dividir o mesmo), sem quem se descadastrou
- * nem quem já recebeu esta campanha.
+ * Público opcional da campanha (`audience` no módulo dela):
+ * - confirmedEmailOnly: só contas com e-mail confirmado (mail_chek = '1');
+ * - excludeAccounts: usernames que nunca recebem (contas de teste etc.),
+ *   sem diferenciar maiúsculas, como o banco.
+ */
+function matchesAudience(account, audience = {}) {
+  if (audience.confirmedEmailOnly && String(account.emailConfirmedFlag ?? '').trim() !== '1') return false;
+  if (audience.excludeAccounts?.length) {
+    const username = String(account.username).trim().toLowerCase();
+    if (audience.excludeAccounts.some((excluded) => excluded.toLowerCase() === username)) return false;
+  }
+  return true;
+}
+
+/**
+ * Destinatários pendentes: contas não banidas com e-mail que entram no
+ * público da campanha, um envio por e-mail (contas antigas podem dividir o
+ * mesmo), sem quem se descadastrou nem quem já recebeu esta campanha.
  */
 async function findPendingRecipients(campaignKey) {
+  const campaign = requireCampaign(campaignKey);
   const [accounts, sent, unsubscribed] = await Promise.all([
     emailCampaignsRepository.findRecipientAccounts(),
     emailCampaignsRepository.findSentEmails(campaignKey),
@@ -85,6 +101,7 @@ async function findPendingRecipients(campaignKey) {
   const skip = new Set([...sent, ...unsubscribed].map(normalizeEmail));
   const recipients = new Map();
   for (const account of accounts) {
+    if (!matchesAudience(account, campaign.audience)) continue;
     const email = normalizeEmail(account.email);
     if (!email.includes('@') || skip.has(email) || recipients.has(email)) continue;
     const name = (account.displayName || '').trim() || account.username;

@@ -8,6 +8,11 @@ painel de admin, com descadastro.
   (confirmado ou não). Um envio por e-mail: contas antigas que dividem o
   mesmo e-mail recebem uma vez só, com o nome da primeira conta criada.
   Quem se descadastrou e quem já recebeu a campanha ficam de fora.
+- **Público por campanha (opcional):** o módulo da campanha pode exportar
+  `audience = { confirmedEmailOnly, excludeAccounts }`. Ex.: a
+  `tudo-que-faltava` (2026-11-21) vai só para e-mail confirmado
+  (`mail_chek = '1'`) e exclui as contas de teste `texunbosum`, `testebeta`
+  e `teste001`. Sem `audience`, vale a regra acima.
 - **Teste primeiro:** `POST /admin/email-campaigns/:key/test` manda só para
   o seu e-mail (ou para `to`), com `[TESTE]` no assunto. Não grava nada.
 - **Envio em lote em segundo plano:** `POST .../send` responde 202 na hora

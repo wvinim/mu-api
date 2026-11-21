@@ -84,6 +84,44 @@ describe('destinatários pendentes', () => {
   });
 });
 
+describe('público da campanha tudo-que-faltava', () => {
+  it('só e-mail confirmado e sem as contas de teste', async () => {
+    emailCampaignsRepository.findRecipientAccounts.mockResolvedValue([
+      { username: 'ok1', displayName: 'Ok', email: 'ok@x.com', emailConfirmedFlag: '1' },
+      { username: 'pend', displayName: 'P', email: 'pend@x.com', emailConfirmedFlag: '0' },
+      { username: 'nulo', displayName: 'N', email: 'nulo@x.com', emailConfirmedFlag: null },
+      { username: 'TesteBeta', displayName: 'T', email: 'beta@x.com', emailConfirmedFlag: '1' },
+      { username: 'teste001', displayName: 'T', email: 't1@x.com', emailConfirmedFlag: '1' },
+      { username: 'texunbosum', displayName: 'T', email: 'tx@x.com', emailConfirmedFlag: '1' },
+    ]);
+
+    const recipients = await emailCampaignService.findPendingRecipients('tudo-que-faltava');
+
+    expect(recipients).toEqual([{ email: 'ok@x.com', accountId: 'ok1', name: 'Ok' }]);
+  });
+
+  it('conta excluída não "segura" o e-mail para outra conta confirmada com o mesmo endereço', async () => {
+    emailCampaignsRepository.findRecipientAccounts.mockResolvedValue([
+      { username: 'pend', displayName: 'P', email: 'mesmo@x.com', emailConfirmedFlag: '0' },
+      { username: 'ok1', displayName: 'Ok', email: 'mesmo@x.com', emailConfirmedFlag: '1' },
+    ]);
+
+    const recipients = await emailCampaignService.findPendingRecipients('tudo-que-faltava');
+
+    expect(recipients).toEqual([{ email: 'mesmo@x.com', accountId: 'ok1', name: 'Ok' }]);
+  });
+
+  it('a inauguração continua sem filtro de confirmação', async () => {
+    emailCampaignsRepository.findRecipientAccounts.mockResolvedValue([
+      { username: 'pend', displayName: 'P', email: 'pend@x.com', emailConfirmedFlag: '0' },
+    ]);
+
+    const recipients = await emailCampaignService.findPendingRecipients('inauguracao');
+
+    expect(recipients).toHaveLength(1);
+  });
+});
+
 describe('POST /admin/email-campaigns/:key/test', () => {
   it('sem `to`, envia para o e-mail do admin com [TESTE] no assunto e não grava envio', async () => {
     accountsRepository.findByUsername.mockResolvedValue({ username: 'adminuser', displayName: 'Admin', email: 'admin@x.com' });

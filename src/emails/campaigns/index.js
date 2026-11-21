@@ -4,10 +4,12 @@
  * nunca renomeie uma chave já enviada, senão quem já recebeu recebe de novo.
  *
  * Cada campanha: { subject, renderHtml({ name, unsubscribeUrl, appUrl }),
- * renderText(mesmos campos) }.
+ * renderText(mesmos campos), audience? }. `audience` (opcional) restringe
+ * os destinatários: { confirmedEmailOnly, excludeAccounts }.
  */
 const CAMPAIGNS = Object.freeze({
   inauguracao: require('./launchWeekEmail'),
+  'tudo-que-faltava': require('./everythingMissingEmail'),
 });
 
 function getCampaign(key) {
