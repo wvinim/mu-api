@@ -242,3 +242,12 @@ claro se as chamadas do Instagram usam esse limite ou o limite por conta
 ```bash
 pm2 logs mu-api --lines 500 --nostream | grep -i "limite de chamadas"
 ```
+
+## Bônus do story mais criativo (2026-11-25, só texto no hotsite)
+Um vencedor ganha **+90 gold e 30 dias de Mega Vip**, além dos 40 de
+participação. A equipe escolhe o vencedor e anuncia no @muproserver **até o
+final de dezembro de 2026**. Só vale story de Instagram vinculado (para saber
+qual conta premiar). Nada é automático: a escolha é manual, olhando o Direct do
+@muproserver (as `MediaUrl` gravadas expiram), e o prêmio é dado à mão (admin
+ou SQL). **Em janeiro de 2027, tirar ou atualizar o bloco "Bônus extra" e a
+regra correspondente em `mu-front/src/pages/InstagramCampaign.tsx`.**
