@@ -47,6 +47,8 @@ describe('rewardMention', () => {
     const q = queries[0];
     expect(q).toMatch(/BEGIN TRANSACTION/);
     expect(q).toMatch(/FROM WebInstagramRewards WITH \(UPDLOCK, HOLDLOCK\) WHERE Igsid = @igsid/);
+    expect(q).toMatch(/FROM WebInstagramRewards WITH \(UPDLOCK, HOLDLOCK\) WHERE Username = @username/);
+    expect(q).toMatch(/'account_already_rewarded'/);
     expect(q).toMatch(/INSERT INTO WebInstagramRewards/);
     expect(q).toMatch(/SET Cash = Cash \+ @amount/);
     expect(q).toMatch(/WHERE memb___id = @username/);

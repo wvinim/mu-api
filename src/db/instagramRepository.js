@@ -203,9 +203,10 @@ async function updateMention(mid, { status, username, igUsername, followerCount 
 }
 
 /**
- * Prêmio atômico: grava o prêmio (PK no IGSID = uma vez por Instagram),
- * credita o Cash e marca a menção como 'rewarded', tudo ou nada.
- * Retorna 'rewarded' ou 'already_rewarded'.
+ * Prêmio atômico: grava o prêmio, credita o Cash e marca a menção como
+ * 'rewarded', tudo ou nada. Uma vez por Instagram (PK no IGSID) E uma vez
+ * por conta (trava de faixa no índice de Username).
+ * Retorna 'rewarded' | 'already_rewarded' (Instagram) | 'account_already_rewarded'.
  */
 async function rewardMention({ mid, igsid, username, igUsername, followerCount, amount }) {
   const pool = getPool();
@@ -225,6 +226,13 @@ async function rewardMention({ mid, igsid, username, igUsername, followerCount, 
       BEGIN
         ROLLBACK TRANSACTION;
         SELECT 'already_rewarded' AS result;
+        RETURN;
+      END
+
+      IF EXISTS (SELECT 1 FROM WebInstagramRewards WITH (UPDLOCK, HOLDLOCK) WHERE Username = @username)
+      BEGIN
+        ROLLBACK TRANSACTION;
+        SELECT 'account_already_rewarded' AS result;
         RETURN;
       END
 
@@ -253,6 +261,19 @@ async function rewardMention({ mid, igsid, username, igUsername, followerCount, 
       SELECT 'rewarded' AS result;
     `);
   return result.recordset[0].result;
+}
+
+async function findRewardByUsername(username) {
+  const pool = getPool();
+  const result = await pool
+    .request()
+    .input('username', sql.VarChar(10), username)
+    .query(`
+      SELECT TOP 1 IgUsername AS igUsername, Amount AS amount, CreatedAt AS createdAt
+      FROM WebInstagramRewards WHERE Username = @username
+      ORDER BY CreatedAt ASC
+    `);
+  return result.recordset[0] || null;
 }
 
 /**
@@ -297,6 +318,7 @@ module.exports = {
   findLinkByIgsid,
   deleteLink,
   findRewardByIgsid,
+  findRewardByUsername,
   insertMention,
   updateMention,
   rewardMention,

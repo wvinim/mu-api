@@ -327,7 +327,7 @@ Em todos os erros, nada muda: nem o gold nem o item. Rate limit: uma ação (anu
 
 O jogador vincula o Instagram mandando um **código no Direct do @muproserver**.
 Depois posta um story marcando o perfil e recebe **40 gold** automaticamente
-(uma vez por Instagram, na vida). O Instagram precisa ter pelo menos **50
+(uma vez por Instagram **e** uma vez por conta do site, para sempre; mudou em 2026-11-25). O Instagram precisa ter pelo menos **50
 seguidores**. Um story postado **até 7 dias antes** do vínculo é premiado no
 momento do vínculo. As respostas (vinculado, gold creditado, poucos seguidores
 etc.) chegam ao jogador **no próprio Direct**. O site só mostra o status.
@@ -350,6 +350,7 @@ Resposta do `GET /account/instagram`:
   "retroactiveDays": 7,
   "link": { "igUsername": "fulano", "linkedAt": "2026-11-25T15:00:00.000Z" },
   "reward": { "amount": 40, "createdAt": "2026-11-25T15:05:00.000Z", "toThisAccount": true },
+  "accountReward": { "amount": 40, "createdAt": "2026-11-25T15:05:00.000Z", "igUsername": "fulano" },
   "lastMention": { "status": "rewarded", "followerCount": 152, "createdAt": "2026-11-25T15:05:00.000Z" }
 }
 ```
@@ -360,8 +361,11 @@ Resposta do `GET /account/instagram`:
   `link.igUsername` pode ser `null` se a Meta não devolveu o @ no vínculo.
 - `reward` → este Instagram já foi premiado. `toThisAccount: false` = o prêmio
   foi para outra conta do jogo (o Instagram foi vinculado lá antes).
-- `lastMention.status`: `rewarded` (ganhou), `already_rewarded` (já tinha
-  ganhado antes), `low_followers` (menos de `minFollowers`, pode postar outro
+- `accountReward` → esta **conta do site** já ganhou o prêmio (com o Instagram
+  `igUsername`). Vem mesmo sem vínculo. Com ele preenchido, não adianta
+  vincular outro Instagram: mostre "você já ganhou" em vez do fluxo de vínculo.
+- `lastMention.status`: `rewarded` (ganhou), `already_rewarded` (este Instagram já tinha
+  ganhado antes), `account_rewarded` (a conta do site já ganhou com outro Instagram), `low_followers` (menos de `minFollowers`, pode postar outro
   story quando chegar lá), `unlinked` (postou antes de vincular), `disabled`,
   `profile_error`/`received` (em processamento, a Meta reenvia).
 - O vínculo acontece fora do site (no Direct): depois de gerar o código, faça

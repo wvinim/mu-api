@@ -11,7 +11,9 @@ perfil do servidor (**@muproserver**) e recebe **40 gold** (`MEMB_INFO.Cash`) au
 quando o webhook da Meta chega.
 
 ## Decisões (usuário, 2026-11-25)
-- **Prêmio uma vez por conta do Instagram.** Cada IGSID é premiado uma única
+- **Prêmio uma vez por Instagram E uma vez por conta do site** (a segunda trava
+  foi adicionada em 2026-11-25, a pedido do usuário, para impedir juntar 40 gold
+  por Instagram numa conta só). Cada IGSID é premiado uma única
   vez na vida, mesmo se for desvinculado e vinculado a outra conta do jogo.
 - **Conta privada também vale.** A API da Meta não informa se a conta é
   pública ou privada, então isso nem seria verificável.
@@ -195,9 +197,11 @@ devolve `username`/`follower_count` depois do Direct.
   responde 403, e as contas de `INSTAGRAM_TESTERS` funcionam normalmente.
   Teste precisa vincular ANTES de postar (com a campanha desligada, story sem
   vínculo não vira `unlinked`).
-- Unlink permitido: o prêmio continua preso ao IGSID (`WebInstagramRewards`),
-  então desvincular e vincular de novo não paga outra vez. Uma conta do jogo
-  pode ganhar de novo com **outro** Instagram (decisão: uma vez por Instagram).
+- Unlink permitido: o prêmio fica preso ao IGSID **e** à conta
+  (`WebInstagramRewards`: PK no IGSID + trava pelo índice de Username dentro da
+  transação do prêmio). Desvincular e vincular de novo, ou trocar de Instagram,
+  não paga outra vez. Status `account_rewarded` = conta já premiada com outro
+  Instagram.
 
 ## Deploy e teste
 1. Aplicar `migrations/0018_instagram_campaign.sql`.

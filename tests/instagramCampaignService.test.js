@@ -63,6 +63,7 @@ beforeEach(() => {
   repo.insertMention.mockResolvedValue({ inserted: true, status: 'received' });
   repo.findLinkByIgsid.mockResolvedValue({ username: 'player1', igsid: '555' });
   repo.findRewardByIgsid.mockResolvedValue(null);
+  repo.findRewardByUsername.mockResolvedValue(null);
   repo.rewardMention.mockResolvedValue('rewarded');
   repo.findRetroactiveMention.mockResolvedValue(null);
   graph.fetchProfile.mockResolvedValue({ username: 'fulano', followerCount: 152 });
@@ -139,6 +140,23 @@ describe('story_mention', () => {
     expect(graph.fetchProfile).not.toHaveBeenCalled();
     expect(repo.rewardMention).not.toHaveBeenCalled();
     expect(repo.updateMention).toHaveBeenCalledWith('m1', expect.objectContaining({ status: 'already_rewarded' }));
+  });
+
+  it('conta do site já premiada (com outro Instagram) → account_rewarded, sem crédito', async () => {
+    repo.findRewardByUsername.mockResolvedValue({ igUsername: 'outro', amount: 40 });
+    await service.handleWebhook(mentionPayload());
+    await flush();
+    expect(graph.fetchProfile).not.toHaveBeenCalled();
+    expect(repo.rewardMention).not.toHaveBeenCalled();
+    expect(repo.updateMention).toHaveBeenCalledWith('m1', expect.objectContaining({ status: 'account_rewarded' }));
+    expect(sentTexts()[0]).toContain('Sua conta do MU PRO já recebeu o prêmio');
+  });
+
+  it('corrida: o banco diz account_already_rewarded → não audita crédito', async () => {
+    repo.rewardMention.mockResolvedValue('account_already_rewarded');
+    await service.handleWebhook(mentionPayload());
+    expect(auditLog.record).not.toHaveBeenCalled();
+    expect(repo.updateMention).toHaveBeenCalledWith('m1', expect.objectContaining({ status: 'account_rewarded' }));
   });
 
   it('corrida: o banco diz already_rewarded → não audita crédito', async () => {
@@ -236,6 +254,15 @@ describe('código de vínculo no Direct', () => {
     expect(sentTexts()[0]).toContain('já recebeu o prêmio');
   });
 
+  it('conta já premiada com outro Instagram: vincula sem retroativo e avisa', async () => {
+    repo.consumeLinkCode.mockResolvedValue({ result: 'linked', username: 'player1' });
+    repo.findRewardByUsername.mockResolvedValue({ igUsername: 'outro', amount: 40 });
+    await service.handleWebhook(textPayload('MUPRO-ABC234'));
+    await flush();
+    expect(repo.findRetroactiveMention).not.toHaveBeenCalled();
+    expect(sentTexts()[0]).toContain('Sua conta do MU PRO já recebeu o prêmio');
+  });
+
   it('reenvio do mesmo Direct (already_linked) não audita de novo', async () => {
     repo.consumeLinkCode.mockResolvedValue({ result: 'already_linked', username: 'player1' });
     await service.handleWebhook(textPayload('MUPRO-ABC234'));
@@ -285,7 +312,14 @@ describe('site', () => {
   it('getStatus sem vínculo', async () => {
     repo.findLinkByUsername.mockResolvedValue(null);
     const out = await service.getStatus('player1');
-    expect(out).toMatchObject({ campaignEnabled: true, rewardCash: 40, minFollowers: 50, link: null, reward: null });
+    expect(out).toMatchObject({ campaignEnabled: true, rewardCash: 40, minFollowers: 50, link: null, reward: null, accountReward: null });
+  });
+
+  it('getStatus mostra o prêmio da conta mesmo sem vínculo', async () => {
+    repo.findLinkByUsername.mockResolvedValue(null);
+    repo.findRewardByUsername.mockResolvedValue({ igUsername: 'antigo', amount: 40, createdAt: 'd0' });
+    const out = await service.getStatus('player1');
+    expect(out.accountReward).toEqual({ amount: 40, createdAt: 'd0', igUsername: 'antigo' });
   });
 
   it('getStatus com vínculo e prêmio de outra conta', async () => {

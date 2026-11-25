@@ -11,7 +11,8 @@ const auditLog = require('../db/auditLogRepository');
  * 1. O jogador gera um código no site e manda no Direct do @muproserver →
  *    o webhook vincula o IGSID à conta (prova que é dono do @).
  * 2. Quando chega um story_mention de um IGSID vinculado, com pelo menos
- *    INSTAGRAM_MIN_FOLLOWERS seguidores e nunca premiado → credita o gold.
+ *    INSTAGRAM_MIN_FOLLOWERS seguidores → credita o gold. Uma vez por
+ *    Instagram E uma vez por conta do site (o que vier primeiro trava).
  * 3. Um story postado antes do vínculo (até INSTAGRAM_RETROACTIVE_DAYS) é
  *    premiado quando o vínculo acontece.
  *
@@ -57,6 +58,10 @@ const messages = {
     `👀 Vimos sua marcação! Para ganhar ${env.instagram.rewardCash} gold, vincule este Instagram em ${panelUrl()} ` +
     `em até ${env.instagram.retroactiveDays} dias.`,
   alreadyRewarded: () => 'Este Instagram já recebeu o prêmio da campanha 😉 Obrigado por divulgar o MU PRO!',
+  accountRewarded: () =>
+    'Sua conta do MU PRO já recebeu o prêmio da campanha 😉 O prêmio vale uma vez por conta. Obrigado por divulgar!',
+  linkedAccountRewarded: () =>
+    '✅ Instagram vinculado! Sua conta do MU PRO já recebeu o prêmio da campanha, então não há novo gold.',
   lowFollowers: () =>
     `Para participar, seu Instagram precisa ter pelo menos ${env.instagram.minFollowers} seguidores. ` +
     `Quando chegar lá, poste outro story marcando @${env.instagram.handle}!`,
@@ -101,9 +106,20 @@ async function getStatus(username) {
     retroactiveDays: cfg.retroactiveDays,
     link: null,
     reward: null,
+    accountReward: null,
     lastMention: null,
   };
-  const link = await repo.findLinkByUsername(username);
+  const [link, accountReward] = await Promise.all([
+    repo.findLinkByUsername(username),
+    repo.findRewardByUsername(username),
+  ]);
+  if (accountReward) {
+    base.accountReward = {
+      amount: accountReward.amount,
+      createdAt: accountReward.createdAt,
+      igUsername: accountReward.igUsername,
+    };
+  }
   if (!link) return base;
 
   const [reward, lastMention] = await Promise.all([
@@ -142,6 +158,12 @@ async function rewardFlow({ mid, igsid, username, replies }) {
   if (await repo.findRewardByIgsid(igsid)) {
     await repo.updateMention(mid, { status: 'already_rewarded', username });
     replies.push({ igsid, text: messages.alreadyRewarded() });
+    return;
+  }
+
+  if (await repo.findRewardByUsername(username)) {
+    await repo.updateMention(mid, { status: 'account_rewarded', username });
+    replies.push({ igsid, text: messages.accountRewarded() });
     return;
   }
 
@@ -188,6 +210,9 @@ async function rewardFlow({ mid, igsid, username, replies }) {
     });
     logger.info({ username, igsid, amount: env.instagram.rewardCash }, 'instagram: gold creditado');
     replies.push({ igsid, text: messages.rewarded() });
+  } else if (result === 'account_already_rewarded') {
+    await repo.updateMention(mid, { status: 'account_rewarded', username });
+    replies.push({ igsid, text: messages.accountRewarded() });
   } else {
     await repo.updateMention(mid, { status: 'already_rewarded', username });
     replies.push({ igsid, text: messages.alreadyRewarded() });
@@ -241,10 +266,16 @@ async function handleLinkMessage({ igsid, code, replies }) {
     });
   }
 
-  const alreadyRewarded = Boolean(await repo.findRewardByIgsid(igsid));
-  replies.push({ igsid, text: alreadyRewarded ? messages.linkedAlreadyRewarded() : messages.linked() });
+  const [igsidReward, accountReward] = await Promise.all([
+    repo.findRewardByIgsid(igsid),
+    repo.findRewardByUsername(username),
+  ]);
+  let linkedText = messages.linked();
+  if (igsidReward) linkedText = messages.linkedAlreadyRewarded();
+  else if (accountReward) linkedText = messages.linkedAccountRewarded();
+  replies.push({ igsid, text: linkedText });
 
-  if (!alreadyRewarded && isActiveFor(username)) {
+  if (!igsidReward && !accountReward && isActiveFor(username)) {
     const pending = await repo.findRetroactiveMention(igsid, env.instagram.retroactiveDays);
     if (pending) await rewardFlow({ mid: pending.mid, igsid, username, replies });
   }
