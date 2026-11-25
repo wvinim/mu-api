@@ -323,6 +323,52 @@ Em todos os erros, nada muda: nem o gold nem o item. Rate limit: uma ação (anu
 
 ---
 
+## Campanha de story no Instagram (`/account/instagram`) — adicionado em 2026-11-25
+
+O jogador vincula o Instagram mandando um **código no Direct do @muproserver**.
+Depois posta um story marcando o perfil e recebe **40 gold** automaticamente
+(uma vez por Instagram, na vida). O Instagram precisa ter pelo menos **50
+seguidores**. Um story postado **até 7 dias antes** do vínculo é premiado no
+momento do vínculo. As respostas (vinculado, gold creditado, poucos seguidores
+etc.) chegam ao jogador **no próprio Direct**. O site só mostra o status.
+Valores (40, 50, 7, @) vêm sempre de `GET /account/instagram`, nunca fixos no front.
+
+| Método | Rota | Body | Resposta | Erros |
+|---|---|---|---|---|
+| GET | `/account/instagram` 🔒 | — | status (abaixo) | — |
+| POST | `/account/instagram/link-code` 🔒 | — | **201** `{ code, expiresAt, instagramHandle }`. Gerar outro invalida o anterior. Vale 30 min | 403 `CAMPAIGN_DISABLED`, 429 (5 a cada 10 min) |
+| DELETE | `/account/instagram` 🔒 | — | `{ message }` | 404 `INSTAGRAM_NOT_LINKED` |
+
+Resposta do `GET /account/instagram`:
+```json
+{
+  "campaignEnabled": true,
+  "instagramHandle": "muproserver",
+  "rewardCash": 40,
+  "minFollowers": 50,
+  "retroactiveDays": 7,
+  "link": { "igUsername": "fulano", "linkedAt": "2026-11-25T15:00:00.000Z" },
+  "reward": { "amount": 40, "createdAt": "2026-11-25T15:05:00.000Z", "toThisAccount": true },
+  "lastMention": { "status": "rewarded", "followerCount": 152, "createdAt": "2026-11-25T15:05:00.000Z" }
+}
+```
+- `campaignEnabled: false` → esconda o card ou mostre "campanha encerrada".
+  `link-code` responde 403. Contas de teste veem `true` mesmo com a campanha
+  desligada.
+- `link: null` → não vinculado (`reward` e `lastMention` também `null`).
+  `link.igUsername` pode ser `null` se a Meta não devolveu o @ no vínculo.
+- `reward` → este Instagram já foi premiado. `toThisAccount: false` = o prêmio
+  foi para outra conta do jogo (o Instagram foi vinculado lá antes).
+- `lastMention.status`: `rewarded` (ganhou), `already_rewarded` (já tinha
+  ganhado antes), `low_followers` (menos de `minFollowers`, pode postar outro
+  story quando chegar lá), `unlinked` (postou antes de vincular), `disabled`,
+  `profile_error`/`received` (em processamento, a Meta reenvia).
+- O vínculo acontece fora do site (no Direct): depois de gerar o código, faça
+  polling de `GET /account/instagram` (ex.: a cada 5s enquanto o código estiver
+  na tela) até `link` deixar de ser `null`.
+- O jogador pode mandar o código com texto em volta ("meu código MUPRO-AB12CD"),
+  e o formato aceita minúsculas e espaço no lugar do hífen.
+
 ## Suporte / Tickets (`/support`) — todas exigem 🔒
 
 | Método | Rota | Body/Query | Resposta |

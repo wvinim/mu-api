@@ -1,7 +1,9 @@
 # Seção 15 — Campanha "story no Instagram" (planejamento, 2026-11-25)
 
-> Status: **validado** (testes A e B ok em 2026-11-25). Em produção só existe a
-> rota de teste (log, sem crédito). Falta implementar. Envolve mu-api e mu-front.
+> Status: **implementado** (2026-11-25), com resposta automática no Direct.
+> Migration `0018_instagram_campaign.sql` **pendente**: aplicar ANTES do deploy.
+> Lança desligado (`INSTAGRAM_CAMPAIGN_ENABLED=false`): primeiro teste com
+> `INSTAGRAM_TESTERS`. Contrato para o front em `docs/API_REFERENCE.md`.
 
 ## O que faz
 O jogador vincula o Instagram à conta do site, posta um story marcando o
@@ -174,3 +176,43 @@ payload, sem crédito). Uma conta **sem papel no app** manda um Direct e
 marca o perfil num story. Confirmar (a) se os eventos chegam sem App
 Review, (b) o JSON real do `story_mention` e (c) se a User Profile API
 devolve `username`/`follower_count` depois do Direct.
+
+## Implementação (2026-11-25)
+- `src/routes/instagram.js`: webhook (GET verificação, POST com HMAC) e rotas
+  `/account/instagram`. O webhook processa **antes** de responder 200. Erro de
+  banco ou de perfil responde 500, e a Meta reenvia (tudo é idempotente: menção
+  por `mid`, código marcado como usado com o IGSID).
+- `src/services/instagramCampaignService.js`: regras e textos do Direct. O login
+  da conta do jogo **nunca** vai no Direct. Mensagens comuns do Direct (sem
+  código) são ignoradas e **não são logadas**.
+- `src/services/instagramGraph.js`: perfil (`username,follower_count`) e envio
+  de mensagem (`POST /<IG_ACCOUNT_ID>/messages`, ID vindo do `entry.id` do
+  webhook). O envio usa a mesma permissão `instagram_manage_messages` do
+  webhook. Resposta só vale até 24h após a última mensagem da pessoa.
+- `src/db/instagramRepository.js`: prêmio atômico (trava no IGSID + INSERT +
+  `Cash = Cash + 40` + status da menção, tudo ou nada).
+- Campanha desligada: menções viram `disabled` (sem resposta), `link-code`
+  responde 403, e as contas de `INSTAGRAM_TESTERS` funcionam normalmente.
+  Teste precisa vincular ANTES de postar (com a campanha desligada, story sem
+  vínculo não vira `unlinked`).
+- Unlink permitido: o prêmio continua preso ao IGSID (`WebInstagramRewards`),
+  então desvincular e vincular de novo não paga outra vez. Uma conta do jogo
+  pode ganhar de novo com **outro** Instagram (decisão: uma vez por Instagram).
+
+## Deploy e teste
+1. Aplicar `migrations/0018_instagram_campaign.sql`.
+2. `.env`: `INSTAGRAM_CAMPAIGN_ENABLED=false` e `INSTAGRAM_TESTERS=<sua conta>`
+   (demais variáveis em `.env.example`).
+3. Deploy de API + front.
+4. Em `/painel/instagram` (logado na conta de teste): gerar código → mandar no
+   Direct do @muproserver de um Instagram com 50+ seguidores → conferir a
+   resposta "vinculado" → postar story marcando @muproserver → conferir a
+   resposta "gold creditado" e o Cash da conta.
+5. Liberar: `INSTAGRAM_CAMPAIGN_ENABLED=true` + restart.
+
+Consultas úteis (SSMS):
+```sql
+SELECT TOP 50 * FROM WebInstagramMentions ORDER BY CreatedAt DESC;
+SELECT * FROM WebInstagramRewards ORDER BY CreatedAt DESC;
+SELECT COUNT(*) AS premiados, SUM(Amount) AS gold FROM WebInstagramRewards;
+```

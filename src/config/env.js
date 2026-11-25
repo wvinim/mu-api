@@ -149,6 +149,22 @@ const env = {
     // Unified Login (app novo, token de usuário do sistema): graph.facebook.com.
     // Instagram Login (token IGAA...): graph.instagram.com.
     graphHost: optional('INSTAGRAM_GRAPH_HOST', 'graph.facebook.com'),
+    graphVersion: optional('INSTAGRAM_GRAPH_VERSION', 'v27.0'),
+    // @ do perfil do servidor (sem @), mostrado ao jogador nas instruções.
+    handle: optional('INSTAGRAM_HANDLE', 'muproserver'),
+    // Desligado: menções são gravadas como 'disabled' e as rotas da conta
+    // respondem 403, exceto para as contas de INSTAGRAM_TESTERS (teste em
+    // produção, como o mercado — não há staging).
+    campaignEnabled: bool('INSTAGRAM_CAMPAIGN_ENABLED', false),
+    testers: optional('INSTAGRAM_TESTERS', '')
+      .split(',')
+      .map((u) => u.trim())
+      .filter(Boolean),
+    rewardCash: int('INSTAGRAM_REWARD_CASH', 40),
+    minFollowers: int('INSTAGRAM_MIN_FOLLOWERS', 50),
+    linkCodeTtlMinutes: int('INSTAGRAM_LINK_CODE_TTL_MINUTES', 30),
+    // Story postado antes do vínculo é premiado se tiver até N dias.
+    retroactiveDays: int('INSTAGRAM_RETROACTIVE_DAYS', 7),
   },
 
   // Bloqueio de scanners por IP (src/middlewares/scannerGuard.js).

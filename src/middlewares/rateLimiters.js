@@ -71,6 +71,15 @@ const marketWriteLimiter = buildLimiter({
   message: 'Aguarde alguns segundos antes de tentar novamente.',
 });
 
+// Código de vínculo do Instagram (campanha de story), por conta.
+const instagramLinkCodeLimiter = buildLimiter({
+  windowMinutes: 10,
+  max: 5,
+  keyGenerator: (req) => `instagram-code:${req.user?.username || req.ip}`,
+  code: 'TOO_MANY_REQUESTS',
+  message: 'Muitos códigos gerados. Aguarde alguns minutos.',
+});
+
 const ticketCreateLimiter = buildLimiter({
   windowMinutes: env.rateLimit.ticketCreateWindowMinutes,
   max: env.rateLimit.ticketCreateMax,
@@ -117,6 +126,7 @@ module.exports = {
   purchaseLimiter,
   marketWriteLimiter,
   ticketCreateLimiter,
+  instagramLinkCodeLimiter,
   giftRedeemAccountLimiter,
   giftRedeemIpLimiter,
   campaignVisitLimiter,
