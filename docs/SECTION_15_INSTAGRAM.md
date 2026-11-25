@@ -5,7 +5,7 @@
 
 ## O que faz
 O jogador vincula o Instagram à conta do site, posta um story marcando o
-perfil do servidor e recebe **40 gold** (`MEMB_INFO.Cash`) automaticamente
+perfil do servidor (**@muproserver**) e recebe **40 gold** (`MEMB_INFO.Cash`) automaticamente
 quando o webhook da Meta chega.
 
 ## Decisões (usuário, 2026-11-25)
@@ -81,7 +81,7 @@ O token de longa duração vale 60 dias e precisa de renovação automática
 regra de 50 seguidores, prêmio único por IGSID e texto SQL dos repositórios.
 
 **mu-front:** card "Instagram" em Minha Conta com o código, as instruções
-("mande este código no Direct de @<perfil>"), o @ vinculado e o status do
+("mande este código no Direct de @muproserver"), o @ vinculado e o status do
 prêmio (pendente / recebido / menos de 50 seguidores).
 
 ## Roteiro de validação (fase atual)
