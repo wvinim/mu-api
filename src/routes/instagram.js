@@ -34,7 +34,7 @@ router.get('/instagram/webhook', (req, res) => {
 async function fetchProfile(igsid) {
   const token = env.instagram.accessToken;
   if (!token) return { skipped: 'INSTAGRAM_ACCESS_TOKEN vazio' };
-  const url = new URL(`https://graph.instagram.com/${encodeURIComponent(igsid)}`);
+  const url = new URL(`https://${env.instagram.graphHost}/${encodeURIComponent(igsid)}`);
   url.searchParams.set('fields', 'username,name,follower_count,is_user_follow_business,is_verified_user');
   url.searchParams.set('access_token', token);
   try {

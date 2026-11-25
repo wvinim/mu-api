@@ -94,17 +94,28 @@ e o resultado da consulta de perfil. **Não grava no banco nem credita.**
    Ferramentas conectadas).
 2. **Política de privacidade** publicada (ex.: `https://mupro.vip/privacidade`).
    A Meta exige isso para o app ir para Live.
-3. **App na Meta** (developers.facebook.com → Criar app → tipo Business →
-   produto Instagram → "API setup with Instagram login").
-   - Adicione o Instagram do servidor e gere o **token** → `INSTAGRAM_ACCESS_TOKEN`.
-   - Copie o **App Secret do Instagram** (na tela do produto Instagram, não o
-     do app Facebook) → `INSTAGRAM_APP_SECRET`.
+3. **App na Meta**: o painel novo só oferece **Unified Login**, e o Instagram
+   Login não aparece mais para apps novos. Com ele, o token é de **usuário do
+   sistema**, o host é `graph.facebook.com` e o segredo que valida o webhook é
+   a **Chave secreta do app da Meta** (Configurações → Básico), não o
+   "Instagram App Secret". O app precisa pertencer a um **portfólio
+   empresarial**. Uma Página do Facebook não é necessária. Se o Instagram
+   estiver ligado a uma Página, compartilhe a Página também, senão o webhook
+   `messages` pode não chegar (limitação temporária documentada pela Meta).
+   - Casos de uso → Gerenciar mensagens e conteúdo no Instagram → Personalizar
+     → API setup with unified login → Gerar tokens de acesso com o
+     @muproserver → `INSTAGRAM_ACCESS_TOKEN`. O token aparece só uma vez.
+   - Chave secreta do app → `INSTAGRAM_APP_SECRET`.
    - Invente um texto → `INSTAGRAM_VERIFY_TOKEN`.
+   - Para a User Profile API no Unified Login, a doc não confirma host nem
+     campos. O teste diz: `INSTAGRAM_GRAPH_HOST` (padrão `graph.facebook.com`).
 4. **Deploy** com as 3 variáveis no `.env` de produção.
 5. **Webhook no painel:** Callback URL
    `https://api.mupro.vip/api/v1/instagram/webhook` + Verify token →
    "Verify and save" → assinar o campo **`messages`**. Log esperado:
-   `instagram webhook: verificação aceita`.
+   `instagram webhook: verificação aceita`. No Unified Login também é preciso
+   inscrever a conta: `POST graph.facebook.com/v27.0/<IG_ACCOUNT_ID>/subscribed_apps`
+   com `subscribed_fields=messages` e o token → `{"success": true}`.
 6. **Teste A, conta com papel no app** (adicionada como Instagram Tester):
    mandar um Direct com texto e depois marcar o perfil num story. Isso confirma
    que o fluxo funciona.
