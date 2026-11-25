@@ -149,9 +149,11 @@ e o resultado da consulta de perfil. **Não grava no banco nem credita.**
 
 **Teste B (2026-11-25), conta separada (@natvinimoraes), app em Development:**
 funcionou igual. Chegaram o Direct e o `story_mention`, e o perfil voltou com
-`follower_count: 6` (valor real). **Conclusão: viável sem App Review**, pelo
-menos para esse caso. Ressalva: a conta de teste é do mesmo dono e pode estar
-na mesma Central de Contas. A confirmação final vem com os primeiros jogadores.
+`follower_count: 6` (valor real). **Conclusão: viável sem App Review.**
+
+**Teste C (2026-11-25), Direct de um jogador sem nenhuma ligação com o dono do
+app:** chegou, e o perfil voltou com `follower_count: 152`. Confirma que
+funciona para jogadores reais com o app em Development.
 
 ## Passos manuais do usuário (antes de codar)
 1. Perfil do servidor como **conta profissional** (Business ou Creator).
