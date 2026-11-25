@@ -1,7 +1,7 @@
 # Seção 15 — Campanha "story no Instagram" (planejamento, 2026-11-25)
 
-> Status: **planejado, nada implementado.** Bloqueado pelo teste do app na
-> Meta (ver "Próximo passo"). Envolve mu-api e mu-front.
+> Status: **validado** (testes A e B ok em 2026-11-25). Em produção só existe a
+> rota de teste (log, sem crédito). Falta implementar. Envolve mu-api e mu-front.
 
 ## O que faz
 O jogador vincula o Instagram à conta do site, posta um story marcando o
@@ -144,11 +144,14 @@ e o resultado da consulta de perfil. **Não grava no banco nem credita.**
 - A User Profile API em `graph.facebook.com/<IGSID>` com o token do Unified
   Login devolveu 200 com `username`, `name`, `follower_count`,
   `is_user_follow_business` e `is_verified_user`.
-- ⚠ `follower_count` veio **0**. Falta confirmar se a conta de teste tem mesmo
-  0 seguidores ou se a API zera esse número (o que inviabilizaria a regra dos
-  50 seguidores).
-- A conta de teste provavelmente está ligada ao Facebook do admin do app, então
-  isso ainda não prova que funciona para jogadores. Falta o **Teste B**.
+- `follower_count` veio 0, e o usuário confirmou que a conta tem mesmo 0
+  seguidores.
+
+**Teste B (2026-11-25), conta separada (@natvinimoraes), app em Development:**
+funcionou igual. Chegaram o Direct e o `story_mention`, e o perfil voltou com
+`follower_count: 6` (valor real). **Conclusão: viável sem App Review**, pelo
+menos para esse caso. Ressalva: a conta de teste é do mesmo dono e pode estar
+na mesma Central de Contas. A confirmação final vem com os primeiros jogadores.
 
 ## Passos manuais do usuário (antes de codar)
 1. Perfil do servidor como **conta profissional** (Business ou Creator).
