@@ -9,6 +9,7 @@ const adminRoutes = require('./admin');
 const serverRoutes = require('./server');
 const emailRoutes = require('./email');
 const campaignsRoutes = require('./campaigns');
+const marketRoutes = require('./market');
 
 const router = Router();
 
@@ -22,5 +23,6 @@ router.use(adminRoutes);
 router.use(serverRoutes);
 router.use(emailRoutes);
 router.use(campaignsRoutes);
+router.use(marketRoutes);
 
 module.exports = router;

@@ -62,6 +62,15 @@ const purchaseLimiter = buildLimiter({
   message: 'Aguarde alguns segundos antes de tentar novamente.',
 });
 
+// Mercado: anunciar, comprar, retirar e renovar (mexem em baú/gold).
+const marketWriteLimiter = buildLimiter({
+  windowMinutes: env.rateLimit.marketWriteWindowSeconds / 60,
+  max: env.rateLimit.marketWriteMax,
+  keyGenerator: (req) => `market:${req.user?.username || req.ip}`,
+  code: 'TOO_MANY_REQUESTS',
+  message: 'Aguarde alguns segundos antes de tentar novamente.',
+});
+
 const ticketCreateLimiter = buildLimiter({
   windowMinutes: env.rateLimit.ticketCreateWindowMinutes,
   max: env.rateLimit.ticketCreateMax,
@@ -106,6 +115,7 @@ module.exports = {
   resendConfirmationLimiter,
   forgotPasswordLimiter,
   purchaseLimiter,
+  marketWriteLimiter,
   ticketCreateLimiter,
   giftRedeemAccountLimiter,
   giftRedeemIpLimiter,

@@ -48,6 +48,31 @@ function findEmptyWarehouseSlot(itemsBuffer) {
   return rel === -1 ? -1 : WAREHOUSE_START_SLOT + rel;
 }
 
+/**
+ * Primeiro slot (âncora, canto superior esquerdo) onde cabe um item
+ * `width` x `height`, varrendo linha a linha como o jogo. Usa a ocupação
+ * real (footprint de cada item, ver buildOccupancyGrid) e aborta se o baú
+ * tiver item desconhecido. Retorna -1 se não couber.
+ */
+function findFreeArea(itemsBuffer, width, height) {
+  assertValidBuffer(itemsBuffer);
+  const { occupied, unknownItems } = buildWarehouseGrid(itemsBuffer);
+  assertGridIsReliable(unknownItems);
+
+  for (let row = 0; row + height <= WAREHOUSE_HEIGHT; row++) {
+    for (let col = 0; col + width <= WAREHOUSE_WIDTH; col++) {
+      let fits = true;
+      for (let dRow = 0; dRow < height && fits; dRow++) {
+        for (let dCol = 0; dCol < width && fits; dCol++) {
+          if (occupied[(row + dRow) * WAREHOUSE_WIDTH + col + dCol]) fits = false;
+        }
+      }
+      if (fits) return WAREHOUSE_START_SLOT + row * WAREHOUSE_WIDTH + col;
+    }
+  }
+  return -1;
+}
+
 function assertValidBuffer(itemsBuffer) {
   if (!Buffer.isBuffer(itemsBuffer) || itemsBuffer.length !== ITEM_DB_BYTE * WAREHOUSE_SIZE) {
     throw new AppError(500, 'INVALID_WAREHOUSE_FORMAT', 'Formato do baú desta conta não reconhecido — abortando para não corromper dados.');
@@ -109,6 +134,7 @@ module.exports = {
   buildWarehouseGrid,
   countEmptyWarehouseSlots,
   findEmptyWarehouseSlot,
+  findFreeArea,
   insertItemIntoWarehouse,
   insertItemsIntoWarehouse,
   assertRedeemableAsSimpleItem: codec.assertRedeemableAsSimpleItem,

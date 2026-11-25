@@ -237,6 +237,92 @@ Chave não expira e só pode ser resgatada uma vez.
 
 ---
 
+## Mercado entre jogadores (`/market`) — adicionado em 2026-11-24
+
+Jogador **offline** anuncia um item do baú por gold (`cash`). O item sai do
+baú e fica no mercado; quem compra paga em gold e recebe o item no baú que
+escolher. O vendedor recebe o preço menos **10%** de taxa. Regras completas:
+`docs/SECTION_14_MARKET.md`.
+
+**Liberação:** enquanto `MARKET_ENABLED=false` no backend, só as contas de
+teste (`MARKET_TESTERS`) usam o mercado; as outras recebem **403**
+`MARKET_DISABLED` em todas as rotas abaixo, exceto `/market/catalog`. O
+front pode esconder o menu do mercado ao receber esse erro.
+
+| Método | Rota | Auth | Body/Query | Resposta |
+|---|---|---|---|---|
+| GET | `/market/catalog` | não | — | `{ categories, classes, items, rules }` (ver abaixo) |
+| GET | `/market/vaults` | 🔒 | — | `{ online, vaultsAvailable, listings: { active, limit }, vaults }` |
+| GET | `/market/listings` | 🔒 | filtros abaixo + `?sort&page&limit` | `{ page, limit, total, listings }` — só anúncios ativos e não expirados |
+| GET | `/market/listings/:id` | 🔒 | — | um anúncio + `mine` (bool). 404 se vendido, retirado ou expirado |
+| POST | `/market/listings` | 🔒 | `{ vaultId, slot, price }` | **201** `{ id, price, item }` |
+| POST | `/market/listings/:id/buy` | 🔒 | `{ vaultId }` (baú de destino) | `{ id, price, item, vaultId, slot }` |
+| POST | `/market/listings/:id/return` | 🔒 | `{ vaultId }` (baú de destino) | `{ id, vaultId, slot }` — cancela um anúncio ativo ou resgata um expirado |
+| POST | `/market/listings/:id/renew` | 🔒 | — | `{ id, expiresAt }` — só anúncio **seu** e **já expirado**; vale mais 7 dias |
+| GET | `/market/my/listings` | 🔒 | `?state&page&limit` (`state`: `active`, `expired`, `sold`, `returned`) | `{ page, limit, total, listings }` |
+| GET | `/market/my/purchases` | 🔒 | `?page&limit` | `{ page, limit, total, purchases }` |
+| GET | `/admin/market/repeated-serials` | 🔒 admin | — | `{ serials }` (ver abaixo) |
+
+**`/market/catalog`** (para montar os filtros):
+- `categories: [{ id, label, group }]`. `id` é um de `sword, axe, mace, scepter, spear, bow, crossbow, staff, shield, helm, armor, pants, gloves, boots, ring, pendant, wing`. `group` agrupa no menu: `weapon`, `shield`, `set`, `accessory`, `wing`.
+- `classes: [{ id, label }]`, com `id` em `dw, dk, elf, mg, dl`.
+- `items: [{ group, index, name, category, width, height, classes, image, excellentRequired }]`: os 231 itens que podem ser vendidos. Sets = mesmo `index` nos grupos 7 a 11 (ex.: Dragon = `index` 1).
+- `rules: { minPrice: 10, maxPrice: 10000, feePercent: 10, listingLimit: 10, listingDays: 7 }`.
+
+**`image`** é o caminho relativo dentro do pacote de imagens do mercado (ex.: `"Helm/Dragon Helm.jpg"`, `"Capas e Asas/Wing of Satan.jpg"`). As imagens (92x119 JPG) vêm de `docs/imgs_shop/` do backend; o front serve como arquivos estáticos e monta a URL. O caminho tem espaços, então use `encodeURI`.
+
+**Objeto `item`** (em baús, anúncios e históricos):
+`{ name, group, index, category, width, height, classes, image, level, skill, luck, additionalOption, additionalOptionText, excellentCount, excellent: [texto...], durability }`.
+`additionalOptionText` e os textos de `excellent` já vêm em português (ex.: `"Defesa adicional +20"`, `"Vida máxima +4%"`). Exiba como `Nome +level`.
+
+**`/market/vaults`**:
+- `vaults: [{ vaultId, active, items: [{ slot, x, y, sellable, notSellableReason, item }] }]`, um por baú (ativo e guardados, em ordem de número). `active: true` = o baú em uso no jogo. Um baú guardado nunca usado vem com `items: []`.
+- `sellable: false` vem com `notSellableReason` pronto para mostrar (ex.: "Só a versão excelente deste item pode ser vendida no mercado.").
+- `online: true` = a conta está no jogo: avise que é preciso sair do jogo (e esperar 2 minutos) antes de anunciar, comprar ou retirar.
+- `vaultsAvailable: false` = a conta tem baú duplicado e não pode usar o mercado (mostre "abra um ticket").
+- `listings: { active, limit }` = quantos anúncios a conta tem (inclui expirados não resgatados) e o máximo (10).
+
+**Filtros de `/market/listings`** (todos opcionais, combináveis):
+- `category`: uma ou várias separadas por vírgula (`category=helm,armor`).
+- `class`: um de `dw, dk, elf, mg, dl`, para itens que a classe usa.
+- `group` + `index`: um item específico. Só `index` com `category=helm,armor,...` = um set inteiro.
+- `minLevel` (0-15), `minExc` (nº mínimo de opções excelentes, 0-6), `skill=true`, `luck=true`, `minPrice`, `maxPrice`.
+- `q`: texto no nome do item.
+- `sort`: `newest` (padrão), `price_asc`, `price_desc`, `level_desc`, `exc_desc`. `limit` máximo 50.
+- Cada anúncio: `{ id, price, createdAt, expiresAt, item }`. **Anônimo**: não vem nome do vendedor.
+
+**`/market/my/listings`**: cada anúncio traz também `state` (`active`, `expired`, `sold` ou `returned`), `closedAt`, `sourceVault` e `destVault`. Quando `sold`, traz também `buyerName`, `received` (gold recebido) e `fee`. Anúncios ativos vêm primeiro.
+- Botões: `active` → "Cancelar" (`/return`); `expired` → "Resgatar" (`/return`) e "Renovar" (`/renew`).
+
+**`/market/my/purchases`**: cada compra traz `boughtAt`, `sellerName` e `destVault`. O nome do vendedor só aparece aqui, depois da venda.
+
+**Escolha do baú de destino** (`/buy` e `/return`): mostre os baús de `/market/vaults`. A API acha o primeiro espaço livre do tamanho do item (`width` x `height`) no baú escolhido.
+
+**Erros das ações** (formato padrão `{ error: { code, message } }`, mensagens prontas para mostrar):
+
+| HTTP | `code` | Quando |
+|---|---|---|
+| 409 | `ACCOUNT_ONLINE` | conta logada no jogo ou saiu há menos de 2 minutos |
+| 409 | `VAULT_CHANGED` | o baú mudou durante a operação (raro); nada mudou, pode tentar de novo |
+| 503 | `MARKET_BUSY` | o banco estava ocupado com o jogo; nada mudou, tente de novo em alguns segundos |
+| 404 | `VAULT_NOT_FOUND` | `vaultId` não é um baú da conta |
+| 409 | `VAULT_NOT_AVAILABLE` | baú duplicado ou indisponível; abrir ticket |
+| 422 | `ITEM_NOT_SELLABLE` | slot vazio ou item que não pode ser vendido |
+| 409 | `LISTING_LIMIT` | já tem 10 anúncios |
+| 409 | `LISTING_UNAVAILABLE` | anúncio vendido, retirado, expirado ou (no `/return`) não é seu |
+| 409 | `OWN_LISTING` | tentou comprar o próprio anúncio |
+| 409 | `WAREHOUSE_FULL` | não cabe no baú escolhido; o gold **não** é debitado |
+| 409 | `WAREHOUSE_UNKNOWN_ITEM` | o baú tem um item que a API não reconhece; recusa para não arriscar |
+| 402 | `INSUFFICIENT_CREDITS` | gold insuficiente |
+| 409 | `LISTING_NOT_RENEWABLE` | renovar algo que não é seu ou que ainda não expirou |
+| 400 | `VALIDATION_ERROR` | preço fora de 10 a 10.000, slot fora de 0 a 119 etc. |
+
+Em todos os erros, nada muda: nem o gold nem o item. Rate limit: uma ação (anunciar, comprar, retirar ou renovar) a cada 3s por conta.
+
+**`/admin/market/repeated-serials`**: `serials: [{ serial, listings, activeCount, sellers, lastListedAt, entries: [{ id, itemName, sellerAccount, buyerAccount, price, state, createdAt, closedAt }] }]`. Lista os itens com o mesmo serial em mais de um anúncio. `activeCount > 1` = o mesmo item anunciado duas vezes ao mesmo tempo, suspeita de item duplicado: destaque em vermelho. Revenda e anúncio de novo depois de retirar também repetem o serial, e isso é normal. Mostra no máximo 100 seriais.
+
+---
+
 ## Suporte / Tickets (`/support`) — todas exigem 🔒
 
 | Método | Rota | Body/Query | Resposta |

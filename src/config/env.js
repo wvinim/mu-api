@@ -119,6 +119,21 @@ const env = {
     // POST /campaigns/visit (links mupro.vip/bonus/<codigo>), por IP.
     campaignVisitMax: int('RATE_LIMIT_CAMPAIGN_VISIT_MAX', 10),
     campaignVisitWindowMinutes: int('RATE_LIMIT_CAMPAIGN_VISIT_WINDOW_MINUTES', 1),
+    // Ações do mercado que mexem em baú/gold (anunciar, comprar, retirar,
+    // renovar), por conta: um clique duplicado não vira duas chamadas.
+    marketWriteMax: int('RATE_LIMIT_MARKET_WRITE_MAX', 1),
+    marketWriteWindowSeconds: int('RATE_LIMIT_MARKET_WRITE_WINDOW_SECONDS', 3),
+  },
+
+  // Mercado entre jogadores (docs/SECTION_14_MARKET.md). Desligado por
+  // padrão: com MARKET_ENABLED=false, só as contas de MARKET_TESTERS usam
+  // as rotas (teste em produção com contas de teste — não há staging).
+  market: {
+    enabled: bool('MARKET_ENABLED', false),
+    testers: optional('MARKET_TESTERS', '')
+      .split(',')
+      .map((u) => u.trim())
+      .filter(Boolean),
   },
 
   // Bloqueio de scanners por IP (src/middlewares/scannerGuard.js).

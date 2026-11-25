@@ -1,0 +1,3412 @@
+{
+  "0:0": {
+    "group": 0,
+    "index": 0,
+    "name": "Kris",
+    "category": "sword",
+    "width": 1,
+    "height": 2,
+    "classes": [
+      "dw",
+      "dk",
+      "elf",
+      "mg",
+      "dl"
+    ],
+    "box": 1,
+    "excellentRequired": true,
+    "image": "Swords/kris.jpg"
+  },
+  "0:1": {
+    "group": 0,
+    "index": 1,
+    "name": "Short Sword",
+    "category": "sword",
+    "width": 1,
+    "height": 3,
+    "classes": [
+      "dw",
+      "dk",
+      "elf",
+      "mg",
+      "dl"
+    ],
+    "box": 1,
+    "excellentRequired": true,
+    "image": "Swords/Short Sword.jpg"
+  },
+  "0:2": {
+    "group": 0,
+    "index": 2,
+    "name": "Rapier",
+    "category": "sword",
+    "width": 1,
+    "height": 3,
+    "classes": [
+      "dk",
+      "elf",
+      "mg",
+      "dl"
+    ],
+    "box": 1,
+    "excellentRequired": true,
+    "image": "Swords/Rapier.jpg"
+  },
+  "0:3": {
+    "group": 0,
+    "index": 3,
+    "name": "Katana",
+    "category": "sword",
+    "width": 1,
+    "height": 3,
+    "classes": [
+      "dk",
+      "mg",
+      "dl"
+    ],
+    "box": 1,
+    "excellentRequired": true,
+    "image": "Swords/Katana.jpg"
+  },
+  "0:5": {
+    "group": 0,
+    "index": 5,
+    "name": "Blade",
+    "category": "sword",
+    "width": 1,
+    "height": 3,
+    "classes": [
+      "dw",
+      "dk",
+      "elf",
+      "mg",
+      "dl"
+    ],
+    "box": 2,
+    "excellentRequired": true,
+    "image": "Swords/Blade.jpg"
+  },
+  "0:8": {
+    "group": 0,
+    "index": 8,
+    "name": "Serpent Sword",
+    "category": "sword",
+    "width": 1,
+    "height": 3,
+    "classes": [
+      "dk",
+      "mg",
+      "dl"
+    ],
+    "box": 2,
+    "excellentRequired": true,
+    "image": "Swords/Serpent Sword.jpg"
+  },
+  "0:10": {
+    "group": 0,
+    "index": 10,
+    "name": "Light Saber",
+    "category": "sword",
+    "width": 2,
+    "height": 4,
+    "classes": [
+      "dk",
+      "elf",
+      "mg"
+    ],
+    "box": 2,
+    "excellentRequired": true,
+    "image": "Swords/Light Saber.jpg"
+  },
+  "0:14": {
+    "group": 0,
+    "index": 14,
+    "name": "Lighting Sword",
+    "category": "sword",
+    "width": 1,
+    "height": 3,
+    "classes": [
+      "dk",
+      "elf",
+      "mg"
+    ],
+    "box": 3,
+    "excellentRequired": true,
+    "image": "Swords/Lighting Sword.jpg"
+  },
+  "0:16": {
+    "group": 0,
+    "index": 16,
+    "name": "Sword of Destruction",
+    "category": "sword",
+    "width": 1,
+    "height": 4,
+    "classes": [
+      "dk",
+      "mg"
+    ],
+    "box": 3,
+    "excellentRequired": true,
+    "image": "Swords/Sword of Destruction.jpg"
+  },
+  "0:20": {
+    "group": 0,
+    "index": 20,
+    "name": "Knight Blade",
+    "category": "sword",
+    "width": 1,
+    "height": 4,
+    "classes": [
+      "dk"
+    ],
+    "box": 5,
+    "excellentRequired": true,
+    "image": "Swords/Knight Blade.jpg"
+  },
+  "0:21": {
+    "group": 0,
+    "index": 21,
+    "name": "Dark Reign Blade",
+    "category": "sword",
+    "width": 2,
+    "height": 4,
+    "classes": [
+      "mg"
+    ],
+    "box": 5,
+    "excellentRequired": true,
+    "image": "Swords/Dark Reign Blade.jpg"
+  },
+  "0:31": {
+    "group": 0,
+    "index": 31,
+    "name": "Rune Blade",
+    "category": "sword",
+    "width": 2,
+    "height": 4,
+    "classes": [
+      "mg"
+    ],
+    "box": 4,
+    "excellentRequired": true,
+    "image": "Swords/Rune Blade.jpg"
+  },
+  "1:0": {
+    "group": 1,
+    "index": 0,
+    "name": "Small Axe",
+    "category": "axe",
+    "width": 1,
+    "height": 3,
+    "classes": [
+      "dw",
+      "dk",
+      "elf",
+      "mg",
+      "dl"
+    ],
+    "box": 1,
+    "excellentRequired": true,
+    "image": "Axes/Small Axe.jpg"
+  },
+  "1:1": {
+    "group": 1,
+    "index": 1,
+    "name": "Hand Axe",
+    "category": "axe",
+    "width": 1,
+    "height": 3,
+    "classes": [
+      "dw",
+      "dk",
+      "elf",
+      "mg",
+      "dl"
+    ],
+    "box": 1,
+    "excellentRequired": true,
+    "image": "Axes/Hand Axe.jpg"
+  },
+  "2:9": {
+    "group": 2,
+    "index": 9,
+    "name": "Master Scepter",
+    "category": "scepter",
+    "width": 1,
+    "height": 3,
+    "classes": [
+      "dl"
+    ],
+    "box": 2,
+    "excellentRequired": true,
+    "image": "Scepter/Master Scepter.jpg"
+  },
+  "2:10": {
+    "group": 2,
+    "index": 10,
+    "name": "Great Scepter",
+    "category": "scepter",
+    "width": 1,
+    "height": 4,
+    "classes": [
+      "dl"
+    ],
+    "box": 3,
+    "excellentRequired": true,
+    "image": "Scepter/Great Scepter.jpg"
+  },
+  "2:11": {
+    "group": 2,
+    "index": 11,
+    "name": "Lord Scepter",
+    "category": "scepter",
+    "width": 1,
+    "height": 4,
+    "classes": [
+      "dl"
+    ],
+    "box": 4,
+    "excellentRequired": true,
+    "image": "Scepter/Lord Scepter.jpg"
+  },
+  "2:12": {
+    "group": 2,
+    "index": 12,
+    "name": "Great Lord Scepter",
+    "category": "scepter",
+    "width": 1,
+    "height": 4,
+    "classes": [
+      "dl"
+    ],
+    "box": 5,
+    "excellentRequired": true,
+    "image": "Scepter/Great Lord Scepter.jpg"
+  },
+  "3:9": {
+    "group": 3,
+    "index": 9,
+    "name": "Bill of Balrog",
+    "category": "spear",
+    "width": 2,
+    "height": 4,
+    "classes": [
+      "dk",
+      "elf",
+      "mg"
+    ],
+    "box": 3,
+    "excellentRequired": true,
+    "image": "Spears/Bill of Balrog.jpg"
+  },
+  "3:10": {
+    "group": 3,
+    "index": 10,
+    "name": "Dragon Spear",
+    "category": "spear",
+    "width": 2,
+    "height": 4,
+    "classes": [
+      "dk"
+    ],
+    "box": 4,
+    "excellentRequired": true,
+    "image": "Spears/Dragon Spear.jpg"
+  },
+  "4:4": {
+    "group": 4,
+    "index": 4,
+    "name": "Tiger Bow",
+    "category": "bow",
+    "width": 2,
+    "height": 4,
+    "classes": [
+      "elf"
+    ],
+    "box": 2,
+    "excellentRequired": true,
+    "image": "Bow/Tiger Bow.jpg"
+  },
+  "4:13": {
+    "group": 4,
+    "index": 13,
+    "name": "Bluewing Crossbow",
+    "category": "crossbow",
+    "width": 2,
+    "height": 3,
+    "classes": [
+      "elf"
+    ],
+    "box": 3,
+    "excellentRequired": true,
+    "image": "Crossbow/Bluewing Crossbow.jpg"
+  },
+  "4:14": {
+    "group": 4,
+    "index": 14,
+    "name": "Aquagold Crossbow",
+    "category": "crossbow",
+    "width": 2,
+    "height": 3,
+    "classes": [
+      "elf"
+    ],
+    "box": 3,
+    "excellentRequired": true,
+    "image": "Crossbow/Aquagold Crossbow.jpg"
+  },
+  "4:19": {
+    "group": 4,
+    "index": 19,
+    "name": "Great Reign Crossbow",
+    "category": "crossbow",
+    "width": 2,
+    "height": 3,
+    "classes": [
+      "elf"
+    ],
+    "box": 4,
+    "excellentRequired": true,
+    "image": "Crossbow/Great Reign Crossbow.jpg"
+  },
+  "4:20": {
+    "group": 4,
+    "index": 20,
+    "name": "Arrow Viper Bow",
+    "category": "bow",
+    "width": 2,
+    "height": 4,
+    "classes": [
+      "elf"
+    ],
+    "box": 5,
+    "excellentRequired": true,
+    "image": "Bow/Arrow Viper Bow.jpg"
+  },
+  "5:0": {
+    "group": 5,
+    "index": 0,
+    "name": "Skull Staff",
+    "category": "staff",
+    "width": 1,
+    "height": 3,
+    "classes": [
+      "dw",
+      "mg"
+    ],
+    "box": 1,
+    "excellentRequired": true,
+    "image": "Staffs/Skull Staff.jpg"
+  },
+  "5:1": {
+    "group": 5,
+    "index": 1,
+    "name": "Angelic Staff",
+    "category": "staff",
+    "width": 2,
+    "height": 3,
+    "classes": [
+      "dw",
+      "mg"
+    ],
+    "box": 1,
+    "excellentRequired": true,
+    "image": "Staffs/Angelic Staff.jpg"
+  },
+  "5:3": {
+    "group": 5,
+    "index": 3,
+    "name": "Thunder Staff",
+    "category": "staff",
+    "width": 2,
+    "height": 4,
+    "classes": [
+      "dw",
+      "mg"
+    ],
+    "box": 2,
+    "excellentRequired": true,
+    "image": "Staffs/Thunder Staff.jpg"
+  },
+  "5:4": {
+    "group": 5,
+    "index": 4,
+    "name": "Gorgon Staff",
+    "category": "staff",
+    "width": 2,
+    "height": 4,
+    "classes": [
+      "dw",
+      "mg"
+    ],
+    "box": 2,
+    "excellentRequired": true,
+    "image": "Staffs/Gorgon Staff.jpg"
+  },
+  "5:5": {
+    "group": 5,
+    "index": 5,
+    "name": "Legendary Staff",
+    "category": "staff",
+    "width": 1,
+    "height": 4,
+    "classes": [
+      "dw",
+      "mg"
+    ],
+    "box": 2,
+    "excellentRequired": true,
+    "image": "Staffs/Legendary Staff.jpg"
+  },
+  "5:6": {
+    "group": 5,
+    "index": 6,
+    "name": "Staff of Resurrection",
+    "category": "staff",
+    "width": 1,
+    "height": 4,
+    "classes": [
+      "dw",
+      "mg"
+    ],
+    "box": 3,
+    "excellentRequired": true,
+    "image": "Staffs/Staff of Resurrection.jpg"
+  },
+  "5:8": {
+    "group": 5,
+    "index": 8,
+    "name": "Staff of Destruction",
+    "category": "staff",
+    "width": 2,
+    "height": 4,
+    "classes": [
+      "dw",
+      "mg"
+    ],
+    "box": 3,
+    "excellentRequired": true,
+    "image": "Staffs/Staff of Destruction.jpg"
+  },
+  "5:9": {
+    "group": 5,
+    "index": 9,
+    "name": "Dragon Soul Staff",
+    "category": "staff",
+    "width": 1,
+    "height": 4,
+    "classes": [
+      "dw"
+    ],
+    "box": 4,
+    "excellentRequired": true,
+    "image": "Staffs/Dragon Soul Staff.jpg"
+  },
+  "5:10": {
+    "group": 5,
+    "index": 10,
+    "name": "Divine Staff of Archangel",
+    "category": "staff",
+    "width": 1,
+    "height": 4,
+    "classes": [
+      "dw",
+      "mg"
+    ],
+    "box": 5,
+    "excellentRequired": true,
+    "image": "Staffs/Divine Staff of Archangel.jpg"
+  },
+  "5:11": {
+    "group": 5,
+    "index": 11,
+    "name": "Staff of Kundun",
+    "category": "staff",
+    "width": 1,
+    "height": 4,
+    "classes": [
+      "dw",
+      "mg"
+    ],
+    "box": 5,
+    "excellentRequired": true,
+    "image": "Staffs/Staff of Kundun.jpg"
+  },
+  "5:13": {
+    "group": 5,
+    "index": 13,
+    "name": "Platina Staff",
+    "category": "staff",
+    "width": 1,
+    "height": 4,
+    "classes": [
+      "dw"
+    ],
+    "box": 5,
+    "excellentRequired": true,
+    "image": "Staffs/Platina Staff.jpg"
+  },
+  "6:0": {
+    "group": 6,
+    "index": 0,
+    "name": "Small Shield",
+    "category": "shield",
+    "width": 2,
+    "height": 2,
+    "classes": [
+      "dw",
+      "dk",
+      "elf",
+      "mg",
+      "dl"
+    ],
+    "box": 1,
+    "excellentRequired": true,
+    "image": "Shields/Small Shield.jpg"
+  },
+  "6:1": {
+    "group": 6,
+    "index": 1,
+    "name": "Horn Shield",
+    "category": "shield",
+    "width": 2,
+    "height": 2,
+    "classes": [
+      "dk",
+      "mg",
+      "dl"
+    ],
+    "box": 1,
+    "excellentRequired": true,
+    "image": "Shields/Horn Shield.jpg"
+  },
+  "6:2": {
+    "group": 6,
+    "index": 2,
+    "name": "Kite Shield",
+    "category": "shield",
+    "width": 2,
+    "height": 2,
+    "classes": [
+      "dk",
+      "mg",
+      "dl"
+    ],
+    "box": 2,
+    "excellentRequired": true,
+    "image": "Shields/Kite Shield.jpg"
+  },
+  "6:3": {
+    "group": 6,
+    "index": 3,
+    "name": "Elven Shield",
+    "category": "shield",
+    "width": 2,
+    "height": 2,
+    "classes": [
+      "elf"
+    ],
+    "box": 2,
+    "excellentRequired": true,
+    "image": "Shields/Elven Shield.jpg"
+  },
+  "6:4": {
+    "group": 6,
+    "index": 4,
+    "name": "Buckler",
+    "category": "shield",
+    "width": 2,
+    "height": 2,
+    "classes": [
+      "dw",
+      "dk",
+      "elf",
+      "mg",
+      "dl"
+    ],
+    "box": 1,
+    "excellentRequired": true,
+    "image": "Shields/Buckler.jpg"
+  },
+  "6:5": {
+    "group": 6,
+    "index": 5,
+    "name": "Dragon Slayer Shield",
+    "category": "shield",
+    "width": 2,
+    "height": 2,
+    "classes": [
+      "dk",
+      "mg",
+      "dl"
+    ],
+    "box": 3,
+    "excellentRequired": true,
+    "image": "Shields/Dragon Slayer Shield.jpg"
+  },
+  "6:6": {
+    "group": 6,
+    "index": 6,
+    "name": "Skull Shield",
+    "category": "shield",
+    "width": 2,
+    "height": 2,
+    "classes": [
+      "dw",
+      "dk",
+      "elf",
+      "mg",
+      "dl"
+    ],
+    "box": 2,
+    "excellentRequired": true,
+    "image": "Shields/Skull Shield.jpg"
+  },
+  "6:8": {
+    "group": 6,
+    "index": 8,
+    "name": "Tower Shield",
+    "category": "shield",
+    "width": 2,
+    "height": 2,
+    "classes": [
+      "dk",
+      "elf",
+      "mg",
+      "dl"
+    ],
+    "box": 3,
+    "excellentRequired": true,
+    "image": "Shields/Tower Shield.jpg"
+  },
+  "6:9": {
+    "group": 6,
+    "index": 9,
+    "name": "Plate Shield",
+    "category": "shield",
+    "width": 2,
+    "height": 2,
+    "classes": [
+      "dk",
+      "mg",
+      "dl"
+    ],
+    "box": 2,
+    "excellentRequired": true,
+    "image": "Shields/Plate Shield.jpg"
+  },
+  "6:12": {
+    "group": 6,
+    "index": 12,
+    "name": "Bronze Shield",
+    "category": "shield",
+    "width": 2,
+    "height": 2,
+    "classes": [
+      "dk",
+      "mg"
+    ],
+    "box": 4,
+    "excellentRequired": true,
+    "image": "Shields/Bronze Shield.jpg"
+  },
+  "6:13": {
+    "group": 6,
+    "index": 13,
+    "name": "Dragon Shield",
+    "category": "shield",
+    "width": 2,
+    "height": 2,
+    "classes": [
+      "dk",
+      "mg"
+    ],
+    "box": 4,
+    "excellentRequired": true,
+    "image": "Shields/Dragon Shield.jpg"
+  },
+  "6:14": {
+    "group": 6,
+    "index": 14,
+    "name": "Legendary Shield",
+    "category": "shield",
+    "width": 2,
+    "height": 3,
+    "classes": [
+      "dw",
+      "elf",
+      "mg"
+    ],
+    "box": 4,
+    "excellentRequired": true,
+    "image": "Shields/Legendary Shield.jpg"
+  },
+  "6:15": {
+    "group": 6,
+    "index": 15,
+    "name": "Grand Soul Shield",
+    "category": "shield",
+    "width": 2,
+    "height": 3,
+    "classes": [
+      "dw"
+    ],
+    "box": 5,
+    "excellentRequired": true,
+    "image": "Shields/Grand Soul Shield.jpg"
+  },
+  "6:16": {
+    "group": 6,
+    "index": 16,
+    "name": "Elemental Shield",
+    "category": "shield",
+    "width": 2,
+    "height": 2,
+    "classes": [
+      "elf"
+    ],
+    "box": 4,
+    "excellentRequired": true,
+    "image": "Shields/Elemental Shield.jpg"
+  },
+  "7:0": {
+    "group": 7,
+    "index": 0,
+    "name": "Bronze Helm",
+    "category": "helm",
+    "width": 2,
+    "height": 2,
+    "classes": [
+      "dk",
+      "dl"
+    ],
+    "box": 1,
+    "excellentRequired": true,
+    "image": "Helm/Bronze Helm.jpg"
+  },
+  "7:1": {
+    "group": 7,
+    "index": 1,
+    "name": "Dragon Helm",
+    "category": "helm",
+    "width": 2,
+    "height": 2,
+    "classes": [
+      "dk"
+    ],
+    "box": 3,
+    "excellentRequired": true,
+    "image": "Helm/Dragon Helm.jpg"
+  },
+  "7:2": {
+    "group": 7,
+    "index": 2,
+    "name": "Pad Helm",
+    "category": "helm",
+    "width": 2,
+    "height": 2,
+    "classes": [
+      "dw"
+    ],
+    "box": 1,
+    "excellentRequired": true,
+    "image": "Helm/Pad Helm.jpg"
+  },
+  "7:3": {
+    "group": 7,
+    "index": 3,
+    "name": "Legendary Helm",
+    "category": "helm",
+    "width": 2,
+    "height": 2,
+    "classes": [
+      "dw"
+    ],
+    "box": 3,
+    "excellentRequired": true,
+    "image": "Helm/Legendary Helm.jpg"
+  },
+  "7:4": {
+    "group": 7,
+    "index": 4,
+    "name": "Bone Helm",
+    "category": "helm",
+    "width": 2,
+    "height": 2,
+    "classes": [
+      "dw"
+    ],
+    "box": 2,
+    "excellentRequired": true,
+    "image": "Helm/Bone Helm.jpg"
+  },
+  "7:5": {
+    "group": 7,
+    "index": 5,
+    "name": "Leather Helm",
+    "category": "helm",
+    "width": 2,
+    "height": 2,
+    "classes": [
+      "dk",
+      "dl"
+    ],
+    "box": 1,
+    "excellentRequired": true,
+    "image": "Helm/Leather Helm.jpg"
+  },
+  "7:6": {
+    "group": 7,
+    "index": 6,
+    "name": "Scale Helm",
+    "category": "helm",
+    "width": 2,
+    "height": 2,
+    "classes": [
+      "dk",
+      "dl"
+    ],
+    "box": 2,
+    "excellentRequired": true,
+    "image": "Helm/Scale Helm.jpg"
+  },
+  "7:7": {
+    "group": 7,
+    "index": 7,
+    "name": "Sphinx Mask",
+    "category": "helm",
+    "width": 2,
+    "height": 2,
+    "classes": [
+      "dw"
+    ],
+    "box": 2,
+    "excellentRequired": true,
+    "image": "Helm/Sphinx Mask.jpg"
+  },
+  "7:8": {
+    "group": 7,
+    "index": 8,
+    "name": "Brass Helm",
+    "category": "helm",
+    "width": 2,
+    "height": 2,
+    "classes": [
+      "dk"
+    ],
+    "box": 2,
+    "excellentRequired": true,
+    "image": "Helm/Brass Helm.jpg"
+  },
+  "7:9": {
+    "group": 7,
+    "index": 9,
+    "name": "Plate Helm",
+    "category": "helm",
+    "width": 2,
+    "height": 2,
+    "classes": [
+      "dk"
+    ],
+    "box": 2,
+    "excellentRequired": true,
+    "image": "Helm/Plate Helm.jpg"
+  },
+  "7:10": {
+    "group": 7,
+    "index": 10,
+    "name": "Vine Helm",
+    "category": "helm",
+    "width": 2,
+    "height": 2,
+    "classes": [
+      "elf"
+    ],
+    "box": 1,
+    "excellentRequired": true,
+    "image": "Helm/Vine Helm.jpg"
+  },
+  "7:11": {
+    "group": 7,
+    "index": 11,
+    "name": "Silk Helm",
+    "category": "helm",
+    "width": 2,
+    "height": 2,
+    "classes": [
+      "elf"
+    ],
+    "box": 2,
+    "excellentRequired": true,
+    "image": "Helm/Silk Helm.jpg"
+  },
+  "7:12": {
+    "group": 7,
+    "index": 12,
+    "name": "Wind Helm",
+    "category": "helm",
+    "width": 2,
+    "height": 2,
+    "classes": [
+      "elf"
+    ],
+    "box": 2,
+    "excellentRequired": true,
+    "image": "Helm/Wind Helm.jpg"
+  },
+  "7:13": {
+    "group": 7,
+    "index": 13,
+    "name": "Spirit Helm",
+    "category": "helm",
+    "width": 2,
+    "height": 2,
+    "classes": [
+      "elf"
+    ],
+    "box": 2,
+    "excellentRequired": true,
+    "image": "Helm/Spirit Helm.jpg"
+  },
+  "7:14": {
+    "group": 7,
+    "index": 14,
+    "name": "Guardian Helm",
+    "category": "helm",
+    "width": 2,
+    "height": 2,
+    "classes": [
+      "elf"
+    ],
+    "box": 3,
+    "excellentRequired": true,
+    "image": "Helm/Guardian Helm.jpg"
+  },
+  "7:16": {
+    "group": 7,
+    "index": 16,
+    "name": "Black Dragon Helm",
+    "category": "helm",
+    "width": 2,
+    "height": 2,
+    "classes": [
+      "dk"
+    ],
+    "box": 4,
+    "excellentRequired": true,
+    "image": "Helm/Black Dragon Helm.jpg"
+  },
+  "7:17": {
+    "group": 7,
+    "index": 17,
+    "name": "Dark Phoenix Helm",
+    "category": "helm",
+    "width": 2,
+    "height": 2,
+    "classes": [
+      "dk"
+    ],
+    "box": 4,
+    "excellentRequired": true,
+    "image": "Helm/Dark Phoenix Helm.jpg"
+  },
+  "7:18": {
+    "group": 7,
+    "index": 18,
+    "name": "Grand Soul Helm",
+    "category": "helm",
+    "width": 2,
+    "height": 2,
+    "classes": [
+      "dw"
+    ],
+    "box": 4,
+    "excellentRequired": true,
+    "image": "Helm/Grand Soul Helm.jpg"
+  },
+  "7:19": {
+    "group": 7,
+    "index": 19,
+    "name": "Divine Helm",
+    "category": "helm",
+    "width": 2,
+    "height": 2,
+    "classes": [
+      "elf"
+    ],
+    "box": 4,
+    "excellentRequired": true,
+    "image": "Helm/Divine Helm.jpg"
+  },
+  "7:21": {
+    "group": 7,
+    "index": 21,
+    "name": "Great Dragon Helm",
+    "category": "helm",
+    "width": 2,
+    "height": 2,
+    "classes": [
+      "dk"
+    ],
+    "box": 5,
+    "excellentRequired": true,
+    "image": "Helm/Great Dragon Helm.jpg"
+  },
+  "7:22": {
+    "group": 7,
+    "index": 22,
+    "name": "Dark Soul Helm",
+    "category": "helm",
+    "width": 2,
+    "height": 2,
+    "classes": [
+      "dw"
+    ],
+    "box": 5,
+    "excellentRequired": true,
+    "image": "Helm/Dark Soul Helm.jpg"
+  },
+  "7:24": {
+    "group": 7,
+    "index": 24,
+    "name": "Red Spirit Helm",
+    "category": "helm",
+    "width": 2,
+    "height": 2,
+    "classes": [
+      "elf"
+    ],
+    "box": 5,
+    "excellentRequired": true,
+    "image": "Helm/Red Spirit Helm.jpg"
+  },
+  "7:25": {
+    "group": 7,
+    "index": 25,
+    "name": "Light Plate Mask",
+    "category": "helm",
+    "width": 2,
+    "height": 2,
+    "classes": [
+      "dl"
+    ],
+    "box": 3,
+    "excellentRequired": true,
+    "image": "Helm/Light Plate Mask.jpg"
+  },
+  "7:26": {
+    "group": 7,
+    "index": 26,
+    "name": "Adamantine Mask",
+    "category": "helm",
+    "width": 2,
+    "height": 2,
+    "classes": [
+      "dl"
+    ],
+    "box": 3,
+    "excellentRequired": true,
+    "image": "Helm/Adamantine Mask.jpg"
+  },
+  "7:27": {
+    "group": 7,
+    "index": 27,
+    "name": "Dark Steel Mask",
+    "category": "helm",
+    "width": 2,
+    "height": 2,
+    "classes": [
+      "dl"
+    ],
+    "box": 4,
+    "excellentRequired": true,
+    "image": "Helm/Dark Steel Mask.jpg"
+  },
+  "7:28": {
+    "group": 7,
+    "index": 28,
+    "name": "Dark Master Mask",
+    "category": "helm",
+    "width": 2,
+    "height": 2,
+    "classes": [
+      "dl"
+    ],
+    "box": 5,
+    "excellentRequired": true,
+    "image": "Helm/Dark Master Mask.jpg"
+  },
+  "7:34": {
+    "group": 7,
+    "index": 34,
+    "name": "Ashcrow Helm",
+    "category": "helm",
+    "width": 2,
+    "height": 2,
+    "classes": [
+      "dk"
+    ],
+    "box": 3,
+    "excellentRequired": true,
+    "image": "Helm/Ashcrow Helm.jpg"
+  },
+  "7:35": {
+    "group": 7,
+    "index": 35,
+    "name": "Eclipse Helm",
+    "category": "helm",
+    "width": 2,
+    "height": 2,
+    "classes": [
+      "dw"
+    ],
+    "box": 3,
+    "excellentRequired": true,
+    "image": "Helm/Eclipse Helm.jpg"
+  },
+  "7:36": {
+    "group": 7,
+    "index": 36,
+    "name": "Iris Helm",
+    "category": "helm",
+    "width": 2,
+    "height": 2,
+    "classes": [
+      "elf"
+    ],
+    "box": 3,
+    "excellentRequired": true,
+    "image": "Helm/Iris Helm.jpg"
+  },
+  "7:38": {
+    "group": 7,
+    "index": 38,
+    "name": "Glorious Mask",
+    "category": "helm",
+    "width": 2,
+    "height": 2,
+    "classes": [
+      "dl"
+    ],
+    "box": 4,
+    "excellentRequired": true,
+    "image": "Helm/Glorious Mask.jpg"
+  },
+  "8:0": {
+    "group": 8,
+    "index": 0,
+    "name": "Bronze Armor",
+    "category": "armor",
+    "width": 2,
+    "height": 2,
+    "classes": [
+      "dk",
+      "mg",
+      "dl"
+    ],
+    "box": 1,
+    "excellentRequired": true,
+    "image": "Armor/Bronze Armor.jpg"
+  },
+  "8:1": {
+    "group": 8,
+    "index": 1,
+    "name": "Dragon Armor",
+    "category": "armor",
+    "width": 2,
+    "height": 3,
+    "classes": [
+      "dk",
+      "mg"
+    ],
+    "box": 3,
+    "excellentRequired": true,
+    "image": "Armor/Dragon Armor.jpg"
+  },
+  "8:2": {
+    "group": 8,
+    "index": 2,
+    "name": "Pad Armor",
+    "category": "armor",
+    "width": 2,
+    "height": 2,
+    "classes": [
+      "dw",
+      "mg"
+    ],
+    "box": 1,
+    "excellentRequired": true,
+    "image": "Armor/Pad Armor.jpg"
+  },
+  "8:3": {
+    "group": 8,
+    "index": 3,
+    "name": "Legendary Armor",
+    "category": "armor",
+    "width": 2,
+    "height": 2,
+    "classes": [
+      "dw",
+      "mg"
+    ],
+    "box": 3,
+    "excellentRequired": true,
+    "image": "Armor/Legendary Armor.jpg"
+  },
+  "8:4": {
+    "group": 8,
+    "index": 4,
+    "name": "Bone Armor",
+    "category": "armor",
+    "width": 2,
+    "height": 2,
+    "classes": [
+      "dw",
+      "mg"
+    ],
+    "box": 2,
+    "excellentRequired": true,
+    "image": "Armor/Bone Armor.jpg"
+  },
+  "8:5": {
+    "group": 8,
+    "index": 5,
+    "name": "Leather Armor",
+    "category": "armor",
+    "width": 2,
+    "height": 3,
+    "classes": [
+      "dk",
+      "mg",
+      "dl"
+    ],
+    "box": 1,
+    "excellentRequired": true,
+    "image": "Armor/Leather Armor.jpg"
+  },
+  "8:6": {
+    "group": 8,
+    "index": 6,
+    "name": "Scale Armor",
+    "category": "armor",
+    "width": 2,
+    "height": 2,
+    "classes": [
+      "dk",
+      "mg",
+      "dl"
+    ],
+    "box": 2,
+    "excellentRequired": true,
+    "image": "Armor/Scale Armor.jpg"
+  },
+  "8:7": {
+    "group": 8,
+    "index": 7,
+    "name": "Sphinx Armor",
+    "category": "armor",
+    "width": 2,
+    "height": 3,
+    "classes": [
+      "dw",
+      "mg"
+    ],
+    "box": 2,
+    "excellentRequired": true,
+    "image": "Armor/Sphinx Armor.jpg"
+  },
+  "8:8": {
+    "group": 8,
+    "index": 8,
+    "name": "Brass Armor",
+    "category": "armor",
+    "width": 2,
+    "height": 2,
+    "classes": [
+      "dk",
+      "mg"
+    ],
+    "box": 2,
+    "excellentRequired": true,
+    "image": "Armor/Brass Armor.jpg"
+  },
+  "8:9": {
+    "group": 8,
+    "index": 9,
+    "name": "Plate Armor",
+    "category": "armor",
+    "width": 2,
+    "height": 2,
+    "classes": [
+      "dk",
+      "mg"
+    ],
+    "box": 2,
+    "excellentRequired": true,
+    "image": "Armor/Plate Armor.jpg"
+  },
+  "8:10": {
+    "group": 8,
+    "index": 10,
+    "name": "Vine Armor",
+    "category": "armor",
+    "width": 2,
+    "height": 2,
+    "classes": [
+      "elf"
+    ],
+    "box": 1,
+    "excellentRequired": true,
+    "image": "Armor/Vine Armor.jpg"
+  },
+  "8:11": {
+    "group": 8,
+    "index": 11,
+    "name": "Silk Armor",
+    "category": "armor",
+    "width": 2,
+    "height": 2,
+    "classes": [
+      "elf"
+    ],
+    "box": 2,
+    "excellentRequired": true,
+    "image": "Armor/Silk Armor.jpg"
+  },
+  "8:12": {
+    "group": 8,
+    "index": 12,
+    "name": "Wind Armor",
+    "category": "armor",
+    "width": 2,
+    "height": 2,
+    "classes": [
+      "elf"
+    ],
+    "box": 2,
+    "excellentRequired": true,
+    "image": "Armor/Wind Armor.jpg"
+  },
+  "8:13": {
+    "group": 8,
+    "index": 13,
+    "name": "Spirit Armor",
+    "category": "armor",
+    "width": 2,
+    "height": 2,
+    "classes": [
+      "elf"
+    ],
+    "box": 2,
+    "excellentRequired": true,
+    "image": "Armor/Spirit Armor.jpg"
+  },
+  "8:14": {
+    "group": 8,
+    "index": 14,
+    "name": "Guardian Armor",
+    "category": "armor",
+    "width": 2,
+    "height": 2,
+    "classes": [
+      "elf"
+    ],
+    "box": 3,
+    "excellentRequired": true,
+    "image": "Armor/Guardian Armor.jpg"
+  },
+  "8:15": {
+    "group": 8,
+    "index": 15,
+    "name": "Storm Crow Armor",
+    "category": "armor",
+    "width": 2,
+    "height": 3,
+    "classes": [
+      "mg"
+    ],
+    "box": 3,
+    "excellentRequired": true,
+    "image": "Armor/Storm Crow Armor.jpg"
+  },
+  "8:16": {
+    "group": 8,
+    "index": 16,
+    "name": "Black Dragon Armor",
+    "category": "armor",
+    "width": 2,
+    "height": 3,
+    "classes": [
+      "dk"
+    ],
+    "box": 4,
+    "excellentRequired": true,
+    "image": "Armor/Black Dragon Armor.jpg"
+  },
+  "8:17": {
+    "group": 8,
+    "index": 17,
+    "name": "Dark Phoenix Armor",
+    "category": "armor",
+    "width": 2,
+    "height": 3,
+    "classes": [
+      "dk"
+    ],
+    "box": 4,
+    "excellentRequired": true,
+    "image": "Armor/Dark Phoenix Armor.jpg"
+  },
+  "8:18": {
+    "group": 8,
+    "index": 18,
+    "name": "Grand Soul Armor",
+    "category": "armor",
+    "width": 2,
+    "height": 3,
+    "classes": [
+      "dw"
+    ],
+    "box": 4,
+    "excellentRequired": true,
+    "image": "Armor/Grand Soul Armor.jpg"
+  },
+  "8:19": {
+    "group": 8,
+    "index": 19,
+    "name": "Divine Armor",
+    "category": "armor",
+    "width": 2,
+    "height": 2,
+    "classes": [
+      "elf"
+    ],
+    "box": 4,
+    "excellentRequired": true,
+    "image": "Armor/Divine Armor.jpg"
+  },
+  "8:20": {
+    "group": 8,
+    "index": 20,
+    "name": "Thunder Hawk Armor",
+    "category": "armor",
+    "width": 2,
+    "height": 3,
+    "classes": [
+      "mg"
+    ],
+    "box": 4,
+    "excellentRequired": true,
+    "image": "Armor/Thunder Hawk Armor.jpg"
+  },
+  "8:21": {
+    "group": 8,
+    "index": 21,
+    "name": "Great Dragon Armor",
+    "category": "armor",
+    "width": 2,
+    "height": 3,
+    "classes": [
+      "dk"
+    ],
+    "box": 5,
+    "excellentRequired": true,
+    "image": "Armor/Great Dragon Armor.jpg"
+  },
+  "8:22": {
+    "group": 8,
+    "index": 22,
+    "name": "Dark Soul Armor",
+    "category": "armor",
+    "width": 2,
+    "height": 3,
+    "classes": [
+      "dw"
+    ],
+    "box": 5,
+    "excellentRequired": true,
+    "image": "Armor/Dark Soul Armor.jpg"
+  },
+  "8:23": {
+    "group": 8,
+    "index": 23,
+    "name": "Hurricane Armor",
+    "category": "armor",
+    "width": 2,
+    "height": 3,
+    "classes": [
+      "mg"
+    ],
+    "box": 5,
+    "excellentRequired": true,
+    "image": "Armor/Hurricane Armor.jpg"
+  },
+  "8:24": {
+    "group": 8,
+    "index": 24,
+    "name": "Red Sprit Armor",
+    "category": "armor",
+    "width": 2,
+    "height": 2,
+    "classes": [
+      "elf"
+    ],
+    "box": 5,
+    "excellentRequired": true,
+    "image": "Armor/Red Sprit Armor.jpg"
+  },
+  "8:25": {
+    "group": 8,
+    "index": 25,
+    "name": "Light Plate Armor",
+    "category": "armor",
+    "width": 2,
+    "height": 3,
+    "classes": [
+      "dl"
+    ],
+    "box": 3,
+    "excellentRequired": true,
+    "image": "Armor/Light Plate Armor.jpg"
+  },
+  "8:26": {
+    "group": 8,
+    "index": 26,
+    "name": "Adamantine Armor",
+    "category": "armor",
+    "width": 2,
+    "height": 3,
+    "classes": [
+      "dl"
+    ],
+    "box": 3,
+    "excellentRequired": true,
+    "image": "Armor/Adamantine Armor.jpg"
+  },
+  "8:27": {
+    "group": 8,
+    "index": 27,
+    "name": "Dark Steel Armor",
+    "category": "armor",
+    "width": 2,
+    "height": 3,
+    "classes": [
+      "dl"
+    ],
+    "box": 4,
+    "excellentRequired": true,
+    "image": "Armor/Dark Steel Armor.jpg"
+  },
+  "8:28": {
+    "group": 8,
+    "index": 28,
+    "name": "Dark Master Armor",
+    "category": "armor",
+    "width": 2,
+    "height": 3,
+    "classes": [
+      "dl"
+    ],
+    "box": 5,
+    "excellentRequired": true,
+    "image": "Armor/Dark Master Armor.jpg"
+  },
+  "8:34": {
+    "group": 8,
+    "index": 34,
+    "name": "Ashcrow Armor",
+    "category": "armor",
+    "width": 2,
+    "height": 3,
+    "classes": [
+      "dk"
+    ],
+    "box": 3,
+    "excellentRequired": true,
+    "image": "Armor/Ashcrow Armor.jpg"
+  },
+  "8:35": {
+    "group": 8,
+    "index": 35,
+    "name": "Eclipse Armor",
+    "category": "armor",
+    "width": 2,
+    "height": 3,
+    "classes": [
+      "dw"
+    ],
+    "box": 3,
+    "excellentRequired": true,
+    "image": "Armor/Eclipse Armor.jpg"
+  },
+  "8:36": {
+    "group": 8,
+    "index": 36,
+    "name": "Iris Armor",
+    "category": "armor",
+    "width": 2,
+    "height": 3,
+    "classes": [
+      "elf"
+    ],
+    "box": 3,
+    "excellentRequired": true,
+    "image": "Armor/Iris Armor.jpg"
+  },
+  "8:37": {
+    "group": 8,
+    "index": 37,
+    "name": "Valiant Armor",
+    "category": "armor",
+    "width": 2,
+    "height": 3,
+    "classes": [
+      "mg"
+    ],
+    "box": 4,
+    "excellentRequired": true,
+    "image": "Armor/Valiant Armor.jpg"
+  },
+  "8:38": {
+    "group": 8,
+    "index": 38,
+    "name": "Glorious Armor",
+    "category": "armor",
+    "width": 2,
+    "height": 3,
+    "classes": [
+      "dl"
+    ],
+    "box": 4,
+    "excellentRequired": true,
+    "image": "Armor/Glorious Armor.jpg"
+  },
+  "9:0": {
+    "group": 9,
+    "index": 0,
+    "name": "Bronze Pants",
+    "category": "pants",
+    "width": 2,
+    "height": 2,
+    "classes": [
+      "dk",
+      "mg",
+      "dl"
+    ],
+    "box": 1,
+    "excellentRequired": true,
+    "image": "Pants/Bronze Pants.jpg"
+  },
+  "9:1": {
+    "group": 9,
+    "index": 1,
+    "name": "Dragon Pants",
+    "category": "pants",
+    "width": 2,
+    "height": 2,
+    "classes": [
+      "dk",
+      "mg"
+    ],
+    "box": 3,
+    "excellentRequired": true,
+    "image": "Pants/Dragon Pants.jpg"
+  },
+  "9:2": {
+    "group": 9,
+    "index": 2,
+    "name": "Pad Pants",
+    "category": "pants",
+    "width": 2,
+    "height": 2,
+    "classes": [
+      "dw",
+      "mg"
+    ],
+    "box": 1,
+    "excellentRequired": true,
+    "image": "Pants/Pad Pants.jpg"
+  },
+  "9:3": {
+    "group": 9,
+    "index": 3,
+    "name": "Legendary Pants",
+    "category": "pants",
+    "width": 2,
+    "height": 2,
+    "classes": [
+      "dw",
+      "mg"
+    ],
+    "box": 3,
+    "excellentRequired": true,
+    "image": "Pants/Legendary Pants.jpg"
+  },
+  "9:4": {
+    "group": 9,
+    "index": 4,
+    "name": "Bone Pants",
+    "category": "pants",
+    "width": 2,
+    "height": 2,
+    "classes": [
+      "dw",
+      "mg"
+    ],
+    "box": 2,
+    "excellentRequired": true,
+    "image": "Pants/Bone Pants.jpg"
+  },
+  "9:5": {
+    "group": 9,
+    "index": 5,
+    "name": "Leather Pants",
+    "category": "pants",
+    "width": 2,
+    "height": 2,
+    "classes": [
+      "dk",
+      "mg",
+      "dl"
+    ],
+    "box": 1,
+    "excellentRequired": true,
+    "image": "Pants/Leather Pants.jpg"
+  },
+  "9:6": {
+    "group": 9,
+    "index": 6,
+    "name": "Scale Pants",
+    "category": "pants",
+    "width": 2,
+    "height": 2,
+    "classes": [
+      "dk",
+      "mg",
+      "dl"
+    ],
+    "box": 2,
+    "excellentRequired": true,
+    "image": "Pants/Scale Pants.jpg"
+  },
+  "9:7": {
+    "group": 9,
+    "index": 7,
+    "name": "Sphinx Pants",
+    "category": "pants",
+    "width": 2,
+    "height": 2,
+    "classes": [
+      "dw",
+      "mg"
+    ],
+    "box": 2,
+    "excellentRequired": true,
+    "image": "Pants/Sphinx Pants.jpg"
+  },
+  "9:8": {
+    "group": 9,
+    "index": 8,
+    "name": "Brass Pants",
+    "category": "pants",
+    "width": 2,
+    "height": 2,
+    "classes": [
+      "dk",
+      "mg"
+    ],
+    "box": 2,
+    "excellentRequired": true,
+    "image": "Pants/Brass Pants.jpg"
+  },
+  "9:9": {
+    "group": 9,
+    "index": 9,
+    "name": "Plate Pants",
+    "category": "pants",
+    "width": 2,
+    "height": 2,
+    "classes": [
+      "dk",
+      "mg"
+    ],
+    "box": 2,
+    "excellentRequired": true,
+    "image": "Pants/Plate Pants.jpg"
+  },
+  "9:10": {
+    "group": 9,
+    "index": 10,
+    "name": "Vine Pants",
+    "category": "pants",
+    "width": 2,
+    "height": 2,
+    "classes": [
+      "elf"
+    ],
+    "box": 1,
+    "excellentRequired": true,
+    "image": "Pants/Vine Pants.jpg"
+  },
+  "9:11": {
+    "group": 9,
+    "index": 11,
+    "name": "Silk Pants",
+    "category": "pants",
+    "width": 2,
+    "height": 2,
+    "classes": [
+      "elf"
+    ],
+    "box": 2,
+    "excellentRequired": true,
+    "image": "Pants/Silk Pants.jpg"
+  },
+  "9:12": {
+    "group": 9,
+    "index": 12,
+    "name": "Wind Pants",
+    "category": "pants",
+    "width": 2,
+    "height": 2,
+    "classes": [
+      "elf"
+    ],
+    "box": 2,
+    "excellentRequired": true,
+    "image": "Pants/Wind Pants.jpg"
+  },
+  "9:13": {
+    "group": 9,
+    "index": 13,
+    "name": "Spirit Pants",
+    "category": "pants",
+    "width": 2,
+    "height": 2,
+    "classes": [
+      "elf"
+    ],
+    "box": 2,
+    "excellentRequired": true,
+    "image": "Pants/Spirit Pants.jpg"
+  },
+  "9:14": {
+    "group": 9,
+    "index": 14,
+    "name": "Guardian Pants",
+    "category": "pants",
+    "width": 2,
+    "height": 2,
+    "classes": [
+      "elf"
+    ],
+    "box": 3,
+    "excellentRequired": true,
+    "image": "Pants/Guardian Pants.jpg"
+  },
+  "9:15": {
+    "group": 9,
+    "index": 15,
+    "name": "Storm Crow Pants",
+    "category": "pants",
+    "width": 2,
+    "height": 2,
+    "classes": [
+      "mg"
+    ],
+    "box": 3,
+    "excellentRequired": true,
+    "image": "Pants/Storm Crow Pants.jpg"
+  },
+  "9:16": {
+    "group": 9,
+    "index": 16,
+    "name": "Black Dragon Pants",
+    "category": "pants",
+    "width": 2,
+    "height": 2,
+    "classes": [
+      "dk"
+    ],
+    "box": 4,
+    "excellentRequired": true,
+    "image": "Pants/Black Dragon Pants.jpg"
+  },
+  "9:17": {
+    "group": 9,
+    "index": 17,
+    "name": "Dark Phoenix Pants",
+    "category": "pants",
+    "width": 2,
+    "height": 2,
+    "classes": [
+      "dk"
+    ],
+    "box": 4,
+    "excellentRequired": true,
+    "image": "Pants/Dark Phoenix Pants.jpg"
+  },
+  "9:18": {
+    "group": 9,
+    "index": 18,
+    "name": "Grand Soul Pants",
+    "category": "pants",
+    "width": 2,
+    "height": 2,
+    "classes": [
+      "dw"
+    ],
+    "box": 4,
+    "excellentRequired": true,
+    "image": "Pants/Grand Soul Pants.jpg"
+  },
+  "9:19": {
+    "group": 9,
+    "index": 19,
+    "name": "Divine Pants",
+    "category": "pants",
+    "width": 2,
+    "height": 2,
+    "classes": [
+      "elf"
+    ],
+    "box": 4,
+    "excellentRequired": true,
+    "image": "Pants/Divine Pants.jpg"
+  },
+  "9:20": {
+    "group": 9,
+    "index": 20,
+    "name": "Thunder Hawk Pants",
+    "category": "pants",
+    "width": 2,
+    "height": 2,
+    "classes": [
+      "mg"
+    ],
+    "box": 4,
+    "excellentRequired": true,
+    "image": "Pants/Thunder Hawk Pants.jpg"
+  },
+  "9:21": {
+    "group": 9,
+    "index": 21,
+    "name": "Great Dragon Pants",
+    "category": "pants",
+    "width": 2,
+    "height": 2,
+    "classes": [
+      "dk"
+    ],
+    "box": 5,
+    "excellentRequired": true,
+    "image": "Pants/Great Dragon Pants.jpg"
+  },
+  "9:22": {
+    "group": 9,
+    "index": 22,
+    "name": "Dark Soul Pants",
+    "category": "pants",
+    "width": 2,
+    "height": 2,
+    "classes": [
+      "dw"
+    ],
+    "box": 5,
+    "excellentRequired": true,
+    "image": "Pants/Dark Soul Pants.jpg"
+  },
+  "9:23": {
+    "group": 9,
+    "index": 23,
+    "name": "Hurricane Pants",
+    "category": "pants",
+    "width": 2,
+    "height": 2,
+    "classes": [
+      "mg"
+    ],
+    "box": 5,
+    "excellentRequired": true,
+    "image": "Pants/Hurricane Pants.jpg"
+  },
+  "9:24": {
+    "group": 9,
+    "index": 24,
+    "name": "Red Spirit Pants",
+    "category": "pants",
+    "width": 2,
+    "height": 2,
+    "classes": [
+      "elf"
+    ],
+    "box": 5,
+    "excellentRequired": true,
+    "image": "Pants/Red Spirit Pants.jpg"
+  },
+  "9:25": {
+    "group": 9,
+    "index": 25,
+    "name": "Light Plate Pants",
+    "category": "pants",
+    "width": 2,
+    "height": 2,
+    "classes": [
+      "dl"
+    ],
+    "box": 3,
+    "excellentRequired": true,
+    "image": "Pants/Light Plate Pants.jpg"
+  },
+  "9:26": {
+    "group": 9,
+    "index": 26,
+    "name": "Adamantine Pants",
+    "category": "pants",
+    "width": 2,
+    "height": 2,
+    "classes": [
+      "dl"
+    ],
+    "box": 3,
+    "excellentRequired": true,
+    "image": "Pants/Adamantine Pants.jpg"
+  },
+  "9:27": {
+    "group": 9,
+    "index": 27,
+    "name": "Dark Steel Pants",
+    "category": "pants",
+    "width": 2,
+    "height": 2,
+    "classes": [
+      "dl"
+    ],
+    "box": 4,
+    "excellentRequired": true,
+    "image": "Pants/Dark Steel Pants.jpg"
+  },
+  "9:28": {
+    "group": 9,
+    "index": 28,
+    "name": "Dark Master Pants",
+    "category": "pants",
+    "width": 2,
+    "height": 2,
+    "classes": [
+      "dl"
+    ],
+    "box": 5,
+    "excellentRequired": true,
+    "image": "Pants/Dark Master Pants.jpg"
+  },
+  "9:34": {
+    "group": 9,
+    "index": 34,
+    "name": "Ashcrow Pants",
+    "category": "pants",
+    "width": 2,
+    "height": 2,
+    "classes": [
+      "dk"
+    ],
+    "box": 3,
+    "excellentRequired": true,
+    "image": "Pants/Ashcrow Pants.jpg"
+  },
+  "9:35": {
+    "group": 9,
+    "index": 35,
+    "name": "Eclipse Pants",
+    "category": "pants",
+    "width": 2,
+    "height": 2,
+    "classes": [
+      "dw"
+    ],
+    "box": 3,
+    "excellentRequired": true,
+    "image": "Pants/Eclipse Pants.jpg"
+  },
+  "9:36": {
+    "group": 9,
+    "index": 36,
+    "name": "Iris Pants",
+    "category": "pants",
+    "width": 2,
+    "height": 2,
+    "classes": [
+      "elf"
+    ],
+    "box": 3,
+    "excellentRequired": true,
+    "image": "Pants/Iris Pants.jpg"
+  },
+  "9:37": {
+    "group": 9,
+    "index": 37,
+    "name": "Valiant Pants",
+    "category": "pants",
+    "width": 2,
+    "height": 2,
+    "classes": [
+      "mg"
+    ],
+    "box": 4,
+    "excellentRequired": true,
+    "image": "Pants/Valiant Pants.jpg"
+  },
+  "9:38": {
+    "group": 9,
+    "index": 38,
+    "name": "Glorious Pants",
+    "category": "pants",
+    "width": 2,
+    "height": 2,
+    "classes": [
+      "dl"
+    ],
+    "box": 4,
+    "excellentRequired": true,
+    "image": "Pants/Glorious Pants.jpg"
+  },
+  "10:0": {
+    "group": 10,
+    "index": 0,
+    "name": "Bronze Gloves",
+    "category": "gloves",
+    "width": 2,
+    "height": 2,
+    "classes": [
+      "dk",
+      "mg",
+      "dl"
+    ],
+    "box": 1,
+    "excellentRequired": true,
+    "image": "Gloves/Bronze Gloves.jpg"
+  },
+  "10:1": {
+    "group": 10,
+    "index": 1,
+    "name": "Dragon Gloves",
+    "category": "gloves",
+    "width": 2,
+    "height": 2,
+    "classes": [
+      "dk",
+      "mg"
+    ],
+    "box": 3,
+    "excellentRequired": true,
+    "image": "Gloves/Dragon Gloves.jpg"
+  },
+  "10:2": {
+    "group": 10,
+    "index": 2,
+    "name": "Pad Gloves",
+    "category": "gloves",
+    "width": 2,
+    "height": 2,
+    "classes": [
+      "dw",
+      "mg"
+    ],
+    "box": 1,
+    "excellentRequired": true,
+    "image": "Gloves/Pad Gloves.jpg"
+  },
+  "10:3": {
+    "group": 10,
+    "index": 3,
+    "name": "Legendary Gloves",
+    "category": "gloves",
+    "width": 2,
+    "height": 2,
+    "classes": [
+      "dw",
+      "mg"
+    ],
+    "box": 3,
+    "excellentRequired": true,
+    "image": "Gloves/Legendary Gloves.jpg"
+  },
+  "10:4": {
+    "group": 10,
+    "index": 4,
+    "name": "Bone Gloves",
+    "category": "gloves",
+    "width": 2,
+    "height": 2,
+    "classes": [
+      "dw",
+      "mg"
+    ],
+    "box": 2,
+    "excellentRequired": true,
+    "image": "Gloves/Bone Gloves.jpg"
+  },
+  "10:5": {
+    "group": 10,
+    "index": 5,
+    "name": "Leather Gloves",
+    "category": "gloves",
+    "width": 2,
+    "height": 2,
+    "classes": [
+      "dk",
+      "mg",
+      "dl"
+    ],
+    "box": 1,
+    "excellentRequired": true,
+    "image": "Gloves/Leather Gloves.jpg"
+  },
+  "10:6": {
+    "group": 10,
+    "index": 6,
+    "name": "Scale Gloves",
+    "category": "gloves",
+    "width": 2,
+    "height": 2,
+    "classes": [
+      "dk",
+      "mg",
+      "dl"
+    ],
+    "box": 2,
+    "excellentRequired": true,
+    "image": "Gloves/Scale Gloves.jpg"
+  },
+  "10:7": {
+    "group": 10,
+    "index": 7,
+    "name": "Sphinx Gloves",
+    "category": "gloves",
+    "width": 2,
+    "height": 2,
+    "classes": [
+      "dw",
+      "mg"
+    ],
+    "box": 2,
+    "excellentRequired": true,
+    "image": "Gloves/Sphinx Gloves.jpg"
+  },
+  "10:8": {
+    "group": 10,
+    "index": 8,
+    "name": "Brass Gloves",
+    "category": "gloves",
+    "width": 2,
+    "height": 2,
+    "classes": [
+      "dk",
+      "mg"
+    ],
+    "box": 2,
+    "excellentRequired": true,
+    "image": "Gloves/Brass Gloves.jpg"
+  },
+  "10:9": {
+    "group": 10,
+    "index": 9,
+    "name": "Plate Gloves",
+    "category": "gloves",
+    "width": 2,
+    "height": 2,
+    "classes": [
+      "dk",
+      "mg"
+    ],
+    "box": 2,
+    "excellentRequired": true,
+    "image": "Gloves/Plate Gloves.jpg"
+  },
+  "10:10": {
+    "group": 10,
+    "index": 10,
+    "name": "Vine Gloves",
+    "category": "gloves",
+    "width": 2,
+    "height": 2,
+    "classes": [
+      "elf"
+    ],
+    "box": 1,
+    "excellentRequired": true,
+    "image": "Gloves/Vine Gloves.jpg"
+  },
+  "10:11": {
+    "group": 10,
+    "index": 11,
+    "name": "Silk Gloves",
+    "category": "gloves",
+    "width": 2,
+    "height": 2,
+    "classes": [
+      "elf"
+    ],
+    "box": 2,
+    "excellentRequired": true,
+    "image": "Gloves/Silk Gloves.jpg"
+  },
+  "10:12": {
+    "group": 10,
+    "index": 12,
+    "name": "Wind Gloves",
+    "category": "gloves",
+    "width": 2,
+    "height": 2,
+    "classes": [
+      "elf"
+    ],
+    "box": 2,
+    "excellentRequired": true,
+    "image": "Gloves/Wind Gloves.jpg"
+  },
+  "10:13": {
+    "group": 10,
+    "index": 13,
+    "name": "Spirit Gloves",
+    "category": "gloves",
+    "width": 2,
+    "height": 2,
+    "classes": [
+      "elf"
+    ],
+    "box": 2,
+    "excellentRequired": true,
+    "image": "Gloves/Spirit Gloves.jpg"
+  },
+  "10:14": {
+    "group": 10,
+    "index": 14,
+    "name": "Guardian Gloves",
+    "category": "gloves",
+    "width": 2,
+    "height": 2,
+    "classes": [
+      "elf"
+    ],
+    "box": 3,
+    "excellentRequired": true,
+    "image": "Gloves/Guardian Gloves.jpg"
+  },
+  "10:15": {
+    "group": 10,
+    "index": 15,
+    "name": "Storm Crow Gloves",
+    "category": "gloves",
+    "width": 2,
+    "height": 2,
+    "classes": [
+      "mg"
+    ],
+    "box": 3,
+    "excellentRequired": true,
+    "image": "Gloves/Storm Crow Gloves.jpg"
+  },
+  "10:16": {
+    "group": 10,
+    "index": 16,
+    "name": "Black Dragon Gloves",
+    "category": "gloves",
+    "width": 2,
+    "height": 2,
+    "classes": [
+      "dk"
+    ],
+    "box": 4,
+    "excellentRequired": true,
+    "image": "Gloves/Black Dragon Gloves.jpg"
+  },
+  "10:17": {
+    "group": 10,
+    "index": 17,
+    "name": "Dark Phoenix Gloves",
+    "category": "gloves",
+    "width": 2,
+    "height": 2,
+    "classes": [
+      "dk"
+    ],
+    "box": 4,
+    "excellentRequired": true,
+    "image": "Gloves/Dark Phoenix Gloves.jpg"
+  },
+  "10:18": {
+    "group": 10,
+    "index": 18,
+    "name": "Grand Soul Gloves",
+    "category": "gloves",
+    "width": 2,
+    "height": 2,
+    "classes": [
+      "dw"
+    ],
+    "box": 4,
+    "excellentRequired": true,
+    "image": "Gloves/Grand Soul Gloves.jpg"
+  },
+  "10:19": {
+    "group": 10,
+    "index": 19,
+    "name": "Divine Gloves",
+    "category": "gloves",
+    "width": 2,
+    "height": 2,
+    "classes": [
+      "elf"
+    ],
+    "box": 4,
+    "excellentRequired": true,
+    "image": "Gloves/Divine Gloves.jpg"
+  },
+  "10:20": {
+    "group": 10,
+    "index": 20,
+    "name": "Thunder Hawk Gloves",
+    "category": "gloves",
+    "width": 2,
+    "height": 2,
+    "classes": [
+      "mg"
+    ],
+    "box": 4,
+    "excellentRequired": true,
+    "image": "Gloves/Thunder Hawk Gloves.jpg"
+  },
+  "10:21": {
+    "group": 10,
+    "index": 21,
+    "name": "Great Dragon Gloves",
+    "category": "gloves",
+    "width": 2,
+    "height": 2,
+    "classes": [
+      "dk"
+    ],
+    "box": 5,
+    "excellentRequired": true,
+    "image": "Gloves/Great Dragon Gloves.jpg"
+  },
+  "10:22": {
+    "group": 10,
+    "index": 22,
+    "name": "Dark Soul Gloves",
+    "category": "gloves",
+    "width": 2,
+    "height": 2,
+    "classes": [
+      "dw"
+    ],
+    "box": 5,
+    "excellentRequired": true,
+    "image": "Gloves/Dark Soul Gloves.jpg"
+  },
+  "10:23": {
+    "group": 10,
+    "index": 23,
+    "name": "Hurricane Gloves",
+    "category": "gloves",
+    "width": 2,
+    "height": 2,
+    "classes": [
+      "mg"
+    ],
+    "box": 5,
+    "excellentRequired": true,
+    "image": "Gloves/Hurricane Gloves.jpg"
+  },
+  "10:24": {
+    "group": 10,
+    "index": 24,
+    "name": "Red Spirit Gloves",
+    "category": "gloves",
+    "width": 2,
+    "height": 2,
+    "classes": [
+      "elf"
+    ],
+    "box": 5,
+    "excellentRequired": true,
+    "image": "Gloves/Red Spirit Gloves.jpg"
+  },
+  "10:25": {
+    "group": 10,
+    "index": 25,
+    "name": "Light Plate Gloves",
+    "category": "gloves",
+    "width": 2,
+    "height": 2,
+    "classes": [
+      "dl"
+    ],
+    "box": 3,
+    "excellentRequired": true,
+    "image": "Gloves/Light Plate Gloves.jpg"
+  },
+  "10:26": {
+    "group": 10,
+    "index": 26,
+    "name": "Adamantine Gloves",
+    "category": "gloves",
+    "width": 2,
+    "height": 2,
+    "classes": [
+      "dl"
+    ],
+    "box": 3,
+    "excellentRequired": true,
+    "image": "Gloves/Adamantine Gloves.jpg"
+  },
+  "10:27": {
+    "group": 10,
+    "index": 27,
+    "name": "Dark Steel Gloves",
+    "category": "gloves",
+    "width": 2,
+    "height": 2,
+    "classes": [
+      "dl"
+    ],
+    "box": 4,
+    "excellentRequired": true,
+    "image": "Gloves/Dark Steel Gloves.jpg"
+  },
+  "10:28": {
+    "group": 10,
+    "index": 28,
+    "name": "Dark Master Gloves",
+    "category": "gloves",
+    "width": 2,
+    "height": 2,
+    "classes": [
+      "dl"
+    ],
+    "box": 5,
+    "excellentRequired": true,
+    "image": "Gloves/Dark Master Gloves.jpg"
+  },
+  "10:34": {
+    "group": 10,
+    "index": 34,
+    "name": "Ashcrow Gloves",
+    "category": "gloves",
+    "width": 2,
+    "height": 2,
+    "classes": [
+      "dk"
+    ],
+    "box": 3,
+    "excellentRequired": true,
+    "image": "Gloves/Ashcrow Gloves.jpg"
+  },
+  "10:35": {
+    "group": 10,
+    "index": 35,
+    "name": "Eclipse Gloves",
+    "category": "gloves",
+    "width": 2,
+    "height": 2,
+    "classes": [
+      "dw"
+    ],
+    "box": 3,
+    "excellentRequired": true,
+    "image": "Gloves/Eclipse Gloves.jpg"
+  },
+  "10:36": {
+    "group": 10,
+    "index": 36,
+    "name": "Iris Gloves",
+    "category": "gloves",
+    "width": 2,
+    "height": 2,
+    "classes": [
+      "elf"
+    ],
+    "box": 3,
+    "excellentRequired": true,
+    "image": "Gloves/Iris Gloves.jpg"
+  },
+  "10:37": {
+    "group": 10,
+    "index": 37,
+    "name": "Valiant Gloves",
+    "category": "gloves",
+    "width": 2,
+    "height": 2,
+    "classes": [
+      "mg"
+    ],
+    "box": 4,
+    "excellentRequired": true,
+    "image": "Gloves/Valiant Gloves.jpg"
+  },
+  "10:38": {
+    "group": 10,
+    "index": 38,
+    "name": "Glorious Gloves",
+    "category": "gloves",
+    "width": 2,
+    "height": 2,
+    "classes": [
+      "dl"
+    ],
+    "box": 4,
+    "excellentRequired": true,
+    "image": "Gloves/Glorious Gloves.jpg"
+  },
+  "11:0": {
+    "group": 11,
+    "index": 0,
+    "name": "Bronze Boots",
+    "category": "boots",
+    "width": 2,
+    "height": 2,
+    "classes": [
+      "dk",
+      "mg",
+      "dl"
+    ],
+    "box": 1,
+    "excellentRequired": true,
+    "image": "Boots/Bronze Boots.jpg"
+  },
+  "11:1": {
+    "group": 11,
+    "index": 1,
+    "name": "Dragon Boots",
+    "category": "boots",
+    "width": 2,
+    "height": 2,
+    "classes": [
+      "dk",
+      "mg"
+    ],
+    "box": 3,
+    "excellentRequired": true,
+    "image": "Boots/Dragon Boots.jpg"
+  },
+  "11:2": {
+    "group": 11,
+    "index": 2,
+    "name": "Pad Boots",
+    "category": "boots",
+    "width": 2,
+    "height": 2,
+    "classes": [
+      "dw",
+      "mg"
+    ],
+    "box": 1,
+    "excellentRequired": true,
+    "image": "Boots/Pad Boots.jpg"
+  },
+  "11:3": {
+    "group": 11,
+    "index": 3,
+    "name": "Legendary Boots",
+    "category": "boots",
+    "width": 2,
+    "height": 2,
+    "classes": [
+      "dw",
+      "mg"
+    ],
+    "box": 3,
+    "excellentRequired": true,
+    "image": "Boots/Legendary Boots.jpg"
+  },
+  "11:4": {
+    "group": 11,
+    "index": 4,
+    "name": "Bone Boots",
+    "category": "boots",
+    "width": 2,
+    "height": 2,
+    "classes": [
+      "dw",
+      "mg"
+    ],
+    "box": 2,
+    "excellentRequired": true,
+    "image": "Boots/Bone Boots.jpg"
+  },
+  "11:5": {
+    "group": 11,
+    "index": 5,
+    "name": "Leather Boots",
+    "category": "boots",
+    "width": 2,
+    "height": 2,
+    "classes": [
+      "dk",
+      "mg",
+      "dl"
+    ],
+    "box": 1,
+    "excellentRequired": true,
+    "image": "Boots/Leather Boots.jpg"
+  },
+  "11:6": {
+    "group": 11,
+    "index": 6,
+    "name": "Scale Boots",
+    "category": "boots",
+    "width": 2,
+    "height": 2,
+    "classes": [
+      "dk",
+      "mg",
+      "dl"
+    ],
+    "box": 2,
+    "excellentRequired": true,
+    "image": "Boots/Scale Boots.jpg"
+  },
+  "11:7": {
+    "group": 11,
+    "index": 7,
+    "name": "Sphinx Boots",
+    "category": "boots",
+    "width": 2,
+    "height": 2,
+    "classes": [
+      "dw",
+      "mg"
+    ],
+    "box": 2,
+    "excellentRequired": true,
+    "image": "Boots/Sphinx Boots.jpg"
+  },
+  "11:8": {
+    "group": 11,
+    "index": 8,
+    "name": "Brass Boots",
+    "category": "boots",
+    "width": 2,
+    "height": 2,
+    "classes": [
+      "dk",
+      "mg"
+    ],
+    "box": 2,
+    "excellentRequired": true,
+    "image": "Boots/Brass Boots.jpg"
+  },
+  "11:9": {
+    "group": 11,
+    "index": 9,
+    "name": "Plate Boots",
+    "category": "boots",
+    "width": 2,
+    "height": 2,
+    "classes": [
+      "dk",
+      "mg"
+    ],
+    "box": 2,
+    "excellentRequired": true,
+    "image": "Boots/Plate Boots.jpg"
+  },
+  "11:10": {
+    "group": 11,
+    "index": 10,
+    "name": "Vine Boots",
+    "category": "boots",
+    "width": 2,
+    "height": 2,
+    "classes": [
+      "elf"
+    ],
+    "box": 1,
+    "excellentRequired": true,
+    "image": "Boots/Vine Boots.jpg"
+  },
+  "11:11": {
+    "group": 11,
+    "index": 11,
+    "name": "Silk Boots",
+    "category": "boots",
+    "width": 2,
+    "height": 2,
+    "classes": [
+      "elf"
+    ],
+    "box": 2,
+    "excellentRequired": true,
+    "image": "Boots/Silk Boots.jpg"
+  },
+  "11:12": {
+    "group": 11,
+    "index": 12,
+    "name": "Wind Boots",
+    "category": "boots",
+    "width": 2,
+    "height": 2,
+    "classes": [
+      "elf"
+    ],
+    "box": 2,
+    "excellentRequired": true,
+    "image": "Boots/Wind Boots.jpg"
+  },
+  "11:13": {
+    "group": 11,
+    "index": 13,
+    "name": "Spirit Boots",
+    "category": "boots",
+    "width": 2,
+    "height": 2,
+    "classes": [
+      "elf"
+    ],
+    "box": 2,
+    "excellentRequired": true,
+    "image": "Boots/Spirit Boots.jpg"
+  },
+  "11:14": {
+    "group": 11,
+    "index": 14,
+    "name": "Guardian Boots",
+    "category": "boots",
+    "width": 2,
+    "height": 2,
+    "classes": [
+      "elf"
+    ],
+    "box": 3,
+    "excellentRequired": true,
+    "image": "Boots/Guardian Boots.jpg"
+  },
+  "11:15": {
+    "group": 11,
+    "index": 15,
+    "name": "Storm Crow Boots",
+    "category": "boots",
+    "width": 2,
+    "height": 2,
+    "classes": [
+      "mg"
+    ],
+    "box": 3,
+    "excellentRequired": true,
+    "image": "Boots/Storm Crow Boots.jpg"
+  },
+  "11:16": {
+    "group": 11,
+    "index": 16,
+    "name": "Black Dragon Boots",
+    "category": "boots",
+    "width": 2,
+    "height": 2,
+    "classes": [
+      "dk"
+    ],
+    "box": 4,
+    "excellentRequired": true,
+    "image": "Boots/Black Dragon Boots.jpg"
+  },
+  "11:17": {
+    "group": 11,
+    "index": 17,
+    "name": "Dark Phoenix Boots",
+    "category": "boots",
+    "width": 2,
+    "height": 2,
+    "classes": [
+      "dk"
+    ],
+    "box": 4,
+    "excellentRequired": true,
+    "image": "Boots/Dark Phoenix Boots.jpg"
+  },
+  "11:18": {
+    "group": 11,
+    "index": 18,
+    "name": "Grand Soul Boots",
+    "category": "boots",
+    "width": 2,
+    "height": 2,
+    "classes": [
+      "dw"
+    ],
+    "box": 4,
+    "excellentRequired": true,
+    "image": "Boots/Grand Soul Boots.jpg"
+  },
+  "11:19": {
+    "group": 11,
+    "index": 19,
+    "name": "Divine Boots",
+    "category": "boots",
+    "width": 2,
+    "height": 2,
+    "classes": [
+      "elf"
+    ],
+    "box": 4,
+    "excellentRequired": true,
+    "image": "Boots/Divine Boots.jpg"
+  },
+  "11:20": {
+    "group": 11,
+    "index": 20,
+    "name": "Thunder Hawk Boots",
+    "category": "boots",
+    "width": 2,
+    "height": 2,
+    "classes": [
+      "mg"
+    ],
+    "box": 4,
+    "excellentRequired": true,
+    "image": "Boots/Thunder Hawk Boots.jpg"
+  },
+  "11:21": {
+    "group": 11,
+    "index": 21,
+    "name": "Great Dragon Boots",
+    "category": "boots",
+    "width": 2,
+    "height": 2,
+    "classes": [
+      "dk"
+    ],
+    "box": 5,
+    "excellentRequired": true,
+    "image": "Boots/Great Dragon Boots.jpg"
+  },
+  "11:22": {
+    "group": 11,
+    "index": 22,
+    "name": "Dark Soul Boots",
+    "category": "boots",
+    "width": 2,
+    "height": 2,
+    "classes": [
+      "dw"
+    ],
+    "box": 5,
+    "excellentRequired": true,
+    "image": "Boots/Dark Soul Boots.jpg"
+  },
+  "11:23": {
+    "group": 11,
+    "index": 23,
+    "name": "Hurricane Boots",
+    "category": "boots",
+    "width": 2,
+    "height": 2,
+    "classes": [
+      "mg"
+    ],
+    "box": 5,
+    "excellentRequired": true,
+    "image": "Boots/Hurricane Boots.jpg"
+  },
+  "11:24": {
+    "group": 11,
+    "index": 24,
+    "name": "Red Spirit Boots",
+    "category": "boots",
+    "width": 2,
+    "height": 2,
+    "classes": [
+      "elf"
+    ],
+    "box": 5,
+    "excellentRequired": true,
+    "image": "Boots/Red Spirit Boots.jpg"
+  },
+  "11:25": {
+    "group": 11,
+    "index": 25,
+    "name": "Light Plate Boots",
+    "category": "boots",
+    "width": 2,
+    "height": 2,
+    "classes": [
+      "dl"
+    ],
+    "box": 3,
+    "excellentRequired": true,
+    "image": "Boots/Light Plate Boots.jpg"
+  },
+  "11:26": {
+    "group": 11,
+    "index": 26,
+    "name": "Adamantine Boots",
+    "category": "boots",
+    "width": 2,
+    "height": 2,
+    "classes": [
+      "dl"
+    ],
+    "box": 3,
+    "excellentRequired": true,
+    "image": "Boots/Adamantine Boots.jpg"
+  },
+  "11:27": {
+    "group": 11,
+    "index": 27,
+    "name": "Dark Steel Boots",
+    "category": "boots",
+    "width": 2,
+    "height": 2,
+    "classes": [
+      "dl"
+    ],
+    "box": 4,
+    "excellentRequired": true,
+    "image": "Boots/Dark Steel Boots.jpg"
+  },
+  "11:28": {
+    "group": 11,
+    "index": 28,
+    "name": "Dark Master Boots",
+    "category": "boots",
+    "width": 2,
+    "height": 2,
+    "classes": [
+      "dl"
+    ],
+    "box": 5,
+    "excellentRequired": true,
+    "image": "Boots/Dark Master Boots.jpg"
+  },
+  "11:34": {
+    "group": 11,
+    "index": 34,
+    "name": "Ashcrow Boots",
+    "category": "boots",
+    "width": 2,
+    "height": 2,
+    "classes": [
+      "dk"
+    ],
+    "box": 3,
+    "excellentRequired": true,
+    "image": "Boots/Ashcrow Boots.jpg"
+  },
+  "11:35": {
+    "group": 11,
+    "index": 35,
+    "name": "Eclipse Boots",
+    "category": "boots",
+    "width": 2,
+    "height": 2,
+    "classes": [
+      "dw"
+    ],
+    "box": 3,
+    "excellentRequired": true,
+    "image": "Boots/Eclipse Boots.jpg"
+  },
+  "11:36": {
+    "group": 11,
+    "index": 36,
+    "name": "Iris Boots",
+    "category": "boots",
+    "width": 2,
+    "height": 2,
+    "classes": [
+      "elf"
+    ],
+    "box": 3,
+    "excellentRequired": true,
+    "image": "Boots/Iris Boots.jpg"
+  },
+  "11:37": {
+    "group": 11,
+    "index": 37,
+    "name": "Valiant Boots",
+    "category": "boots",
+    "width": 2,
+    "height": 2,
+    "classes": [
+      "mg"
+    ],
+    "box": 4,
+    "excellentRequired": true,
+    "image": "Boots/Valiant Boots.jpg"
+  },
+  "11:38": {
+    "group": 11,
+    "index": 38,
+    "name": "Glorious Boots",
+    "category": "boots",
+    "width": 2,
+    "height": 2,
+    "classes": [
+      "dl"
+    ],
+    "box": 4,
+    "excellentRequired": true,
+    "image": "Boots/Glorious Boots.jpg"
+  },
+  "12:0": {
+    "group": 12,
+    "index": 0,
+    "name": "Wings of Elf",
+    "category": "wing",
+    "width": 3,
+    "height": 2,
+    "classes": [
+      "elf"
+    ],
+    "box": null,
+    "excellentRequired": false,
+    "image": "Capas e Asas/Wing of Elf.jpg"
+  },
+  "12:1": {
+    "group": 12,
+    "index": 1,
+    "name": "Wings of Heaven",
+    "category": "wing",
+    "width": 5,
+    "height": 3,
+    "classes": [
+      "dw",
+      "mg"
+    ],
+    "box": null,
+    "excellentRequired": false,
+    "image": "Capas e Asas/Wing of Heaven.jpg"
+  },
+  "12:2": {
+    "group": 12,
+    "index": 2,
+    "name": "Wings of Satan",
+    "category": "wing",
+    "width": 5,
+    "height": 2,
+    "classes": [
+      "dk",
+      "mg",
+      "dl"
+    ],
+    "box": null,
+    "excellentRequired": false,
+    "image": "Capas e Asas/Wing of Satan.jpg"
+  },
+  "13:8": {
+    "group": 13,
+    "index": 8,
+    "name": "Ring of Ice",
+    "category": "ring",
+    "width": 1,
+    "height": 1,
+    "classes": [
+      "dw",
+      "dk",
+      "elf",
+      "mg",
+      "dl"
+    ],
+    "box": 1,
+    "excellentRequired": true,
+    "image": "Rings/Ring of Ice.jpg"
+  },
+  "13:9": {
+    "group": 13,
+    "index": 9,
+    "name": "Ring of Poison",
+    "category": "ring",
+    "width": 1,
+    "height": 1,
+    "classes": [
+      "dw",
+      "dk",
+      "elf",
+      "mg",
+      "dl"
+    ],
+    "box": 1,
+    "excellentRequired": true,
+    "image": "Rings/Ring of Poison.jpg"
+  },
+  "13:12": {
+    "group": 13,
+    "index": 12,
+    "name": "Pendant of Lighting",
+    "category": "pendant",
+    "width": 1,
+    "height": 1,
+    "classes": [
+      "dw",
+      "dk",
+      "elf",
+      "mg",
+      "dl"
+    ],
+    "box": 2,
+    "excellentRequired": true,
+    "image": "Pendants/Pendant of Lightning.jpg"
+  },
+  "13:13": {
+    "group": 13,
+    "index": 13,
+    "name": "Pendant of Fire",
+    "category": "pendant",
+    "width": 1,
+    "height": 1,
+    "classes": [
+      "dw",
+      "dk",
+      "elf",
+      "mg",
+      "dl"
+    ],
+    "box": 2,
+    "excellentRequired": true,
+    "image": "Pendants/Pendant of Fire.jpg"
+  },
+  "13:21": {
+    "group": 13,
+    "index": 21,
+    "name": "Ring of Fire",
+    "category": "ring",
+    "width": 1,
+    "height": 1,
+    "classes": [
+      "dw",
+      "dk",
+      "elf",
+      "mg",
+      "dl"
+    ],
+    "box": 1,
+    "excellentRequired": true,
+    "image": "Rings/Ring of Fire.jpg"
+  },
+  "13:22": {
+    "group": 13,
+    "index": 22,
+    "name": "Ring of Earth",
+    "category": "ring",
+    "width": 1,
+    "height": 1,
+    "classes": [
+      "dw",
+      "dk",
+      "elf",
+      "mg",
+      "dl"
+    ],
+    "box": 1,
+    "excellentRequired": true,
+    "image": "Rings/Ring of Earth.jpg"
+  },
+  "13:23": {
+    "group": 13,
+    "index": 23,
+    "name": "Ring of Wind",
+    "category": "ring",
+    "width": 1,
+    "height": 1,
+    "classes": [
+      "dw",
+      "dk",
+      "elf",
+      "mg",
+      "dl"
+    ],
+    "box": 1,
+    "excellentRequired": true,
+    "image": "Rings/Ring of Wind.jpg"
+  },
+  "13:24": {
+    "group": 13,
+    "index": 24,
+    "name": "Ring of Magic",
+    "category": "ring",
+    "width": 1,
+    "height": 1,
+    "classes": [
+      "dw",
+      "dk",
+      "elf",
+      "mg",
+      "dl"
+    ],
+    "box": 1,
+    "excellentRequired": true,
+    "image": "Rings/Ring of Magic.jpg"
+  },
+  "13:25": {
+    "group": 13,
+    "index": 25,
+    "name": "Pendant of Ice",
+    "category": "pendant",
+    "width": 1,
+    "height": 1,
+    "classes": [
+      "dw",
+      "dk",
+      "elf",
+      "mg",
+      "dl"
+    ],
+    "box": 2,
+    "excellentRequired": true,
+    "image": "Pendants/Pendant of Ice.jpg"
+  },
+  "13:26": {
+    "group": 13,
+    "index": 26,
+    "name": "Pendant of Wind",
+    "category": "pendant",
+    "width": 1,
+    "height": 1,
+    "classes": [
+      "dw",
+      "dk",
+      "elf",
+      "mg",
+      "dl"
+    ],
+    "box": 2,
+    "excellentRequired": true,
+    "image": "Pendants/Pendant of Wind.jpg"
+  },
+  "13:27": {
+    "group": 13,
+    "index": 27,
+    "name": "Pendant of Water",
+    "category": "pendant",
+    "width": 1,
+    "height": 1,
+    "classes": [
+      "dw",
+      "dk",
+      "elf",
+      "mg",
+      "dl"
+    ],
+    "box": 2,
+    "excellentRequired": true,
+    "image": "Pendants/Pendant of Water.jpg"
+  },
+  "13:28": {
+    "group": 13,
+    "index": 28,
+    "name": "Pendant of Ability",
+    "category": "pendant",
+    "width": 1,
+    "height": 1,
+    "classes": [
+      "dw",
+      "dk",
+      "elf",
+      "mg",
+      "dl"
+    ],
+    "box": 2,
+    "excellentRequired": true,
+    "image": "Pendants/Pendant of Ability.jpg"
+  }
+}
