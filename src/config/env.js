@@ -136,6 +136,18 @@ const env = {
       .filter(Boolean),
   },
 
+  // Campanha de story no Instagram (docs/SECTION_15_INSTAGRAM.md). Fase
+  // atual: só teste do webhook (registra no log, não credita nada).
+  instagram: {
+    // App Secret do app na Meta: valida o X-Hub-Signature-256 do webhook.
+    appSecret: optional('INSTAGRAM_APP_SECRET', ''),
+    // Texto livre, igual ao "Verify token" cadastrado no painel da Meta.
+    verifyToken: optional('INSTAGRAM_VERIFY_TOKEN', ''),
+    // Token de usuário do Instagram (login do perfil do servidor), usado
+    // para consultar @ e seguidores de quem mandou mensagem/menção.
+    accessToken: optional('INSTAGRAM_ACCESS_TOKEN', ''),
+  },
+
   // Bloqueio de scanners por IP (src/middlewares/scannerGuard.js).
   scannerGuard: {
     enabled: bool('SCANNER_GUARD_ENABLED', true),

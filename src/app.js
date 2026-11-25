@@ -32,7 +32,14 @@ app.use(
   }),
 );
 
-app.use(express.json());
+// rawBody: o webhook do Instagram valida HMAC sobre os bytes exatos recebidos.
+app.use(
+  express.json({
+    verify: (req, res, buf) => {
+      if (req.originalUrl.startsWith('/api/v1/instagram/webhook')) req.rawBody = buf;
+    },
+  }),
+);
 app.use(createHttpLogger(logger));
 
 app.use('/api/v1', routes);

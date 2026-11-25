@@ -10,6 +10,7 @@ const serverRoutes = require('./server');
 const emailRoutes = require('./email');
 const campaignsRoutes = require('./campaigns');
 const marketRoutes = require('./market');
+const instagramRoutes = require('./instagram');
 
 const router = Router();
 
@@ -24,5 +25,6 @@ router.use(serverRoutes);
 router.use(emailRoutes);
 router.use(campaignsRoutes);
 router.use(marketRoutes);
+router.use(instagramRoutes);
 
 module.exports = router;
