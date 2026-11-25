@@ -120,6 +120,20 @@ describe('POST /instagram/webhook (assinatura)', () => {
   });
 });
 
+describe('GET /instagram/campaign (pública)', () => {
+  it('devolve os valores da campanha sem login', async () => {
+    const res = await request(app).get('/api/v1/instagram/campaign');
+    expect(res.status).toBe(200);
+    expect(res.body).toEqual({
+      enabled: false,
+      instagramHandle: 'muproserver',
+      rewardCash: 40,
+      minFollowers: 50,
+      retroactiveDays: 7,
+    });
+  });
+});
+
 describe('rotas da conta', () => {
   it('exigem login', async () => {
     expect((await request(app).get('/api/v1/account/instagram')).status).toBe(401);

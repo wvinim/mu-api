@@ -82,7 +82,7 @@ O token de longa duração vale 60 dias e precisa de renovação automática
 `mid`, vínculo por código (expirado, reutilizado, IGSID já vinculado),
 regra de 50 seguidores, prêmio único por IGSID e texto SQL dos repositórios.
 
-**mu-front:** card "Instagram" em Minha Conta com o código, as instruções
+**mu-front:** hotsite público `/instagram` (antes era um card em Minha Conta) com o código, as instruções
 ("mande este código no Direct de @muproserver"), o @ vinculado e o status do
 prêmio (pendente / recebido / menos de 50 seguidores).
 
@@ -204,7 +204,7 @@ devolve `username`/`follower_count` depois do Direct.
 2. `.env`: `INSTAGRAM_CAMPAIGN_ENABLED=false` e `INSTAGRAM_TESTERS=<sua conta>`
    (demais variáveis em `.env.example`).
 3. Deploy de API + front.
-4. Em `/painel/instagram` (logado na conta de teste): gerar código → mandar no
+4. Em `/instagram` (logado na conta de teste): gerar código → mandar no
    Direct do @muproserver de um Instagram com 50+ seguidores → conferir a
    resposta "vinculado" → postar story marcando @muproserver → conferir a
    resposta "gold creditado" e o Cash da conta.

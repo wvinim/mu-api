@@ -44,6 +44,9 @@ router.post('/instagram/webhook', verifyInstagramSignature, async (req, res, nex
   }
 });
 
+// Pública: valores da campanha para o hotsite (mupro.vip/instagram).
+router.get('/instagram/campaign', (req, res) => res.json(campaign.getPublicInfo()));
+
 router.get('/account/instagram', requireAuth, controller.getStatus);
 router.post(
   '/account/instagram/link-code',

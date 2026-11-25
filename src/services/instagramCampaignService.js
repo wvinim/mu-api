@@ -41,7 +41,7 @@ function isActiveFor(username) {
 }
 
 function panelUrl() {
-  return `${env.appUrl.replace(/\/+$/, '')}/painel/instagram`;
+  return `${env.appUrl.replace(/\/+$/, '')}/instagram`;
 }
 
 const messages = {
@@ -77,6 +77,18 @@ async function createLinkCode(username) {
     }
   }
   throw new Error('Não foi possível gerar um código de vínculo único');
+}
+
+/** Dados públicos da campanha (hotsite, sem login). */
+function getPublicInfo() {
+  const cfg = env.instagram;
+  return {
+    enabled: cfg.campaignEnabled,
+    instagramHandle: cfg.handle,
+    rewardCash: cfg.rewardCash,
+    minFollowers: cfg.minFollowers,
+    retroactiveDays: cfg.retroactiveDays,
+  };
 }
 
 async function getStatus(username) {
@@ -295,6 +307,7 @@ async function handleWebhook(payload) {
 }
 
 module.exports = {
+  getPublicInfo,
   createLinkCode,
   getStatus,
   unlink,

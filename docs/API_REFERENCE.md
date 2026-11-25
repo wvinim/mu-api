@@ -335,6 +335,7 @@ Valores (40, 50, 7, @) vêm sempre de `GET /account/instagram`, nunca fixos no f
 
 | Método | Rota | Body | Resposta | Erros |
 |---|---|---|---|---|
+| GET | `/instagram/campaign` (pública) | — | `{ enabled, instagramHandle, rewardCash, minFollowers, retroactiveDays }`, para o hotsite sem login. `enabled` é o liga/desliga geral; conta de teste logada deve usar `campaignEnabled` do `/account/instagram` | — |
 | GET | `/account/instagram` 🔒 | — | status (abaixo) | — |
 | POST | `/account/instagram/link-code` 🔒 | — | **201** `{ code, expiresAt, instagramHandle }`. Gerar outro invalida o anterior. Vale 30 min | 403 `CAMPAIGN_DISABLED`, 429 (5 a cada 10 min) |
 | DELETE | `/account/instagram` 🔒 | — | `{ message }` | 404 `INSTAGRAM_NOT_LINKED` |
