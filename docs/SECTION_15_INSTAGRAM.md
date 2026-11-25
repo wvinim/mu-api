@@ -129,6 +129,27 @@ e o resultado da consulta de perfil. **Não grava no banco nem credita.**
    formato real do `story_mention` e conferir se `profile.body` traz
    `username` e `follower_count`.
 
+## Resultados dos testes
+**Teste A (2026-11-25), conta pessoal do usuário, app em Development:** funcionou.
+- O Direct ("Oi") e o story com menção chegaram com assinatura válida, vindos
+  de IPs da Meta (UA `facebookexternalua`).
+- Formato real do story (`entry[].id` = ID da conta @muproserver):
+  ```json
+  {"object":"instagram","entry":[{"time":1795628057330,"id":"17841440190434640",
+    "messaging":[{"sender":{"id":"<IGSID>"},"recipient":{"id":"17841440190434640"},
+      "timestamp":1795628056487,
+      "message":{"mid":"<mid>","attachments":[{"type":"story_mention",
+        "payload":{"url":"https://lookaside.fbsbx.com/ig_messaging_cdn/?asset_id=...&signature=..."}}]}}]}]}
+  ```
+- A User Profile API em `graph.facebook.com/<IGSID>` com o token do Unified
+  Login devolveu 200 com `username`, `name`, `follower_count`,
+  `is_user_follow_business` e `is_verified_user`.
+- ⚠ `follower_count` veio **0**. Falta confirmar se a conta de teste tem mesmo
+  0 seguidores ou se a API zera esse número (o que inviabilizaria a regra dos
+  50 seguidores).
+- A conta de teste provavelmente está ligada ao Facebook do admin do app, então
+  isso ainda não prova que funciona para jogadores. Falta o **Teste B**.
+
 ## Passos manuais do usuário (antes de codar)
 1. Perfil do servidor como **conta profissional** (Business ou Creator).
 2. No Instagram: Configurações → Mensagens → Ferramentas conectadas →
