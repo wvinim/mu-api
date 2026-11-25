@@ -33,7 +33,7 @@ troca de mão.
     por mais 7 dias sem mexer no item.
 13. **Serial repetido**: tela de admin no site listando seriais anunciados mais de uma vez
     (sem e-mail).
-14. **Vendedor anônimo** no anúncio; o nome aparece só no histórico depois da venda.
+14. **Mercado anônimo**: nenhuma resposta de jogador traz nome ou login do vendedor ou do comprador (nem no histórico): `memb_name` espelha o login da conta, então expor o nome exporia o login. As colunas `SellerName`/`BuyerName` ficam só para auditoria; contas só na tela de admin.
 15. **Origem só dos baús** (ativo + guardados). Inventário e equipamento ficam fora.
 16. **Imagens faltantes (28)**: usuário vai procurar manualmente; até lá, ícone
     genérico por categoria.

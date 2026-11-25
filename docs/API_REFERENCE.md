@@ -291,10 +291,10 @@ front pode esconder o menu do mercado ao receber esse erro.
 - `sort`: `newest` (padrão), `price_asc`, `price_desc`, `level_desc`, `exc_desc`. `limit` máximo 50.
 - Cada anúncio: `{ id, price, createdAt, expiresAt, item }`. **Anônimo**: não vem nome do vendedor.
 
-**`/market/my/listings`**: cada anúncio traz também `state` (`active`, `expired`, `sold` ou `returned`), `closedAt`, `sourceVault` e `destVault`. Quando `sold`, traz também `buyerName`, `received` (gold recebido) e `fee`. Anúncios ativos vêm primeiro.
+**`/market/my/listings`**: cada anúncio traz também `state` (`active`, `expired`, `sold` ou `returned`), `closedAt`, `sourceVault` e `destVault`. Quando `sold`, traz também `received` (gold recebido) e `fee`. **Nunca** traz quem comprou. Anúncios ativos vêm primeiro.
 - Botões: `active` → "Cancelar" (`/return`); `expired` → "Resgatar" (`/return`) e "Renovar" (`/renew`).
 
-**`/market/my/purchases`**: cada compra traz `boughtAt`, `sellerName` e `destVault`. O nome do vendedor só aparece aqui, depois da venda.
+**`/market/my/purchases`**: cada compra traz `boughtAt` e `destVault`. **Nunca** traz quem vendeu.
 
 **Escolha do baú de destino** (`/buy` e `/return`): mostre os baús de `/market/vaults`. A API acha o primeiro espaço livre do tamanho do item (`width` x `height`) no baú escolhido.
 

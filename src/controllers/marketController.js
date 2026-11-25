@@ -236,8 +236,9 @@ async function getMyListings(req, res, next) {
         closedAt: row.closedAt,
         sourceVault: row.sourceVault,
         destVault: row.destVault,
-        // Venda: quem comprou e quanto o vendedor recebeu (após a taxa).
-        ...(row.state === 'sold' && { buyerName: row.buyerName, received: row.sellerReceived, fee: row.fee }),
+        // Venda: quanto o vendedor recebeu (após a taxa). Quem comprou nunca
+        // é exposto: memb_name espelha o login da conta.
+        ...(row.state === 'sold' && { received: row.sellerReceived, fee: row.fee }),
       })),
     });
   } catch (err) {
@@ -256,7 +257,6 @@ async function getMyPurchases(req, res, next) {
       purchases: rows.map((row) => ({
         ...publicListing(row),
         boughtAt: row.closedAt,
-        sellerName: row.sellerName,
         destVault: row.destVault,
       })),
     });

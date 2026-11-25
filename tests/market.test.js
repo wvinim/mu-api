@@ -347,3 +347,25 @@ describe('GET /market/listings (busca)', () => {
     expect(res.status).toBe(400);
   });
 });
+
+describe('histórico sem nomes (memb_name espelha o login)', () => {
+  it('meus anúncios vendidos não trazem quem comprou', async () => {
+    marketRepository.findBySeller.mockResolvedValue([
+      listing({ state: 'sold', status: 'sold', buyerName: 'player2', buyerAccount: 'player2', sellerReceived: 900, fee: 100, total: 1 }),
+    ]);
+    const res = await request(app).get('/api/v1/market/my/listings').set('Authorization', authHeader());
+    expect(res.status).toBe(200);
+    expect(res.body.listings[0]).toEqual(expect.objectContaining({ state: 'sold', received: 900, fee: 100 }));
+    expect(JSON.stringify(res.body)).not.toMatch(/player2/);
+  });
+
+  it('minhas compras não trazem quem vendeu', async () => {
+    marketRepository.findByBuyer.mockResolvedValue([
+      listing({ sellerName: 'player2', closedAt: new Date('2026-11-25T00:00:00Z'), destVault: 1, total: 1 }),
+    ]);
+    const res = await request(app).get('/api/v1/market/my/purchases').set('Authorization', authHeader());
+    expect(res.status).toBe(200);
+    expect(res.body.purchases[0]).toEqual(expect.objectContaining({ destVault: 1 }));
+    expect(JSON.stringify(res.body)).not.toMatch(/player2/);
+  });
+});

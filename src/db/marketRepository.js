@@ -246,7 +246,7 @@ async function findBySeller(accountId, { state, page, limit }) {
   const result = await request.query(`
     SELECT * FROM (
       SELECT ${PUBLIC_COLUMNS_SQL}, ${MINE_STATE_SQL} AS state, ClosedAt AS closedAt,
-             BuyerName AS buyerName, SellerReceived AS sellerReceived, Fee AS fee,
+             SellerReceived AS sellerReceived, Fee AS fee,
              SourceVault AS sourceVault, DestVault AS destVault,
              COUNT(*) OVER () AS total,
              ROW_NUMBER() OVER (ORDER BY CASE WHEN Status = 'active' THEN 0 ELSE 1 END, ISNULL(ClosedAt, CreatedAt) DESC, Id DESC) AS rowNum
@@ -269,7 +269,7 @@ async function countActiveBySeller(accountId) {
   return result.recordset[0].total;
 }
 
-/** Compras da conta. O nome do vendedor aparece aqui (só depois da venda). */
+/** Compras da conta. Sem nome do vendedor: memb_name espelha o login. */
 async function findByBuyer(accountId, { page, limit }) {
   const pool = getPool();
   const result = await pool
@@ -279,7 +279,7 @@ async function findByBuyer(accountId, { page, limit }) {
     .input('lastRow', sql.Int, page * limit)
     .query(`
       SELECT * FROM (
-        SELECT ${PUBLIC_COLUMNS_SQL}, ClosedAt AS closedAt, SellerName AS sellerName, DestVault AS destVault,
+        SELECT ${PUBLIC_COLUMNS_SQL}, ClosedAt AS closedAt, DestVault AS destVault,
                COUNT(*) OVER () AS total,
                ROW_NUMBER() OVER (ORDER BY ClosedAt DESC, Id DESC) AS rowNum
         FROM WebMarketListings
