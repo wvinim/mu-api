@@ -15,8 +15,11 @@ quando o webhook da Meta chega.
   foi adicionada em 2026-11-25, a pedido do usuário, para impedir juntar 40 gold
   por Instagram numa conta só). Cada IGSID é premiado uma única
   vez na vida, mesmo se for desvinculado e vinculado a outra conta do jogo.
-- **Conta privada também vale.** A API da Meta não informa se a conta é
-  pública ou privada, então isso nem seria verificável.
+- **Conta precisa estar PÚBLICA ao postar o story** (mudou em 2026-11-25).
+  Teste real: story de conta privada que o @muproserver não segue **não gera
+  menção** no Direct do @muproserver, então o webhook nem dispara. Deixando
+  pública, funcionou. A API não tem como verificar ou contornar isso, então o
+  hotsite e a resposta de vínculo no Direct avisam o jogador.
 - **Mínimo de 50 seguidores**, conferido no momento do crédito via
   `follower_count` da User Profile API. Com menos de 50 seguidores, a menção
   fica registrada como `rejected_followers` e o jogador pode tentar de novo

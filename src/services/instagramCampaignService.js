@@ -48,7 +48,8 @@ function panelUrl() {
 const messages = {
   linked: () =>
     `✅ Instagram vinculado à sua conta do MU PRO! Agora poste um story marcando @${env.instagram.handle} ` +
-    `para ganhar ${env.instagram.rewardCash} gold.`,
+    `para ganhar ${env.instagram.rewardCash} gold. ⚠️ Seu perfil precisa estar PÚBLICO na hora de postar: ` +
+    'story de conta privada não chega até nós.',
   linkedAlreadyRewarded: () =>
     '✅ Instagram vinculado à sua conta do MU PRO! Este Instagram já recebeu o prêmio da campanha, então não há novo gold.',
   invalidCode: () => `❌ Código inválido ou expirado. Gere um novo em ${panelUrl()} e envie aqui de novo.`,

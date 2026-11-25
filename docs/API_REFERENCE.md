@@ -328,7 +328,8 @@ Em todos os erros, nada muda: nem o gold nem o item. Rate limit: uma ação (anu
 O jogador vincula o Instagram mandando um **código no Direct do @muproserver**.
 Depois posta um story marcando o perfil e recebe **40 gold** automaticamente
 (uma vez por Instagram **e** uma vez por conta do site, para sempre; mudou em 2026-11-25). O Instagram precisa ter pelo menos **50
-seguidores**. Um story postado **até 7 dias antes** do vínculo é premiado no
+seguidores** e estar **público na hora de postar** (story de conta privada não
+chega ao @muproserver, limitação do Instagram). Um story postado **até 7 dias antes** do vínculo é premiado no
 momento do vínculo. As respostas (vinculado, gold creditado, poucos seguidores
 etc.) chegam ao jogador **no próprio Direct**. O site só mostra o status.
 Valores (40, 50, 7, @) vêm sempre de `GET /account/instagram`, nunca fixos no front.
