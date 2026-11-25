@@ -1,0 +1,62 @@
+//=================================================================================
+//Wepons and Shields Excellence
+//Type Index  Level   Skill    Exc   AddOption
+//=================================================================================
+0	16	0	0	1	0	// Sword of Destruction
+0	14	0	0	1	0	// Lighting Sword
+2	10	0	0	1	0	// Great Scepter
+3	9	0	0	1	0	// Bill of Balrog
+5	6	0	0	1	0	// Staff of Resurrection
+5	8	0	0	1	0	// Staff of Destruction
+4	13	0	0	1	0	// Bluewing Crossbow
+4	14	0	0	1	0	// Aquagold Crossbow
+6	5	0	0	1	0	// Dragon Slayer Shield
+6	8	0	0	1	0	// Tower Shield
+//=================================================================================
+//Sets Excellence
+//Type Index  Level   Skill    Exc   AddOption
+//=================================================================================
+7	1	0	0	1	0	// Dragon Helm
+8	1	0	0	1	0	// Dragon Armor
+9	1	0	0	1	0	// Dragon Pants
+10	1	0	0	1	0	// Dragon Gloves
+11	1	0	0	1	0	// Dragon Boots
+7	3	0	0	1	0	// Legendary Helm
+8	3	0	0	1	0	// Legendary Armor
+9	3	0	0	1	0	// Legendary Pants
+10	3	0	0	1	0	// Legendary Gloves
+11	3	0	0	1	0	// Legendary Boots
+7	14	0	0	1	0	// Guardian Helm
+8	14	0	0	1	0	// Guardian Armor
+9	14	0	0	1	0	// Guardian Pants
+10	14	0	0	1	0	// Guardian Gloves
+11	14	0	0	1	0	// Guardian Boots
+8	15	0	0	1	0	// Storm Crow Armor
+9	15	0	0	1	0	// Storm Crow Pants
+10	15	0	0	1	0	// Storm Crow Gloves
+11	15	0	0	1	0	// Storm Crow Boots
+7	25	0	0	1	0	// Light Plate Mask
+8	25	0	0	1	0	// Light Plate Armor
+9	25	0	0	1	0	// Light Plate Pants
+10	25	0	0	1	0	// Light Plate Gloves
+11	25	0	0	1	0	// Light Plate Boots
+7	26	0	0	1	0	// Adamantine Mask
+8	26	0	0	1	0	// Adamantine Armor
+9	26	0	0	1	0	// Adamantine Pants
+10	26	0	0	1	0	// Adamantine Gloves
+11	26	0	0	1	0	// Adamantine Boots
+7	34	0	0	1	0	// Ashcrow Helm
+8	34	0	0	1	0	// Ashcrow Armor
+9	34	0	0	1	0	// Ashcrow Pants
+10	34	0	0	1	0	// Ashcrow Gloves
+11	34	0	0	1	0	// Ashcrow Boots
+7	35	0	0	1	0	// Eclipse Helm
+8	35	0	0	1	0	// Eclipse Armor
+9	35	0	0	1	0	// Eclipse Pants
+10	35	0	0	1	0	// Eclipse Gloves
+11	35	0	0	1	0	// Eclipse Boots
+7	36	0	0	1	0	// Iris Helm
+8	36	0	0	1	0	// Iris Armor
+9	36	0	0	1	0	// Iris Pants
+10	36	0	0	1	0	// Iris Gloves
+11	36	0	0	1	0	// Iris Boots

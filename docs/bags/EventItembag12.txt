@@ -1,0 +1,40 @@
+//=================================================================================
+//Wepons and Shields Excellence
+//Type Index  Level   Skill    Exc   AddOption
+//=================================================================================
+5	13	0	0	1	0	// Platina Staff
+5	11	0	0	1	0	// Staff of Kundun
+5	10	0	0	1	0	// Divine Staff of Archangel
+0	20	0	0	1	0	// Knight Blade
+0	21	0	0	1	0	// Dark Reign Blade
+4	20	0	0	1	0	// Arrow Viper Bow
+2	12	0	0	1	0	// Great Lord Scepter
+6	15	0	0	1	0	// Grand Soul Shield
+//=================================================================================
+//Sets Excellence
+//Type Index  Level   Skill    Exc   AddOption
+//=================================================================================
+7	21	0	0	1	0	// Great Dragon Helm
+8	21	0	0	1	0	// Great Dragon Armor
+9	21	0	0	1	0	// Great Dragon Pants
+10	21	0	0	1	0	// Great Dragon Gloves
+11	21	0	0	1	0	// Great Dragon Boots
+7	22	0	0	1	0	// Dark Soul Helm
+8	22	0	0	1	0	// Dark Soul Armor
+9	22	0	0	1	0	// Dark Soul Pants
+10	22	0	0	1	0	// Dark Soul Gloves
+11	22	0	0	1	0	// Dark Soul Boots
+7	24	0	0	1	0	// Red Spirit Helm
+8	24	0	0	1	0	// Red Spirit Armor
+9	24	0	0	1	0	// Red Spirit Pants
+10	24	0	0	1	0	// Red Spirit Gloves
+11	24	0	0	1	0	// Red Spirit Boots
+7	28	0	0	1	0	// Dark Master Mask
+8	28	0	0	1	0	// Dark Master Armor
+9	28	0	0	1	0	// Dark Master Pants
+10	28	0	0	1	0	// Dark Master Gloves
+11	28	0	0	1	0	// Dark Master Boots
+8	23	0	0	1	0	// Hurricane Armor
+9	23	0	0	1	0	// Hurricane Pants
+10	23	0	0	1	0	// Hurricane Gloves
+11	23	0	0	1	0	// Hurricane Boots

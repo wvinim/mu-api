@@ -1,0 +1,55 @@
+//=================================================================================
+//Wepons and Shields Excellence
+//Type Index  Level   Skill    Exc   AddOption
+//=================================================================================
+0	31	0	0	1	0	// Rune Blade
+5	9	0	0	1	0	// Dragon Soul Staff
+3	10	0	0	1	0	// Dragon Spear
+2	11	0	0	1	0	// Lord Scepter
+4	19	0	0	1	0	// Great Reign Crossbow
+6	12	0	0	1	0	// Bronze Shield
+6	13	0	0	1	0	// Dragon Shield
+6	14	0	0	1	0	// Legendary Shield
+6	16	0	0	1	0	// Elemental Shield
+//=================================================================================
+//Sets Excellence
+//Type Index  Level   Skill    Exc   AddOption
+//=================================================================================
+7	16	0	0	1	0	// Black Dragon Helm
+8	16	0	0	1	0	// Black Dragon Armor
+9	16	0	0	1	0	// Black Dragon Pants
+10	16	0	0	1	0	// Black Dragon Gloves
+11	16	0	0	1	0	// Black Dragon Boots
+7	18	0	0	1	0	// Grand Soul Helm
+8	18	0	0	1	0	// Grand Soul Armor
+9	18	0	0	1	0	// Grand Soul Pants
+10	18	0	0	1	0	// Grand Soul Gloves
+11	18	0	0	1	0	// Grand Soul Boots
+7	17	0	0	1	0	// Dark Phoenix Helm
+8	17	0	0	1	0	// Dark Phoenix Armor
+9	17	0	0	1	0	// Dark Phoenix Pants
+10	17	0	0	1	0	// Dark Phoenix Gloves
+11	17	0	0	1	0	// Dark Phoenix Boots
+7	19	0	0	1	0	// Divine Helm
+8	19	0	0	1	0	// Divine Armor
+9	19	0	0	1	0	// Divine Pants
+10	19	0	0	1	0	// Divine Gloves
+11	19	0	0	1	0	// Divine Boots
+7	27	0	0	1	0	// Dark Steel Mask
+8	27	0	0	1	0	// Dark Steel Armor
+9	27	0	0	1	0	// Dark Steel Pants
+10	27	0	0	1	0	// Dark Steel Gloves
+11	27	0	0	1	0	// Dark Steel Boots
+8       20      0       0       1       0       // Thunder Hawk Armor
+9       20      0       0       1       0       // Thunder Hawk Pants
+10      20      0       0       1       0       // Thunder Hawk Gloves
+11      20      0       0       1       0       // Thunder Hawk Boots
+8	37	0	0	1	0	// Valiant Armor
+9	37	0	0	1	0	// Valiant Pants
+10	37	0	0	1	0	// Valiant Gloves
+11	37	0	0	1	0	// Valiant Boots
+7	38	0	0	1	0	// Glorious Mask
+8	38	0	0	1	0	// Glorious Armor
+9	38	0	0	1	0	// Glorious Pants
+10	38	0	0	1	0	// Glorious Gloves
+11	38	0	0	1	0	// Glorious Boots
