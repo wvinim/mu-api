@@ -175,6 +175,8 @@ async function rewardFlow({ mid, igsid, username, replies }) {
     throw err;
   }
 
+  if (profile.username) await repo.updateLinkIgUsername(igsid, profile.username);
+
   if (profile.followerCount === null || profile.followerCount < env.instagram.minFollowers) {
     await repo.updateMention(mid, {
       status: 'low_followers',
@@ -237,15 +239,10 @@ async function handleMention({ igsid, mid, mediaUrl, replies }) {
   await rewardFlow({ mid, igsid, username: link.username, replies });
 }
 
+// Sem consulta de perfil aqui (economiza chamada à Graph API, que tem limite
+// por hora): o @ do vínculo é preenchido quando o story chega (rewardFlow).
 async function handleLinkMessage({ igsid, code, replies }) {
-  let igUsername = null;
-  try {
-    igUsername = (await graph.fetchProfile(igsid)).username;
-  } catch (err) {
-    logger.warn({ err: err.message, status: err.status }, 'instagram: perfil indisponível no vínculo');
-  }
-
-  const { result, username } = await repo.consumeLinkCode(code, igsid, igUsername);
+  const { result, username } = await repo.consumeLinkCode(code, igsid, null);
 
   if (result === 'invalid' || result === 'expired') {
     replies.push({ igsid, text: messages.invalidCode() });
@@ -262,7 +259,7 @@ async function handleLinkMessage({ igsid, code, replies }) {
       username,
       eventType: 'instagram.link',
       success: true,
-      details: { igsid, igUsername },
+      details: { igsid },
     });
   }
 

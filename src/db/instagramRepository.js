@@ -129,6 +129,16 @@ async function findLinkByIgsid(igsid) {
   return result.recordset[0] || null;
 }
 
+/** Atualiza o @ do vínculo (preenchido quando a consulta de perfil acontece). */
+async function updateLinkIgUsername(igsid, igUsername) {
+  const pool = getPool();
+  await pool
+    .request()
+    .input('igsid', sql.VarChar(32), igsid)
+    .input('igUsername', sql.VarChar(64), igUsername)
+    .query('UPDATE WebInstagramLinks SET IgUsername = @igUsername WHERE Igsid = @igsid');
+}
+
 /** Remove o vínculo e devolve o que foi removido (ou null). */
 async function deleteLink(username) {
   const pool = getPool();
@@ -316,6 +326,7 @@ module.exports = {
   consumeLinkCode,
   findLinkByUsername,
   findLinkByIgsid,
+  updateLinkIgUsername,
   deleteLink,
   findRewardByIgsid,
   findRewardByUsername,

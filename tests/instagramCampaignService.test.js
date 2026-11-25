@@ -112,6 +112,11 @@ describe('story_mention', () => {
     expect(graph.sendText).toHaveBeenCalledWith(IG_ACCOUNT, '555', expect.stringContaining('40 gold foram creditados'));
   });
 
+  it('preenche o @ do vínculo com o perfil consultado no story', async () => {
+    await service.handleWebhook(mentionPayload());
+    expect(repo.updateLinkIgUsername).toHaveBeenCalledWith('555', 'fulano');
+  });
+
   it('nunca manda o login da conta no Direct', async () => {
     await service.handleWebhook(mentionPayload());
     await flush();
@@ -228,7 +233,8 @@ describe('código de vínculo no Direct', () => {
     repo.consumeLinkCode.mockResolvedValue({ result: 'linked', username: 'player1' });
     await service.handleWebhook(textPayload('MUPRO-ABC234'));
     await flush();
-    expect(repo.consumeLinkCode).toHaveBeenCalledWith('MUPRO-ABC234', '555', 'fulano');
+    expect(repo.consumeLinkCode).toHaveBeenCalledWith('MUPRO-ABC234', '555', null);
+    expect(graph.fetchProfile).not.toHaveBeenCalled();
     expect(auditLog.record).toHaveBeenCalledWith(expect.objectContaining({ eventType: 'instagram.link' }));
     expect(sentTexts()[0]).toContain('Instagram vinculado');
     expect(sentTexts()[0]).toContain('@muproserver');
@@ -281,13 +287,6 @@ describe('código de vínculo no Direct', () => {
     await service.handleWebhook(textPayload('MUPRO-ABC234'));
     await flush();
     expect(sentTexts()[0]).toContain('já está vinculado a outra conta');
-  });
-
-  it('perfil indisponível não impede o vínculo', async () => {
-    graph.fetchProfile.mockRejectedValue(new Error('graph down'));
-    repo.consumeLinkCode.mockResolvedValue({ result: 'linked', username: 'player1' });
-    await service.handleWebhook(textPayload('MUPRO-ABC234'));
-    expect(repo.consumeLinkCode).toHaveBeenCalledWith('MUPRO-ABC234', '555', null);
   });
 
   it('mensagem comum, eco do próprio perfil ou sem código → ignorada', async () => {

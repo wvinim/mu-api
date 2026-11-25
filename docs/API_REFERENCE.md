@@ -358,7 +358,8 @@ Resposta do `GET /account/instagram`:
   `link-code` responde 403. Contas de teste veem `true` mesmo com a campanha
   desligada.
 - `link: null` → não vinculado (`reward` e `lastMention` também `null`).
-  `link.igUsername` pode ser `null` se a Meta não devolveu o @ no vínculo.
+  `link.igUsername` fica `null` até o primeiro story chegar (o @ é consultado
+  na Meta só nessa hora, para economizar chamadas). Mostre "Instagram vinculado" sem o @.
 - `reward` → este Instagram já foi premiado. `toThisAccount: false` = o prêmio
   foi para outra conta do jogo (o Instagram foi vinculado lá antes).
 - `accountReward` → esta **conta do site** já ganhou o prêmio (com o Instagram

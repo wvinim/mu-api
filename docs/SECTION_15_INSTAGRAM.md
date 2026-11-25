@@ -220,3 +220,22 @@ SELECT TOP 50 * FROM WebInstagramMentions ORDER BY CreatedAt DESC;
 SELECT * FROM WebInstagramRewards ORDER BY CreatedAt DESC;
 SELECT COUNT(*) AS premiados, SUM(Amount) AS gold FROM WebInstagramRewards;
 ```
+
+## Limite de chamadas da Graph API (2026-11-25)
+O painel da Meta mostra o limite do app: 200 chamadas por hora × usuários do
+app. Aqui o app tem 1 usuário, então no pior caso são ~200 por hora. Não está
+claro se as chamadas do Instagram usam esse limite ou o limite por conta
+(Business Use Case).
+- O vínculo **não** consulta o perfil. O @ é gravado no vínculo quando o story
+  chega (a consulta já acontece ali, para contar os seguidores). Ficam ~3-4
+  chamadas por jogador: 1 perfil + 2-3 respostas no Direct.
+- `instagramGraph.js` lê `X-App-Usage` e `X-Business-Use-Case-Usage` de toda
+  resposta. Com 75% ou mais, loga `limite de chamadas da Graph API perto do fim`
+  (warn). Com erro de limite (códigos 4, 17, 32, 613, 80002), loga
+  `limite de chamadas da Graph API atingido` (error).
+- Limite estourado não perde prêmio: a menção vira `profile_error`, o webhook
+  responde 500 e a Meta reenvia por até 36h. Resposta no Direct que falha só
+  gera log.
+```bash
+pm2 logs mu-api --lines 500 --nostream | grep -i "limite de chamadas"
+```
