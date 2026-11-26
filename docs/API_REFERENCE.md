@@ -129,7 +129,7 @@ Bless, gravado automaticamente na compra) — não usa `PUT /account/autopick`.
 
 | Método | Rota | Query/Params | Resposta |
 |---|---|---|---|
-| GET | `/characters/ranking` | `?page&limit(máx 100)&classCode` | `{ page, limit, total, items: [{ name, level, classCode, resets, rank }] }` — só isso, sem build/experiência/PvP (desde 2026-10-05); ordenado por `resets DESC, level DESC`. `total` reflete o filtro. Cacheado ~180s no servidor (por página/limit/raça). Personagens marcados no banco como ocultos (staff/GM) não aparecem nem contam no `total` (desde 2026-10-24). |
+| GET | `/characters/ranking` | `?period(total\|month\|week\|day, padrão total)&previous(bool)&limit(1-10)&classCode` | `{ period, previous, periodStart, periodEnd, page: 1, limit, total, items: [{ rank, name, level, classCode, resets }] }` — **sempre só o top 10** (desde 2026-11-26). `total` = total histórico desde o wipe (`ResetsMonth`); `day`/`week`/`month` = resets feitos no período (tabela `ResetDiario`), semana de segunda a domingo, dia em horário de Brasília. `previous=true` = ontem / semana passada / mês passado (não vale para `total`, dá 400). `periodStart`/`periodEnd` = `YYYY-MM-DD` inclusivos (null no total); o período fecha em `periodEnd` + 1 às 00:00 de Brasília. Empate no período: quem chegou primeiro ao número. `page` é ignorado e `limit` > 10 vira 10 (compatibilidade com o front antigo). Cache ~180s (período atual) / 1h (anterior). Personagens ocultos (`HideFromRanking`) não aparecem. Sem build/experiência/PvP. |
 
 **Filtro `classCode` = raça inteira.** O ranking interpreta `classCode`
 como a raça: `?classCode=0` devolve Dark Wizard (0), Soul Master (1) e
