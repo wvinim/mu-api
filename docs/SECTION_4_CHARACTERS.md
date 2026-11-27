@@ -69,8 +69,10 @@ ranking por `Resets` deixou de medir progresso. Agora:
 
 - `?period=total|month|week|day` (+ `previous=true` para o período
   anterior). Sempre top 10.
-- **Total** = `Character.ResetsMonth` (nunca zerada desde o wipe, não diminui
-  no Time Collector = total histórico). Índice `IX_Character_RankingTotal`.
+- **Total** = `Character.ResetsMonth` (nunca zerada desde o wipe; a troca no
+  Time Collector soma 1 = total histórico). Empate: vence quem fez o último
+  reset primeiro (`MAX(UltimoReset)` da `ResetDiario`; sem linha = mais
+  antigo), depois `cLevel DESC`, depois nome.
 - **Dia/semana/mês** = `SUM(Qtd)` da `dbo.ResetDiario` (1 linha por
   personagem por dia), gravada pelo trigger `TR_Character_ResetDiario` em
   `Character` (script `sql/2026-11-26_reset_diario.sql` do repositório do

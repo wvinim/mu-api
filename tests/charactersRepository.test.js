@@ -30,16 +30,17 @@ function mockPool() {
 }
 
 describe('charactersRepository.findRanking — total', () => {
-  it('top N pelo total histórico (ResetsMonth), sem ler ResetDiario', async () => {
+  it('top N pelo total histórico (ResetsMonth), desempate pelo último reset mais antigo', async () => {
     const { inputs, queries } = mockPool();
 
     await charactersRepository.findRanking({ period: 'total', limit: 10 });
 
     expect(inputs.top).toBe(10);
     expect(queries[0]).toMatch(/SELECT TOP \(@top\)/);
-    expect(queries[0]).toMatch(/ORDER BY c\.ResetsMonth DESC, c\.cLevel DESC;/);
+    expect(queries[0]).toMatch(/ORDER BY c\.ResetsMonth DESC, u\.Ultimo ASC, c\.cLevel DESC, c\.Name;/);
     expect(queries[0]).toMatch(/Character c WITH \(NOLOCK\)/);
-    expect(queries[0]).not.toMatch(/ResetDiario/);
+    expect(queries[0]).toMatch(/MAX\(r\.UltimoReset\)/);
+    expect(queries[0]).toMatch(/LEFT JOIN Ultimo u ON u\.Name = c\.Name/);
     expect(queries[0]).toMatch(/WHERE c\.HideFromRanking = 0\s/);
   });
 

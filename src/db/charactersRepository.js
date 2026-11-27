@@ -55,7 +55,8 @@ async function findByAccountId(accountId) {
 // Desde 2026-11-26 (limite de 200 resets + Time Collector) o ranking é por
 // período e sempre só o top 10 (RANKING_TOP):
 //   - total: Character.ResetsMonth = total histórico desde o wipe (nunca
-//     zerada, não diminui no Time Collector). Índice IX_Character_RankingTotal.
+//     zerada; a troca no Time Collector soma 1). Empate: último reset mais
+//     antigo vence, depois nível.
 //   - day / week / month: SUM(Qtd) da dbo.ResetDiario (1 linha por personagem
 //     por dia, gravada pelo trigger TR_Character_ResetDiario — ver
 //     migrations/0019_ranking_periodo.sql). Semana = segunda a domingo.
@@ -116,18 +117,27 @@ async function findRanking({ period = 'total', previous = false, raceCode, limit
 
   if (period === 'total') {
     const whereClause = rankingFilters(request, raceCode, 'c');
-    // TOP na mesma ordem do índice IX_Character_RankingTotal: lê só as
-    // primeiras linhas do índice, sem ordenar a tabela inteira.
+    // Desempate (decisão do usuário, 2026-11-27): com os mesmos resets, vence
+    // quem fez o último reset primeiro (MAX(UltimoReset) da ResetDiario).
+    // NULL vem antes no ASC: sem linha na ResetDiario = último reset mais
+    // antigo que a limpeza (mês-2), então chegou primeiro mesmo. Com 0
+    // resets todos são NULL e o nível decide; depois o nome (ordem estável).
     const result = await request.query(`
+      WITH Ultimo AS (
+        SELECT r.Name, MAX(r.UltimoReset) AS Ultimo
+        FROM dbo.ResetDiario r WITH (NOLOCK)
+        GROUP BY r.Name
+      )
       SELECT TOP (@top)
         c.Name        AS name,
         c.cLevel      AS level,
         c.Class       AS classCode,
         c.ResetsMonth AS resets,
-        ROW_NUMBER() OVER (ORDER BY c.ResetsMonth DESC, c.cLevel DESC) AS rank
+        ROW_NUMBER() OVER (ORDER BY c.ResetsMonth DESC, u.Ultimo ASC, c.cLevel DESC, c.Name) AS rank
       FROM Character c WITH (NOLOCK)
+      LEFT JOIN Ultimo u ON u.Name = c.Name
       ${whereClause}
-      ORDER BY c.ResetsMonth DESC, c.cLevel DESC;
+      ORDER BY c.ResetsMonth DESC, u.Ultimo ASC, c.cLevel DESC, c.Name;
     `);
     return { items: result.recordset, periodStart: null, periodEnd: null };
   }
