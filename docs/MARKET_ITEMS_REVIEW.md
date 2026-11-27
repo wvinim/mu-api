@@ -7,7 +7,8 @@ contra o `Item.txt` do servidor e o `Item.bmd` do client. Todos saem da box como
 **Regra (decisão 2026-11-24):** dos itens das boxes, só a cópia **excelente** pode ser anunciada
 (pelo menos um bit de excelente). Asas entram à parte: **só as de 1º nível** por enquanto.
 
-Os itens são **231**: 228 das boxes (nenhum aparece em mais de uma box) e 3 asas de 1º nível.
+Os itens são **233**: 228 das boxes (nenhum aparece em mais de uma box), 3 asas de 1º nível e
+2 joias (desde 2026-11-27).
 
 "✓ (gerada)": imagem renderizada a partir do modelo 3D do client (`Data/Item/*.bmd`),
 no mesmo ângulo e fundo das demais (2026-11-24). Todos os itens têm imagem.
@@ -172,6 +173,16 @@ Não saem das boxes (vêm do Chaos Machine). Não precisam ser excelentes.
 | `12:0` | Wings of Elf | 3x2 | Chaos Machine | ✓ (`Capas e Asas/Wing of Elf.jpg`) |
 | `12:1` | Wings of Heaven | 5x3 | Chaos Machine | ✓ (`Capas e Asas/Wing of Heaven.jpg`) |
 | `12:2` | Wings of Satan | 5x2 | Chaos Machine | ✓ (`Capas e Asas/Wing of Satan.jpg`) |
+
+## Joias (2)
+
+Liberadas em 2026-11-27. Qualquer cópia, sem classe. Imagens geradas por
+`scripts/itemRender/jewels.py` (modelos `Jewel85.bmd` e `Jewel93.bmd` do client).
+
+| Item | Nome | Tam. | Imagem |
+|---|---|---|---|
+| `14:84` | Jewel of Excellent | 1x1 | ✓ (gerada, `Jewels/Jewel of Excellent.jpg`) |
+| `14:92` | Jewel of Reset | 1x1 | ✓ (gerada, `Jewels/Jewel of Reset.jpg`) |
 
 ## Fora desta fase
 

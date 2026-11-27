@@ -48,11 +48,29 @@ def load_texture(fname):
     return None, None
 
 
+MAP_FILE_KEY = bytes([0xD1, 0x73, 0x52, 0xF6, 0xD2, 0x9A, 0xCB, 0x27, 0x3E, 0xAF, 0x59, 0x31, 0x37, 0xB3, 0xE7, 0xA2])
+
+
+def map_file_decrypt(src):
+    out = bytearray(len(src))
+    key = 0x5E
+    for i, b in enumerate(src):
+        out[i] = ((b ^ MAP_FILE_KEY[i % 16]) - key) & 0xFF
+        key = (b + 0x3D) & 0xFF
+    return bytes(out)
+
+
 def load_bmd(name):
     path = find_file(name + '.bmd')
     d = open(path, 'rb').read()
-    assert d[:3] == b'BMD' and d[3] == 10, (name, d[:4])
-    p = 4 + 32
+    assert d[:3] == b'BMD' and d[3] in (10, 12), (name, d[:4])
+    if d[3] == 12:
+        # 0x0C: corpo cifrado com o MapFile (ZzzLodTerrain.h), tamanho em d[4:8]
+        size = struct.unpack_from('<i', d, 4)[0]
+        d = map_file_decrypt(d[8:8 + size])
+        p = 32
+    else:
+        p = 4 + 32
     nm, nb, na = struct.unpack_from('<hhh', d, p); p += 6
     meshes = []
     for _ in range(nm):

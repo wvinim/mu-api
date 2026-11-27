@@ -2,7 +2,7 @@ const Joi = require('joi');
 const { CATEGORY_IDS, CLASS_IDS } = require('../services/marketItemService');
 
 // Limites da decisão 4 (docs/SECTION_14_MARKET.md). A procedure confere de novo.
-const MIN_PRICE = 10;
+const MIN_PRICE = 3;
 const MAX_PRICE = 10000;
 
 const listingIdParam = Joi.object({

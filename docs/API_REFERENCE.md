@@ -264,10 +264,10 @@ front pode esconder o menu do mercado ao receber esse erro.
 | GET | `/admin/market/repeated-serials` | 🔒 admin | — | `{ serials }` (ver abaixo) |
 
 **`/market/catalog`** (para montar os filtros):
-- `categories: [{ id, label, group }]`. `id` é um de `sword, axe, mace, scepter, spear, bow, crossbow, staff, shield, helm, armor, pants, gloves, boots, ring, pendant, wing`. `group` agrupa no menu: `weapon`, `shield`, `set`, `accessory`, `wing`.
+- `categories: [{ id, label, group }]`. `id` é um de `sword, axe, mace, scepter, spear, bow, crossbow, staff, shield, helm, armor, pants, gloves, boots, ring, pendant, wing, jewel`. `group` agrupa no menu: `weapon`, `shield`, `set`, `accessory`, `wing`, `jewel`.
 - `classes: [{ id, label }]`, com `id` em `dw, dk, elf, mg, dl`.
-- `items: [{ group, index, name, category, width, height, classes, image, excellentRequired }]`: os 231 itens que podem ser vendidos. Sets = mesmo `index` nos grupos 7 a 11 (ex.: Dragon = `index` 1).
-- `rules: { minPrice: 10, maxPrice: 10000, feePercent: 10, listingLimit: 10, listingDays: 7 }`.
+- `items: [{ group, index, name, category, width, height, classes, image, excellentRequired }]`: os 233 itens que podem ser vendidos. Sets = mesmo `index` nos grupos 7 a 11 (ex.: Dragon = `index` 1). Joias (`category: "jewel"`, desde 2026-11-27): Jewel of Excellent (`14:84`) e Jewel of Reset (`14:92`), com `classes: []` (não são equipamento: não aparecem no filtro de classe) e `item.excellent: []`, `additionalOptionText: null`.
+- `rules: { minPrice: 3, maxPrice: 10000, feePercent: 10, minFee: 1, listingLimit: 10, listingDays: 7 }`. A taxa é `feePercent`% do preço **arredondado para cima**, nunca menos que `minFee`: o vendedor recebe `floor(price * 0.9)` (ex.: 3 → recebe 2, taxa 1; 10 → 9 e 1; 11 → 9 e 2). Use as `rules` em vez de números fixos no front.
 
 **`image`** é o caminho relativo dentro do pacote de imagens do mercado (ex.: `"Helm/Dragon Helm.jpg"`, `"Capas e Asas/Wing of Satan.jpg"`). As imagens (92x119 JPG) vêm de `docs/imgs_shop/` do backend; o front serve como arquivos estáticos e monta a URL. O caminho tem espaços, então use `encodeURI`.
 

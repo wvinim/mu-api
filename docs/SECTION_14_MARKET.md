@@ -11,7 +11,9 @@ troca de mão.
    (ativo em `warehouse` ou guardado em `Extwarehouse`).
 2. **Origem do anúncio**: baú ativo e baús guardados. Conta precisa estar offline.
 3. **Taxa de venda: 10%**. O vendedor recebe `floor(preço × 0,9)`; o resto sai do jogo.
-4. **Limites**: no máximo 10 anúncios por conta; preço de 10 a 10.000 gold;
+4. **Limites**: no máximo 10 anúncios por conta; preço de 10 a 10.000 gold
+   (**3 a 10.000 desde 2026-11-27**, migration 0020; a taxa continua 10%
+   arredondada para cima, no mínimo 1 gold);
    o anúncio **expira em 7 dias** e fica "expirado" até o dono resgatar.
 5. Qualquer conta pode anunciar (não exige VIP).
 6. **Itens permitidos**: só asas, sets, armas, escudos, pendants e rings.
@@ -19,6 +21,8 @@ troca de mão.
    - Fase 1: drops das Box of Kundun +1..+5, **só a cópia excelente**.
    - Asas: **só as de 1º nível** (Elf, Heaven, Satan; 12:0..12:2). As de 2º nível
      e a Cape of Lord ainda não estão liberadas.
+   - Joias (2026-11-27): **Jewel of Excellent (14:84) e Jewel of Reset (14:92)**,
+     categoria `jewel`, sem classe.
 7. A loja do site não vende nada dessas categorias, então não há conflito de revenda.
 8. **Serial repetido**: não recusar o anúncio, mas avisar o admin quando o mesmo
    item (serial ≠ 0) for anunciado repetidas vezes.
@@ -87,7 +91,7 @@ Rotas e contrato: `docs/API_REFERENCE.md`, seção "Mercado entre jogadores".
 - `src/routes/market.js`, `src/controllers/marketController.js`,
   `src/db/marketRepository.js`, `src/services/marketItemService.js`,
   `src/validators/marketValidators.js`.
-- Catálogo: `src/data/marketCatalog.json` (231 itens), gerado por
+- Catálogo: `src/data/marketCatalog.json` (233 itens), gerado por
   `node scripts/generateMarketCatalog.js`. Rode de novo quando mudar as bags,
   as asas liberadas ou as imagens. Lê o `Item.txt` do servidor em
   `../MuPRO/server/Data/Item/Item.txt` ou no caminho passado como argumento.
@@ -120,3 +124,27 @@ Rotas e contrato: `docs/API_REFERENCE.md`, seção "Mercado entre jogadores".
    - tentar anunciar com a conta online (precisa dar `ACCOUNT_ONLINE`).
 4. Tudo certo: `MARKET_ENABLED=true` e reinicie o pm2.
 5. Front-end: copiar `docs/imgs_shop/` para os arquivos estáticos do mu-front.
+
+## Joias e preço mínimo 3 (2026-11-27)
+
+- Jewel of Excellent (`14:84`) e Jewel of Reset (`14:92`) entram no catálogo
+  (`JEWELS` em `scripts/generateMarketCatalog.js`), categoria `jewel` ("Joias"),
+  `classes: []`, sem exigir excelente. O nome do servidor "Jewel of Excelente"
+  é exibido como "Jewel of Excellent" (`NAMES`).
+- O catálogo foi gerado com o Item.txt de
+  `../MuPRO/source/server/GameServer/Data/Item/Item.txt`: a cópia padrão
+  (`../MuPRO/server/Data/Item/Item.txt`) ainda não tem a 14:92.
+- Imagens: `docs/imgs_shop/Jewels/`, renderizadas por `scripts/itemRender/jewels.py`
+  a partir de `Jewel85.bmd`/`Jewel93.bmd` (BMD 0x0C; `bmd.py` agora decifra o
+  MapFile).
+- Preço mínimo 10 → 3: validador (`MIN_PRICE`), `rules.minPrice` e migration
+  `0020_market_preco_minimo_3.sql` (CHECK da tabela + `WebMarket_Create`).
+  `rules.minFee: 1` informa o front. A taxa não mudou: `WebMarket_Buy` já
+  cobra 10% arredondado para cima, que dá no mínimo 1 gold.
+
+### Passos manuais
+
+1. **Aplicar a migration 0020 ANTES do deploy** (com a API nova e o banco velho,
+   anúncios de 3 a 9 gold falham com 500 `MARKET_INVALID_OPERATION`, sem
+   alterar nada).
+2. Front: copiar `docs/imgs_shop/Jewels/` para `mu-front/public/img/market/Jewels/`.

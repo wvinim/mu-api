@@ -6,6 +6,7 @@ const accountsRepository = require('../db/accountsRepository');
 const auditLog = require('../db/auditLogRepository');
 const marketItems = require('../services/marketItemService');
 const warehouseService = require('../services/warehouseService');
+const { MIN_PRICE, MAX_PRICE } = require('../validators/marketValidators');
 
 /**
  * Mercado entre jogadores — docs/SECTION_14_MARKET.md.
@@ -18,6 +19,8 @@ const warehouseService = require('../services/warehouseService');
 const MAX_ATTEMPTS = 3;
 const LISTING_LIMIT = 10;
 const FEE_PERCENT = 10;
+// Taxa = 10% arredondado para cima (WebMarket_Buy): nunca menos de 1 gold.
+const MIN_FEE = 1;
 const ITEM_BYTES = 16;
 const EMPTY_SLOT = Buffer.alloc(ITEM_BYTES, 0xff);
 
@@ -132,9 +135,10 @@ function getCatalog(req, res) {
   res.json({
     ...marketItems.publicCatalog(),
     rules: {
-      minPrice: 10,
-      maxPrice: 10000,
+      minPrice: MIN_PRICE,
+      maxPrice: MAX_PRICE,
       feePercent: FEE_PERCENT,
+      minFee: MIN_FEE,
       listingLimit: LISTING_LIMIT,
       listingDays: 7,
     },

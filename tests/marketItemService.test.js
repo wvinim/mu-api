@@ -4,9 +4,9 @@ const catalog = require('../src/data/marketCatalog.json');
 const { makeItemBytes, makeVault } = require('./helpers/marketItems');
 
 describe('catálogo do mercado', () => {
-  it('tem os 231 itens da fase 1, todos com imagem e tamanho', () => {
+  it('tem os 231 itens da fase 1 + 2 joias, todos com imagem e tamanho', () => {
     const entries = Object.values(catalog);
-    expect(entries).toHaveLength(231);
+    expect(entries).toHaveLength(233);
     for (const e of entries) {
       expect(e.image).toEqual(expect.any(String));
       expect(e.width).toBeGreaterThan(0);
@@ -19,6 +19,15 @@ describe('catálogo do mercado', () => {
     const wings = Object.values(catalog).filter((e) => e.category === 'wing');
     expect(wings.map((w) => `${w.group}:${w.index}`).sort()).toEqual(['12:0', '12:1', '12:2']);
     expect(wings.every((w) => w.excellentRequired === false)).toBe(true);
+  });
+
+  it('joias: só Jewel of Excellent e Jewel of Reset, sem classe e sem exigir excelente', () => {
+    const jewels = Object.values(catalog).filter((e) => e.category === 'jewel');
+    expect(jewels.map((j) => `${j.group}:${j.index} ${j.name}`).sort()).toEqual([
+      '14:84 Jewel of Excellent',
+      '14:92 Jewel of Reset',
+    ]);
+    expect(jewels.every((j) => j.excellentRequired === false && j.classes.length === 0)).toBe(true);
   });
 });
 
@@ -68,7 +77,14 @@ describe('ineligibilityReason', () => {
     expect(reason({ group: 12, index: 3 })).toBe('NOT_IN_CATALOG');
   });
 
-  it('item fora do catálogo (joia) e ancient ficam de fora', () => {
+  it('Jewel of Excellent e Jewel of Reset entram, sem excelentes nem opção adicional', () => {
+    expect(reason({ group: 14, index: 84 })).toBeNull();
+    expect(reason({ group: 14, index: 92 })).toBeNull();
+    const jewel = marketItems.decodeItem(makeItemBytes({ group: 14, index: 92 }));
+    expect(jewel).toEqual(expect.objectContaining({ name: 'Jewel of Reset', category: 'jewel', excellent: [], additionalOptionText: null }));
+  });
+
+  it('item fora do catálogo (Jewel of Bless) e ancient ficam de fora', () => {
     expect(reason({ group: 14, index: 13 })).toBe('NOT_IN_CATALOG');
     expect(reason({ group: 7, index: 1, exc: 1, ancient: true })).toBe('ANCIENT');
   });

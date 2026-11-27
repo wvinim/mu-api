@@ -63,8 +63,8 @@ describe('acesso', () => {
   it('o catálogo é público', async () => {
     const res = await request(app).get('/api/v1/market/catalog');
     expect(res.status).toBe(200);
-    expect(res.body.items).toHaveLength(231);
-    expect(res.body.rules).toEqual({ minPrice: 10, maxPrice: 10000, feePercent: 10, listingLimit: 10, listingDays: 7 });
+    expect(res.body.items).toHaveLength(233);
+    expect(res.body.rules).toEqual({ minPrice: 3, maxPrice: 10000, feePercent: 10, minFee: 1, listingLimit: 10, listingDays: 7 });
   });
 
   it('seriais repetidos: só admin', async () => {
@@ -135,7 +135,7 @@ describe('POST /market/listings (anunciar)', () => {
     const res = await request(app)
       .post('/api/v1/market/listings')
       .set('Authorization', authHeader())
-      .send({ vaultId: 0, slot: 3, price: 9 });
+      .send({ vaultId: 0, slot: 3, price: 2 });
     expect(res.status).toBe(400);
   });
 
@@ -343,7 +343,7 @@ describe('GET /market/listings (busca)', () => {
   });
 
   it('categoria inválida: 400', async () => {
-    const res = await request(app).get('/api/v1/market/listings?category=jewel').set('Authorization', authHeader());
+    const res = await request(app).get('/api/v1/market/listings?category=potion').set('Authorization', authHeader());
     expect(res.status).toBe(400);
   });
 });

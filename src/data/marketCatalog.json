@@ -3408,5 +3408,29 @@
     "box": 2,
     "excellentRequired": true,
     "image": "Pendants/Pendant of Ability.jpg"
+  },
+  "14:84": {
+    "group": 14,
+    "index": 84,
+    "name": "Jewel of Excellent",
+    "category": "jewel",
+    "width": 1,
+    "height": 1,
+    "classes": [],
+    "box": null,
+    "excellentRequired": false,
+    "image": "Jewels/Jewel of Excellent.jpg"
+  },
+  "14:92": {
+    "group": 14,
+    "index": 92,
+    "name": "Jewel of Reset",
+    "category": "jewel",
+    "width": 1,
+    "height": 1,
+    "classes": [],
+    "box": null,
+    "excellentRequired": false,
+    "image": "Jewels/Jewel of Reset.jpg"
   }
 }

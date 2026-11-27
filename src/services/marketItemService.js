@@ -41,6 +41,7 @@ const CATEGORIES = [
   { id: 'ring', label: 'Anéis', group: 'accessory' },
   { id: 'pendant', label: 'Pendants', group: 'accessory' },
   { id: 'wing', label: 'Asas', group: 'wing' },
+  { id: 'jewel', label: 'Joias', group: 'jewel' },
 ];
 const CATEGORY_IDS = CATEGORIES.map((c) => c.id);
 
@@ -77,11 +78,12 @@ const SET_CATEGORIES = new Set(['helm', 'armor', 'pants', 'gloves', 'boots']);
 function excellentTable(category) {
   if (ATTACK_CATEGORIES.has(category)) return ATTACK_EXCELLENT;
   if (category === 'wing') return null; // asas de 1º nível não têm excelentes
+  if (category === 'jewel') return null;
   return DEFENSE_EXCELLENT;
 }
 
 function additionalOptionText(category, value) {
-  if (value === 0) return null;
+  if (value === 0 || category === 'jewel') return null;
   if (category === 'staff') return `Dano de magia adicional +${value * 4}`;
   if (category === 'shield') return `Taxa de defesa adicional +${value * 5}`;
   if (SET_CATEGORIES.has(category)) return `Defesa adicional +${value * 4}`;

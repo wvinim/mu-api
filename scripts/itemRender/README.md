@@ -9,6 +9,8 @@ fundo cinza em degradê), renderizando os modelos 3D do client
 - `render.py`: rasterizador por software (z-buffer, supersampling 4x, luz
   difusa + especular, faces dos dois lados).
 - `sheet.py`: monta uma folha de teste a partir de um JSON de jobs.
+- `jewels.py`: Jewel of Excellent e Jewel of Reset (`Jewel85`/`Jewel93`, BMD 0x0C:
+  `bmd.py` decifra o MapFile).
 - `final.py`: gera as 28 imagens que faltavam (escudos, anéis, pendants,
   Blade, Divine Staff of Archangel).
 

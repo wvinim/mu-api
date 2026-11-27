@@ -6,6 +6,7 @@
  *   - docs/bags/EventItembag8..12.txt  -> drops das Box of Kundun +1..+5
  *     (só a cópia excelente pode ser anunciada)
  *   - WINGS abaixo                      -> asas de 1º nível (qualquer cópia)
+ *   - JEWELS abaixo                     -> joias custom (qualquer cópia, sem classe)
  *   - Item.txt do SERVIDOR              -> nome, tamanho (X/Y) e classes
  *     (5 últimas colunas: DW, DK, Elf, MG, DL; valor > 0 = pode usar).
  *     docs/inv/Item.txt está defasado; por padrão lê a cópia do servidor
@@ -30,6 +31,15 @@ const BAGS = { 1: 8, 2: 9, 3: 10, 4: 11, 5: 12 };
 
 // Asas liberadas no mercado (decisão 2026-11-24: só 1º nível).
 const WINGS = ['12:0', '12:1', '12:2'];
+
+// Joias liberadas no mercado (2026-11-27). Não são equipamento: sem classe.
+// Imagens: scripts/itemRender/jewels.py.
+const JEWELS = ['14:84', '14:92'];
+
+// Nome no servidor -> nome exibido, quando o do Item.txt está errado.
+const NAMES = {
+  'Jewel of Excelente': 'Jewel of Excellent',
+};
 
 // Nome no servidor -> nome do arquivo de imagem, quando diferem.
 const ALIASES = {
@@ -91,6 +101,7 @@ function categoryOf(group, index, name) {
     case 6: return 'shield';
     case 12: return 'wing';
     case 13: return PENDANTS.has(index) ? 'pendant' : 'ring';
+    case 14: return JEWELS.includes(`${group}:${index}`) ? 'jewel' : null;
     default: return SET_PIECES[group] || null;
   }
 }
@@ -114,23 +125,24 @@ function main() {
   const entries = {};
   const problems = [];
 
-  const add = (key, box, excellentRequired) => {
+  const add = (key, box, excellentRequired, noClasses = false) => {
     if (entries[key]) { problems.push(`${key} aparece mais de uma vez`); return; }
     const info = itemTxt[key];
     if (!info) { problems.push(`${key} não existe no Item.txt`); return; }
     const [group, index] = key.split(':').map(Number);
     const category = categoryOf(group, index, info.name);
     if (!category) { problems.push(`${key} ${info.name}: categoria fora do mercado`); return; }
-    const image = findImage(info.name);
-    if (!image) problems.push(`${key} ${info.name}: sem imagem`);
+    const name = NAMES[info.name] || info.name;
+    const image = findImage(name);
+    if (!image) problems.push(`${key} ${name}: sem imagem`);
     entries[key] = {
       group,
       index,
-      name: info.name,
+      name,
       category,
       width: info.width,
       height: info.height,
-      classes: info.classes,
+      classes: noClasses ? [] : info.classes,
       box,
       excellentRequired,
       image,
@@ -141,6 +153,7 @@ function main() {
     for (const key of parseBag(path.join(BAGS_DIR, `EventItembag${bag}.txt`))) add(key, Number(box), true);
   }
   for (const key of WINGS) add(key, null, false);
+  for (const key of JEWELS) add(key, null, false, true);
 
   if (problems.length) {
     console.error(problems.join('\n'));
