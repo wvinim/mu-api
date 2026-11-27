@@ -10,6 +10,7 @@
 const CAMPAIGNS = Object.freeze({
   inauguracao: require('./launchWeekEmail'),
   'tudo-que-faltava': require('./everythingMissingEmail'),
+  estreia: require('./launchDayEmail'),
 });
 
 function getCampaign(key) {

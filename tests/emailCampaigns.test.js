@@ -111,6 +111,20 @@ describe('público da campanha tudo-que-faltava', () => {
     expect(recipients).toEqual([{ email: 'mesmo@x.com', accountId: 'ok1', name: 'Ok' }]);
   });
 
+  it('estreia usa o mesmo público: banidas e não confirmadas entram, contas de teste não', async () => {
+    emailCampaignsRepository.findRecipientAccounts.mockResolvedValue([
+      { username: 'ok1', displayName: 'Ok', email: 'ok@x.com', emailConfirmedFlag: '1', banFlag: '0' },
+      { username: 'pend', displayName: 'P', email: 'pend@x.com', emailConfirmedFlag: '0', banFlag: '0' },
+      { username: 'ban', displayName: 'B', email: 'ban@x.com', emailConfirmedFlag: '1', banFlag: '1' },
+      { username: 'TesteBeta', displayName: 'T', email: 'beta@x.com', emailConfirmedFlag: '1', banFlag: '0' },
+      { username: 'teste001', displayName: 'T', email: 't1@x.com', emailConfirmedFlag: '1', banFlag: '0' },
+    ]);
+
+    const recipients = await emailCampaignService.findPendingRecipients('estreia');
+
+    expect(recipients.map((r) => r.accountId)).toEqual(['ok1', 'pend', 'ban']);
+  });
+
   it('sem audience (inauguração), banidas continuam de fora e não confirmadas entram', async () => {
     emailCampaignsRepository.findRecipientAccounts.mockResolvedValue([
       { username: 'pend', displayName: 'P', email: 'pend@x.com', emailConfirmedFlag: '0', banFlag: '0' },
@@ -134,6 +148,22 @@ describe('assunto com o nome do jogador', () => {
 
     const [, message] = emailService.sendCampaignEmail.mock.calls[0];
     expect(message.subject).toBe('Olá, Fulano! 🔥 Agora tem app mobile, AFK, party com senha e autoreset no MU PRO');
+  });
+
+  it('estreia começa com "Olá, <nome>!" e o HTML tem o nome escapado, a arte e o descadastro', async () => {
+    emailCampaignsRepository.findRecipientAccounts.mockResolvedValue([
+      { username: 'ok1', displayName: 'Fu<la>no', email: 'ok@x.com', emailConfirmedFlag: '1', banFlag: '0' },
+    ]);
+
+    await request(app).post('/api/v1/admin/email-campaigns/estreia/send').set('Authorization', authHeader('adminuser'));
+    await waitForJob('estreia');
+
+    const [, message] = emailService.sendCampaignEmail.mock.calls[0];
+    expect(message.subject).toBe('Olá, Fu<la>no! 🚀 O MU PRO está no ar, com bosses, ranking premiado e Black Friday');
+    expect(message.html).toContain('Olá, Fu&lt;la&gt;no!');
+    expect(message.html).toContain('https://mupro.vip/img/email-estreia.jpg');
+    expect(message.html).toContain('Não quero mais receber novidades');
+    expect(message.text).toContain('Para não receber mais novidades:');
   });
 
   it('o status mostra o assunto com {nome}', async () => {

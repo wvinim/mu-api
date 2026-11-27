@@ -10,7 +10,7 @@ painel de admin, com descadastro.
   Quem se descadastrou e quem já recebeu a campanha ficam de fora.
 - **Público por campanha (opcional):** o módulo da campanha pode exportar
   `audience = { includeBanned, confirmedEmailOnly, excludeAccounts }`. Ex.:
-  a `tudo-que-faltava` (2026-11-21) vai para todas as contas com e-mail
+  a `tudo-que-faltava` (2026-11-21) e a `estreia` (2026-11-27) vão para todas as contas com e-mail
   (confirmado ou não, banidas inclusive) menos as contas de teste
   `testebeta` e `teste001`. Sem `audience`, vale a regra acima.
 - **Teste primeiro:** `POST /admin/email-campaigns/:key/test` manda só para
