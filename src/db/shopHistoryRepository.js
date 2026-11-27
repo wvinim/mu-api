@@ -20,7 +20,8 @@ async function findByAccount(accountId, { page = 1, limit = 20 } = {}) {
       CreditsAmount AS creditsAmount,
       Status AS status,
       CreatedAt AS createdAt
-    FROM WebPixCharges WHERE AccountId = @accountId
+    -- Só cobranças pagas: PIX gerado e não pago (pending/expired/failed) não é compra.
+    FROM WebPixCharges WHERE AccountId = @accountId AND Status = 'paid'
 
     UNION ALL
 

@@ -156,7 +156,7 @@ inventário).
 | GET | `/shop/items/:id` | não | `id` = `credit:<n>`, `item:<n>` ou `bundle:<n>` | uma entrada do catálogo, 404 se inativo/inexistente |
 | POST | `/shop/purchase` | 🔒 | `{ catalogId, gift? }` — mesmo body pra todo tipo de compra, nenhuma recebe `characterName`; `gift: true` só com `credit:*` (ver "Gold de presente") | ver abaixo |
 | GET | `/shop/credits` | 🔒 | — | `{ cash }` |
-| GET | `/shop/history` | 🔒 | `?page&limit` | `{ page, limit, total, items }` — unifica compras de crédito (`credit_purchase`) + compras de presente (`gift_purchase`) + resgates de item + resgates de pacote + compras de VIP (`vip_purchase`) + resgates de chave de presente (`gift_redemption`, `reference` = 4 últimos caracteres da chave) |
+| GET | `/shop/history` | 🔒 | `?page&limit` | `{ page, limit, total, items }` — unifica compras de crédito (`credit_purchase`) + compras de presente (`gift_purchase`) — só cobranças PIX com status `paid` + resgates de item + resgates de pacote + compras de VIP (`vip_purchase`) + resgates de chave de presente (`gift_redemption`, `reference` = 4 últimos caracteres da chave) |
 | GET | `/shop/charges/:txid` | 🔒 | — | status de uma cobrança Pix **da própria conta** (ver "Gold de presente"). 404 se não existe ou é de outra conta |
 | GET | `/shop/gift-codes` | 🔒 | `?page&limit` | `{ page, limit, total, items }` — chaves de presente compradas pela conta |
 | POST | `/shop/gift-codes/redeem` | 🔒 | `{ code }` | `{ type: "gift_code_redeemed", creditsAmount }` |
