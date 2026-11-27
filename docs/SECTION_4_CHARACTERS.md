@@ -62,3 +62,27 @@ documentação da Efí) antes de eu poder codar qualquer coisa.
   aplicar a migration **antes** do deploy desta mudança (sem a coluna, o
   ranking dá erro de SQL) e avisar quando aplicou.
 
+## Adendo (2026-11-26): ranking por período, top 10
+
+Com o limite de 200 resets e a troca de 100 resets no Time Collector, o
+ranking por `Resets` deixou de medir progresso. Agora:
+
+- `?period=total|month|week|day` (+ `previous=true` para o período
+  anterior). Sempre top 10.
+- **Total** = `Character.ResetsMonth` (nunca zerada desde o wipe, não diminui
+  no Time Collector = total histórico). Índice `IX_Character_RankingTotal`.
+- **Dia/semana/mês** = `SUM(Qtd)` da `dbo.ResetDiario` (1 linha por
+  personagem por dia), gravada pelo trigger `TR_Character_ResetDiario` em
+  `Character` (script `sql/2026-11-26_reset_diario.sql` do repositório do
+  GameServer). O trigger só conta `Resets` subindo exatamente +1.
+- As datas do período são calculadas no SQL (`GETDATE()` = horário de
+  Brasília na VPS). Não calcular em JS: o driver trabalha em UTC.
+- Consultas com `WITH (NOLOCK)`: ranking nunca bloqueia o gameserver.
+- Cache: 180s no período atual, 1h no anterior
+  (`RANKING_PREVIOUS_CACHE_TTL_SECONDS`); a chave inclui o dia de Brasília,
+  então a virada do dia não deixa "hoje" preso no dia anterior.
+- **Ordem de deploy:** script do GameServer → `migrations/0019_ranking_periodo.sql`
+  (GRANT + índice) → API → front. A API antiga continua funcionando com a
+  tabela nova; a API nova sem a tabela dá erro só nos períodos.
+- Limpeza futura (manter mês atual + 2 anteriores):
+  `DELETE FROM dbo.ResetDiario WHERE Dia < DATEADD(month, DATEDIFF(month, 0, GETDATE()) - 2, 0)`.

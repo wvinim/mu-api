@@ -19,50 +19,96 @@ function mockPool() {
     },
     query: jest.fn((text) => {
       queries.push(text);
-      return Promise.resolve({ recordsets: [[], [{ total: 0 }]] });
+      return Promise.resolve({
+        recordset: [],
+        recordsets: [[], [{ periodStart: '2026-11-23', periodEnd: '2026-11-29' }]],
+      });
     }),
   };
   getPool.mockReturnValue({ request: () => req });
   return { inputs, queries };
 }
 
-describe('charactersRepository.findRanking', () => {
-  it('filtra a raça inteira por faixa, no ranking e no total', async () => {
+describe('charactersRepository.findRanking — total', () => {
+  it('top N pelo total histórico (ResetsMonth), sem ler ResetDiario', async () => {
     const { inputs, queries } = mockPool();
 
-    await charactersRepository.findRanking({ page: 1, limit: 20, raceCode: 0 });
+    await charactersRepository.findRanking({ period: 'total', limit: 10 });
 
-    expect(inputs).toMatchObject({ raceMin: 0, raceMax: 16 });
-    const sqlText = queries[0];
-    expect(sqlText).not.toMatch(/Class = @/);
-    // Aparece duas vezes: no CTE do ranking e no COUNT do total.
-    expect(sqlText.match(/WHERE HideFromRanking = 0 AND Class >= @raceMin AND Class < @raceMax/g)).toHaveLength(2);
-    expect(sqlText).toMatch(/ORDER BY Resets DESC, cLevel DESC/);
+    expect(inputs.top).toBe(10);
+    expect(queries[0]).toMatch(/SELECT TOP \(@top\)/);
+    expect(queries[0]).toMatch(/ORDER BY c\.ResetsMonth DESC, c\.cLevel DESC;/);
+    expect(queries[0]).toMatch(/Character c WITH \(NOLOCK\)/);
+    expect(queries[0]).not.toMatch(/ResetDiario/);
+    expect(queries[0]).toMatch(/WHERE c\.HideFromRanking = 0\s/);
   });
 
-  it('sem filtro de raça só esconde os marcados com HideFromRanking', async () => {
+  it('nunca passa de 10, mesmo pedindo mais', async () => {
+    const { inputs } = mockPool();
+    await charactersRepository.findRanking({ period: 'total', limit: 50 });
+    expect(inputs.top).toBe(10);
+  });
+
+  it('filtra a raça inteira por faixa', async () => {
     const { inputs, queries } = mockPool();
 
-    await charactersRepository.findRanking({ page: 1, limit: 20 });
+    await charactersRepository.findRanking({ period: 'total', raceCode: 16 });
 
-    expect(inputs.raceMin).toBeUndefined();
-    expect(queries[0]).not.toMatch(/Class >= @raceMin/);
-    // No ranking e no COUNT do total.
-    expect(queries[0].match(/WHERE HideFromRanking = 0[\s;]/g)).toHaveLength(2);
+    expect(inputs).toMatchObject({ raceMin: 16, raceMax: 32 });
+    expect(queries[0]).toMatch(/WHERE c\.HideFromRanking = 0 AND c\.Class >= @raceMin AND c\.Class < @raceMax/);
+  });
+});
+
+describe('charactersRepository.findRanking — períodos', () => {
+  it.each(['day', 'week', 'month'])('%s soma ResetDiario no intervalo, datas calculadas no SQL', async (period) => {
+    const { inputs, queries } = mockPool();
+
+    const result = await charactersRepository.findRanking({ period, previous: true });
+
+    expect(inputs).toMatchObject({ prev: 1, top: 10 });
+    const q = queries[0];
+    expect(q).toMatch(/SET @Hoje = CAST\(GETDATE\(\) AS date\)/);
+    expect(q).toMatch(/FROM dbo\.ResetDiario r WITH \(NOLOCK\)\s+WHERE r\.Dia BETWEEN @Ini AND @Fim/);
+    expect(q).toMatch(/JOIN Character c WITH \(NOLOCK\) ON c\.Name = s\.Name/);
+    expect(q).toMatch(/ORDER BY s\.Qtd DESC, s\.Ultimo ASC, c\.Name/);
+    expect(q).toMatch(/WHERE c\.HideFromRanking = 0\s/);
+    expect(q).not.toMatch(/OFFSET|FETCH/);
+    // Sem variável @Prev (conflitaria com o parâmetro @prev em collation CI).
+    expect(q).not.toMatch(/DECLARE[^;]*@Prev/i);
+    expect(result).toEqual({ items: [], periodStart: '2026-11-23', periodEnd: '2026-11-29' });
+  });
+
+  it('período atual manda @prev = 0', async () => {
+    const { inputs } = mockPool();
+    await charactersRepository.findRanking({ period: 'week' });
+    expect(inputs.prev).toBe(0);
+  });
+
+  it('semana começa na segunda sem depender de DATEFIRST', async () => {
+    const { queries } = mockPool();
+    await charactersRepository.findRanking({ period: 'week' });
+    expect(queries[0]).toMatch(/DATEDIFF\(day, '19000101', @Hoje\) % 7/);
+    expect(queries[0]).not.toMatch(/DATEPART\(weekday|DATEFIRST/i);
+  });
+
+  it('período inválido dá erro antes de ir ao banco', async () => {
+    const { queries } = mockPool();
+    await expect(charactersRepository.findRanking({ period: 'year' })).rejects.toThrow(/period/);
+    expect(queries).toHaveLength(0);
   });
 });
 
 describe('charactersRepository.findRanking — colunas', () => {
-  it('expõe só nome, nível, classe e resets (sem build, experiência ou PvP)', async () => {
+  it.each(['total', 'week'])('%s expõe só nome, nível, classe e resets', async (period) => {
     const { queries } = mockPool();
 
-    await charactersRepository.findRanking({ page: 1, limit: 20 });
+    await charactersRepository.findRanking({ period });
 
     const select = queries[0].split('ROW_NUMBER()')[0];
     expect(select).toMatch(/Name\s+AS name/);
     expect(select).toMatch(/cLevel\s+AS level/);
     expect(select).toMatch(/Class\s+AS classCode/);
-    expect(select).toMatch(/Resets\s+AS resets/);
-    expect(select).not.toMatch(/Strength|Dexterity|Vitality|Energy|Leadership|Experience|PkCount|PkLevel|Money|MapPos/);
+    expect(select).toMatch(/AS resets/);
+    expect(select).not.toMatch(/Strength|Dexterity|Vitality|Energy|Leadership|Experience|PkCount|PkLevel|Money|MapPos|AccountID/);
   });
 });

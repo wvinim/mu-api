@@ -18,44 +18,69 @@ describe('GET /api/v1/characters/:name', () => {
 });
 
 describe('GET /api/v1/characters/ranking', () => {
-  it('usa paginação padrão e cacheia o resultado por parâmetro', async () => {
-    charactersRepository.findRanking.mockResolvedValue({ items: [{ name: 'Hero1', rank: 1 }], total: 1 });
+  const ok = (extra = {}) => ({ items: [{ name: 'Hero1', rank: 1 }], periodStart: null, periodEnd: null, ...extra });
+
+  it('padrão = total, top 10; cacheia por parâmetro', async () => {
+    charactersRepository.findRanking.mockResolvedValue(ok());
 
     const res1 = await request(app).get('/api/v1/characters/ranking');
     const res2 = await request(app).get('/api/v1/characters/ranking');
 
     expect(res1.status).toBe(200);
-    expect(res1.body.total).toBe(1);
+    expect(res1.body).toMatchObject({ period: 'total', previous: false, page: 1, limit: 10, total: 1 });
     expect(res2.body).toEqual(res1.body);
-    // A segunda chamada com os mesmos parâmetros deve vir do cache.
     expect(charactersRepository.findRanking).toHaveBeenCalledTimes(1);
-    expect(charactersRepository.findRanking).toHaveBeenCalledWith({ page: 1, limit: 20, raceCode: undefined });
+    expect(charactersRepository.findRanking).toHaveBeenCalledWith({
+      period: 'total',
+      previous: false,
+      limit: 10,
+      raceCode: undefined,
+    });
   });
 
-  it('rejeita limit acima de 100', async () => {
-    const res = await request(app).get('/api/v1/characters/ranking?limit=999');
-    expect(res.status).toBe(400);
+  it('limit acima de 10 vira 10 (front antigo manda 20); acima de 100 é 400', async () => {
+    charactersRepository.findRanking.mockResolvedValue(ok());
+
+    const res = await request(app).get('/api/v1/characters/ranking?page=3&limit=20&period=day');
+    expect(res.status).toBe(200);
+    expect(res.body.limit).toBe(10);
+    expect(charactersRepository.findRanking).toHaveBeenCalledWith(expect.objectContaining({ period: 'day', limit: 10 }));
+
+    expect((await request(app).get('/api/v1/characters/ranking?limit=999')).status).toBe(400);
   });
 
-  it('classCode filtra pela raça inteira (Grand Master=3 vira raça 0)', async () => {
-    charactersRepository.findRanking.mockResolvedValue({ items: [], total: 0 });
+  it('limit menor que 10 é respeitado (top 5 da home)', async () => {
+    charactersRepository.findRanking.mockResolvedValue(ok());
+    await request(app).get('/api/v1/characters/ranking?period=week&limit=5');
+    expect(charactersRepository.findRanking).toHaveBeenCalledWith(expect.objectContaining({ period: 'week', limit: 5 }));
+  });
 
-    const res = await request(app).get('/api/v1/characters/ranking?classCode=3&page=2&limit=5');
+  it('período anterior devolve as datas do período', async () => {
+    charactersRepository.findRanking.mockResolvedValue(ok({ periodStart: '2026-11-16', periodEnd: '2026-11-22' }));
+
+    const res = await request(app).get('/api/v1/characters/ranking?period=week&previous=true');
 
     expect(res.status).toBe(200);
-    expect(charactersRepository.findRanking).toHaveBeenCalledWith({ page: 2, limit: 5, raceCode: 0 });
+    expect(res.body).toMatchObject({ period: 'week', previous: true, periodStart: '2026-11-16', periodEnd: '2026-11-22' });
+    expect(charactersRepository.findRanking).toHaveBeenCalledWith(expect.objectContaining({ period: 'week', previous: true }));
   });
 
-  it('classCodes da mesma raça dividem a entrada de cache; raças diferentes não', async () => {
-    charactersRepository.findRanking.mockResolvedValue({ items: [], total: 0 });
+  it('rejeita período desconhecido e previous no total', async () => {
+    expect((await request(app).get('/api/v1/characters/ranking?period=year')).status).toBe(400);
+    expect((await request(app).get('/api/v1/characters/ranking?period=total&previous=true')).status).toBe(400);
+    expect(charactersRepository.findRanking).not.toHaveBeenCalled();
+  });
 
-    await request(app).get('/api/v1/characters/ranking?classCode=16&limit=7');
-    await request(app).get('/api/v1/characters/ranking?classCode=19&limit=7');
+  it('classCodes da mesma raça dividem a entrada de cache; raças e períodos diferentes não', async () => {
+    charactersRepository.findRanking.mockResolvedValue(ok());
+
+    await request(app).get('/api/v1/characters/ranking?classCode=16&period=month');
+    await request(app).get('/api/v1/characters/ranking?classCode=19&period=month');
     expect(charactersRepository.findRanking).toHaveBeenCalledTimes(1);
-    expect(charactersRepository.findRanking).toHaveBeenCalledWith({ page: 1, limit: 7, raceCode: 16 });
+    expect(charactersRepository.findRanking).toHaveBeenCalledWith(expect.objectContaining({ raceCode: 16 }));
 
-    await request(app).get('/api/v1/characters/ranking?classCode=32&limit=7');
-    expect(charactersRepository.findRanking).toHaveBeenCalledTimes(2);
-    expect(charactersRepository.findRanking).toHaveBeenLastCalledWith({ page: 1, limit: 7, raceCode: 32 });
+    await request(app).get('/api/v1/characters/ranking?classCode=32&period=month');
+    await request(app).get('/api/v1/characters/ranking?classCode=16&period=day');
+    expect(charactersRepository.findRanking).toHaveBeenCalledTimes(3);
   });
 });
