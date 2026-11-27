@@ -7,8 +7,8 @@
 --
 -- 1. GRANT SELECT em ResetDiario para o mu_api (só leitura; quem escreve é o
 --    trigger em Character).
--- 2. Índice do ranking "Total": ResetsMonth nunca é zerada desde o wipe nem
---    diminui no Time Collector, então é o total histórico de resets. Custo
+-- 2. Índice do ranking "Total": ResetsMonth nunca é zerada desde o wipe (a troca
+--    no Time Collector soma 1, como um reset), então é o total histórico de resets. Custo
 --    nas escritas de Character: ResetsMonth só muda num reset.
 --
 -- Os rankings de dia/semana/mês leem só o trecho de datas do índice
